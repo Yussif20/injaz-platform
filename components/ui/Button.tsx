@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    "bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700",
+    "bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700",
   secondary:
     "bg-secondary-700 text-white hover:bg-secondary-800 active:bg-secondary-900",
   success:
@@ -17,13 +17,13 @@ const variantClasses = {
   warning:
     "bg-warning-500 text-white hover:bg-warning-600 active:bg-warning-700",
   outline:
-    "border-2 border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100",
+    "border-2 bg-white border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100",
 };
 
 const sizeClasses = {
-  sm: "px-3 py-2 text-sm",
-  md: "px-4 py-2.5 text-base",
-  lg: "px-6 py-3 text-lg",
+  lg: "w-[200px] h-[54px] px-2 py-2 text-lg",
+  md: "w-[200px] h-[48px] px-2 py-2 text-base",
+  sm: "w-[200px] h-[32px] px-2 py-3 text-sm",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -44,7 +44,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={`
-          font-semibold rounded-lg transition-colors duration-200
+          flex justify-center items-center gap-2
+          font-normal rounded-4xl transition-colors duration-200
           disabled:opacity-50 disabled:cursor-not-allowed
           ${variantClasses[variant]}
           ${sizeClasses[size]}

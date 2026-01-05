@@ -1,0 +1,54 @@
+import { Button } from "@/components/ui";
+import { content } from "@/lib/content";
+import Image from "next/image";
+
+export const HeroSection = () => {
+  const { hero } = content;
+
+  return (
+    <section className="flex flex-col items-center justify-center px-4 py-10 ">
+      {/* Hero Title with Highlight */}
+      <h1 className="text-center max-w-4xl mb-12">
+        <span className="block text-4xl font-normal text-text-dark">
+          {hero.titleStart}
+          <span className="text-primary-500">{hero.titleHighlight}</span>
+          {hero.titleEnd1}
+          <br />
+          {hero.titleEnd2}
+        </span>
+      </h1>
+
+      {/* CTA Button with Icon */}
+      <Button variant="primary" size="lg" className="flex items-center gap-3">
+        <svg
+          className="h-6 w-6 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="12" cy="12" r="10" strokeWidth="2" />
+          <path
+            d="M12 8v8m-4-4h8"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        {hero.ctaButton}
+      </Button>
+
+      {/* Hero Image */}
+      <div className="py-8 w-full max-w-3xl bg-[url('/sections/hero/bg-blocks.png')] bg-no-repeat bg-center bg-cover">
+        <Image
+          src="/hero-image.png"
+          alt={hero.imageAlt}
+          width={1200}
+          height={675}
+          className="w-full h-auto rounded-lg"
+          priority
+        />
+      </div>
+    </section>
+  );
+};
