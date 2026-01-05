@@ -5,10 +5,10 @@ export const WhySection = () => {
   const { whySection } = content;
 
   return (
-    <section className="bg-white py-16 px-4">
+    <section className="bg-white text-text-dark py-16 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <h2 className="text-4xl font-normal text-text-dark text-center mb-12">
+        <h2 className="text-4xl font-normal  text-center mb-12">
           {whySection.title}
         </h2>
 
@@ -16,7 +16,7 @@ export const WhySection = () => {
         <div className="flex flex-col gap-6">
           {/* Card 1: Text Right, Image Left */}
           <div className="bg-card-bg rounded-3xl h-50 flex items-center justify-between px-8">
-            <p className="w-1/2 text-center text-[28px] text-text-dark">
+            <p className="w-1/2 text-center text-[28px] ">
               {whySection.card1Text}
             </p>
             <div className="w-1/2 flex items-center justify-center h-full">
@@ -31,12 +31,14 @@ export const WhySection = () => {
           </div>
 
           {/* Card 2: Two Sub-Cards */}
-          <div className="flex gap-6">
+          <div className="flex gap-6 text-xl">
             {/* Right Sub-Card: Title Top, Image Bottom */}
             <div className="flex-1 bg-card-bg rounded-3xl h-50 flex justify-between">
               <div className="flex flex-col items-end justify-end p-6">
-                <p className=" text-right text-xl text-text-dark">
-                  {whySection.card2RightTitle}
+                <p className=" text-right text-xl ">
+                  {whySection.card2RightTitleLine1}
+                  <br />
+                  {whySection.card2RightTitleLine2}
                 </p>
               </div>
               <div className="h-full">
@@ -51,13 +53,11 @@ export const WhySection = () => {
             </div>
 
             {/* Left Sub-Card: Image Top, Title Bottom */}
-            <div className="flex-1 bg-card-bg rounded-3xl h-50 p-6 flex flex-col justify-between">
-              <div className="flex-1 h-full pb-2">
-                <p className=" text-center text mt-2 text-xl text-text-dark">
-                  {whySection.card2LeftTitle}
-                </p>
+            <div className="flex-1 bg-card-bg rounded-3xl h-50 flex flex-col items-center justify-between">
+              <div className="flex-1 flex items-center justify-center">
+                <p className=" ">{whySection.card2LeftTitle}</p>
               </div>
-              <div className="flex items-start justify-center h-full">
+              <div className="flex-1 items-center justify-center h-full">
                 <Image
                   src="/sections/why/why-card-2-right.png"
                   alt="Card 2 Right"
@@ -80,7 +80,7 @@ export const WhySection = () => {
                 className="h-full w-full object-contain"
               />
             </div>
-            <p className="w-1/2 text-center text-[28px] text-text-dark">
+            <p className="w-1/2 text-center text-[28px] ">
               {whySection.card3Text}
             </p>
           </div>

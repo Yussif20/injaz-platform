@@ -25,9 +25,16 @@ export const content = {
   whySection: {
     title: "ليش انجاز المعلم؟",
     card1Text: "إمكانية الوصول من الموقع والجوال",
-    card2RightTitle: "إمكانية مشاركة الملف وتحميله PDF",
+    card2RightTitleLine1: "إمكانية مشاركة",
+    card2RightTitleLine2: " الملف وتحميله PDF",
     card2LeftTitle: "تصاميم مختلفة وأقسام متنوعة لكل رتبة",
     card3Text: "تحديثات سنوية لملف إنجازك",
+  },
+
+  bannerSection: {
+    title: "نهتم بكل تفاصيلك!",
+    subtitle: "شاركنا رحلتك المهنية الحين وانشئ ملفات انجازك معنا",
+    imageAlt: "Banner background",
   },
 
   howToSection: {
@@ -63,8 +70,20 @@ export const content = {
     backToHome: "العودة للصفحة الرئيسية",
   },
 
-  // Add more sections as you build them
   footer: {
-    // Footer content will go here
+    description:
+      "انجاز المعلم هو مشروع متخصص في تقديم خدمة إنشاء ملف إنجاز احترافي ومميز للمعلّمين، يساعدهم على توثيق خبراتهم، مهاراتهم، وإنجازاتهم التعليمية بشكل منظّم واحترافي.",
+    links: {
+      subscribe: "اشترك الآن",
+      createProfile: "أنشئ ملف",
+      downloadApp: "حمل التطبيق",
+      howToUse: "كيفية الإستخدام",
+    },
+    socialLinks: {
+      x: "https://x.com",
+      whatsapp: "https://wa.me",
+      tiktok: "https://tiktok.com",
+      instagram: "https://instagram.com",
+    },
   },
 };

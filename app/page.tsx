@@ -1,7 +1,9 @@
 import { Navbar } from "@/components/sections/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { WhySection } from "@/components/sections/WhySection";
+import { BannerSection } from "@/components/sections/BannerSection";
 import { HowToSection } from "@/components/sections/HowToSection";
+import { Footer } from "@/components/sections/Footer";
 
 export default function Home() {
   return (
@@ -22,6 +24,8 @@ export default function Home() {
       {/* White Background Sections */}
       <WhySection />
       <HowToSection />
+      {/* <BannerSection /> */}
+      <Footer />
     </main>
   );
 }
