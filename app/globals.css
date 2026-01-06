@@ -91,6 +91,7 @@
 html {
   scroll-behavior: smooth;
   direction: rtl;
+  overflow-x: hidden;
 }
 
 a,

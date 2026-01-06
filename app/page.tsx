@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/sections/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { WhySection } from "@/components/sections/WhySection";
-// import { BannerSection } from "@/components/sections/BannerSection";
+import { BannerSection } from "@/components/sections/BannerSection";
 import { HowToSection } from "@/components/sections/HowToSection";
 import { DesignChoiceSection } from "@/components/sections/DesignChoiceSection";
 import { MobileAppSection } from "@/components/sections/MobileAppSection";
@@ -24,12 +24,14 @@ export default function Home() {
       </div>
 
       {/* White Background Sections */}
-      <WhySection />
-      <HowToSection />
-      {/* <BannerSection /> */}
-      <DesignChoiceSection />
-      <MobileAppSection />
-      <Footer />
+      <div className="flex flex-col gap-16">
+        <WhySection />
+        <HowToSection />
+        <BannerSection />
+        <DesignChoiceSection />
+        <MobileAppSection />
+        <Footer />
+      </div>
     </main>
   );
 }

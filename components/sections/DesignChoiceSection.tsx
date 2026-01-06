@@ -19,7 +19,7 @@ export function DesignChoiceSection() {
           </p>
 
           {/* Image */}
-          <div className="w-full relative h-96">
+          <div className="w-full relative h-32 sm:h-48 md:h-96">
             <Image
               src="/sections/design-choice/smartphones.svg"
               alt={designChoiceSection.imageAlt}

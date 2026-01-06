@@ -12,7 +12,7 @@ export const HowToSection = () => {
           {howToSection.title}
         </h2>
 
-        <div className="flex gap-12 items-stretch">
+        <div className="flex flex-col md:flex-row gap-12 items-stretch">
           {/* Steps - Left Side */}
           <div className="flex-1 order-1 space-y-8">
             {howToSection.steps.map((step, index) => (
