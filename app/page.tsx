@@ -1,8 +1,10 @@
 import { Navbar } from "@/components/sections/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { WhySection } from "@/components/sections/WhySection";
-import { BannerSection } from "@/components/sections/BannerSection";
+// import { BannerSection } from "@/components/sections/BannerSection";
 import { HowToSection } from "@/components/sections/HowToSection";
+import { DesignChoiceSection } from "@/components/sections/DesignChoiceSection";
+import { MobileAppSection } from "@/components/sections/MobileAppSection";
 import { Footer } from "@/components/sections/Footer";
 
 export default function Home() {
@@ -25,6 +27,8 @@ export default function Home() {
       <WhySection />
       <HowToSection />
       {/* <BannerSection /> */}
+      <DesignChoiceSection />
+      <MobileAppSection />
       <Footer />
     </main>
   );

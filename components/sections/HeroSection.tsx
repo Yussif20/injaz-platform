@@ -41,7 +41,7 @@ export const HeroSection = () => {
       {/* Hero Image */}
       <div className="py-8 w-full max-w-3xl bg-[url('/sections/hero/bg-blocks.png')] bg-no-repeat bg-center bg-cover">
         <Image
-          src="/hero-image.png"
+          src="/sections/hero/hero-image.svg"
           alt={hero.imageAlt}
           width={1200}
           height={675}
