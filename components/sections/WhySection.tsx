@@ -21,7 +21,7 @@ export const WhySection = () => {
             </p>
             <div className="w-1/2 flex items-center justify-center h-full">
               <Image
-                src="/sections/why/why-card-1.png"
+                src="/sections/why/why-card-1.svg"
                 alt="Card 1"
                 width={300}
                 height={150}
@@ -31,7 +31,22 @@ export const WhySection = () => {
           </div>
 
           {/* Card 2: Two Sub-Cards */}
-          <div className="flex gap-6 text-xl">
+          <div className="flex gap-6 text-xl flex-row-reverse">
+            {/* Left Sub-Card: Image Top, Title Bottom */}
+            <div className="flex-1 bg-card-bg rounded-3xl h-50 flex flex-col items-center justify-between">
+              <div className="flex-1 flex items-center justify-center">
+                <p className=" ">{whySection.card2LeftTitle}</p>
+              </div>
+              <div className="flex-1 items-center justify-center h-full">
+                <Image
+                  src="/sections/why/why-card-2-left.svg"
+                  alt="Card 2 Right"
+                  width={150}
+                  height={100}
+                  className="h-full w-auto"
+                />
+              </div>
+            </div>{" "}
             {/* Right Sub-Card: Title Top, Image Bottom */}
             <div className="flex-1 bg-card-bg rounded-3xl h-50 flex justify-between">
               <div className="flex flex-col items-end justify-end p-6">
@@ -43,27 +58,11 @@ export const WhySection = () => {
               </div>
               <div className="h-full">
                 <Image
-                  src="/sections/why/why-card-2-left.png"
+                  src="/sections/why/why-card-2-right.svg"
                   alt="Card 2 Left"
                   width={150}
                   height={100}
                   className="h-full w-auto rounded-3xl"
-                />
-              </div>
-            </div>
-
-            {/* Left Sub-Card: Image Top, Title Bottom */}
-            <div className="flex-1 bg-card-bg rounded-3xl h-50 flex flex-col items-center justify-between">
-              <div className="flex-1 flex items-center justify-center">
-                <p className=" ">{whySection.card2LeftTitle}</p>
-              </div>
-              <div className="flex-1 items-center justify-center h-full">
-                <Image
-                  src="/sections/why/why-card-2-right.png"
-                  alt="Card 2 Right"
-                  width={150}
-                  height={100}
-                  className="h-full w-auto"
                 />
               </div>
             </div>
@@ -73,7 +72,7 @@ export const WhySection = () => {
           <div className="bg-card-bg rounded-3xl h-50 flex items-center justify-between">
             <div className="flex items-center justify-start h-full">
               <Image
-                src="/sections/why/why-card-3.png"
+                src="/sections/why/why-card-3.svg"
                 alt="Card 3"
                 width={300}
                 height={150}
