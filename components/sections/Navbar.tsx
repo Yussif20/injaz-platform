@@ -47,11 +47,9 @@ export const Navbar = () => {
           {nav.downloadApp}
         </Link>
         <Link
-          href="/teacher/profiles/new"
+          href="/profiles/new"
           className={`text-lg font-normal hover:text-primary-500 transition-colors ${
-            pathname === "/teacher/profiles/new"
-              ? "text-primary-500"
-              : "text-text-dark"
+            pathname === "/profiles/new" ? "text-primary-500" : "text-text-dark"
           }`}
         >
           {nav.createProfile}
@@ -112,9 +110,9 @@ export const Navbar = () => {
               {nav.downloadApp}
             </Link>
             <Link
-              href="/teacher/profiles/new"
+              href="/profiles/new"
               className={`text-lg font-normal hover:text-primary-500 transition-colors ${
-                pathname === "/teacher/profiles/new"
+                pathname === "/profiles/new"
                   ? "text-primary-500"
                   : "text-text-dark"
               }`}
@@ -138,12 +136,12 @@ export const Navbar = () => {
       )}
       {/* Auth Buttons (always visible) */}
       <div className="flex gap-4">
-        <Link href="/teacher/login">
+        <Link href="/login">
           <Button variant="primary" size="sm">
             {nav.login}
           </Button>
         </Link>
-        <Link href="/teacher/register">
+        <Link href="/register">
           <Button variant="outline" size="sm">
             {nav.signup}
           </Button>

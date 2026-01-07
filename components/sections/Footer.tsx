@@ -31,13 +31,13 @@ export const Footer = () => {
             {/* Navigation Links */}
             <nav className="flex gap-8 justify-between text-right">
               <Link
-                href="/teacher/register"
+                href="/register"
                 className="text-base font-normal hover:text-primary-300 transition-colors"
               >
                 {footer.links.subscribe}
               </Link>
               <Link
-                href="/teacher/profiles/new"
+                href="/profiles/new"
                 className="text-base font-normal hover:text-primary-300 transition-colors"
               >
                 {footer.links.createProfile}
