@@ -3,8 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui";
+import { content } from "@/lib/content";
 
 export default function SignInPage() {
+  const { signIn } = content;
+
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // Only allow numbers, +, and common phone separators
@@ -20,7 +23,7 @@ export default function SignInPage() {
           <Link href="/">
             <Image
               src="/logo/logo-cyan.svg"
-              alt="شعار إنجاز معلم"
+              alt={signIn.logoAlt}
               width={70}
               height={80}
               className="h-20 w-auto"
@@ -31,9 +34,11 @@ export default function SignInPage() {
 
         {/* Heading */}
         <div className="text-right">
-          <h1 className="text-[28px] font-normal text-text-dark">تسجيل دخول</h1>
+          <h1 className="text-[28px] font-normal text-text-dark">
+            {signIn.title}
+          </h1>
           <p className="text-[18px] font-light text-[#D4D4D4] mt-2">
-            مرحبا بك مرة ثانية، سجل بياناتك للدخول
+            {signIn.subtitle}
           </p>
         </div>
 
@@ -44,12 +49,12 @@ export default function SignInPage() {
               className="text-[16px] font-normal text-text-dark"
               htmlFor="phone"
             >
-              رقم الجوال*
+              {signIn.phoneLabel}
             </label>
             <input
               id="phone"
               type="tel"
-              placeholder="مثال: 96587432"
+              placeholder={signIn.phonePlaceholder}
               onChange={handlePhoneInput}
               className="bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-[14px] px-3 py-2 rounded-2xl outline-none text-right"
             />
@@ -60,17 +65,17 @@ export default function SignInPage() {
               className="text-[16px] font-normal text-text-dark"
               htmlFor="password"
             >
-              كلمة المرور*
+              {signIn.passwordLabel}
             </label>
             <input
               id="password"
               type="password"
-              placeholder="*********"
+              placeholder={signIn.passwordPlaceholder}
               className="bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-[14px] px-3 py-2 rounded-2xl outline-none"
             />
             <div className="text-right">
               <a href="#" className="text-[18px] font-light text-primary-500">
-                نسيت كلمة المرور؟
+                {signIn.forgotPassword}
               </a>
             </div>
           </div>
@@ -82,13 +87,13 @@ export default function SignInPage() {
             type="button"
             className="w-full bg-primary-500 text-white text-[18px] font-light py-3 rounded-2xl"
           >
-            تسجيل دخول
+            {signIn.submitButton}
           </Button>
         </div>
 
         {/* Sign Up Link */}
         <div className="text-right text-primary-500 text-[18px] font-light">
-          <Link href="/sign/up">ليس لديك حساب؟ إنشاء حساب جديد</Link>
+          <Link href="/sign/up">{signIn.signUpLink}</Link>
         </div>
 
         {/* Customer Service Icon */}
@@ -101,7 +106,7 @@ export default function SignInPage() {
           >
             <Image
               src="/pages/sign/customer-service.svg"
-              alt="خدمة العملاء"
+              alt={signIn.customerServiceAlt}
               width={40}
               height={40}
             />
