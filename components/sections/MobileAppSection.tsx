@@ -8,7 +8,7 @@ export function MobileAppSection() {
     <section className=" ">
       <div className="max-w-[90%] lg:max-w-screen mx-auto lg:mx-0 bg-[#E3EFEF] rounded-[28px] lg:rounded-none py-6 lg:py-12 px-4 lg:px-0">
         {/* Title */}
-        <h2 className="text-4xl font-normal text-text-dark text-center mb-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal text-text-dark text-center mb-16">
           {mobileAppSection.title}
         </h2>
 
@@ -52,7 +52,7 @@ export function MobileAppSection() {
             </ul>
 
             {/* Download Text */}
-            <p className="mx-auto lg:mx-0 text-2xl font-normal text-primary-500 mt-8">
+            <p className="mx-auto lg:mx-0 text-lg sm:text-xl md:text-2xl font-normal text-primary-500 mt-8">
               {mobileAppSection.downloadText}
             </p>
 

@@ -8,7 +8,7 @@ export const HowToSection = () => {
     <section className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <h2 className="text-4xl font-normal text-text-dark text-center mb-14">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal text-text-dark text-center mb-14">
           {howToSection.title}
         </h2>
 
@@ -24,10 +24,10 @@ export const HowToSection = () => {
 
                 {/* Step Content */}
                 <div className="flex-1">
-                  <p className="text-lg font-normal text-right text-text-dark mb-2">
+                  <p className="text-base sm:text-lg font-normal text-right text-text-dark mb-2">
                     {step.main}
                   </p>
-                  <p className="text-lg font-light text-right text-text-dark">
+                  <p className="text-sm sm:text-base md:text-lg font-light text-right text-text-dark">
                     {step.sub}
                   </p>
                 </div>

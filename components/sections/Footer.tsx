@@ -31,7 +31,7 @@ export const Footer = () => {
             {/* Navigation Links */}
             <nav className="flex gap-8 justify-between text-right">
               <Link
-                href="/register"
+                href="/sign/up"
                 className="text-base font-normal hover:text-primary-300 transition-colors"
               >
                 {footer.links.subscribe}

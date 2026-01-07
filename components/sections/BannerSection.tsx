@@ -5,7 +5,7 @@ export const BannerSection = () => {
   const { bannerSection } = content;
 
   return (
-    <section className="w-screen">
+    <section className="w-full">
       {/*
         Original banner content commented per request:
         <div className="bg-primary-500 text-white w-screen">
@@ -18,13 +18,12 @@ export const BannerSection = () => {
           </div>
         </div>
       */}
-
       <Image
         src="/sections/banner/banner.svg"
         alt={bannerSection.title}
         width={1920}
         height={600}
-        className="w-full h-auto"
+        className="block w-full h-auto"
         priority
       />
     </section>

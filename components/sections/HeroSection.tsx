@@ -9,7 +9,7 @@ export const HeroSection = () => {
     <section className="flex flex-col items-center justify-center px-4 py-10 ">
       {/* Hero Title with Highlight */}
       <h1 className="text-center max-w-4xl mb-12">
-        <span className="block text-4xl font-normal text-text-dark">
+        <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-text-dark">
           {hero.titleStart}
           <span className="text-primary-500">{hero.titleHighlight}</span>
           {hero.titleEnd1}

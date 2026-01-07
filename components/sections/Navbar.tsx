@@ -136,12 +136,12 @@ export const Navbar = () => {
       )}
       {/* Auth Buttons (always visible) */}
       <div className="flex gap-4">
-        <Link href="/login">
+        <Link href="/sign/in">
           <Button variant="primary" size="sm">
             {nav.login}
           </Button>
         </Link>
-        <Link href="/register">
+        <Link href="/sign/up">
           <Button variant="outline" size="sm">
             {nav.signup}
           </Button>

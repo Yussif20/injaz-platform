@@ -9,12 +9,12 @@ export function DesignChoiceSection() {
       <div className="max-w-[90%] mx-auto">
         <div className="bg-card-bg rounded-[28px] px-12 pt-16 flex flex-col items-center text-center">
           {/* Title */}
-          <h2 className="text-4xl font-normal text-primary-500 mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal text-primary-500 mb-6">
             {designChoiceSection.title}
           </h2>
 
           {/* Subtitle */}
-          <p className="text-2xl font-light text-[#4D4D4D]">
+          <p className="text-lg sm:text-xl md:text-2xl font-light text-[#4D4D4D]">
             {designChoiceSection.subtitle}
           </p>
 
