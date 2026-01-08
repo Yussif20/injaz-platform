@@ -8,15 +8,15 @@ export const WhySection = () => {
     <section className="bg-white text-text-dark py-16 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal  text-center mb-12">
+        <h2 className="text-base md:text-2xl lg:text-4xl font-normal text-center mb-11">
           {whySection.title}
         </h2>
 
         {/* Cards Container */}
         <div className="flex flex-col gap-6">
           {/* Card 1: Text Right, Image Left */}
-          <div className="bg-card-bg rounded-3xl h-50 flex items-center justify-between px-8">
-            <p className="w-1/2 text-center text-lg sm:text-xl md:text-2xl lg:text-[28px]">
+          <div className="bg-card-bg rounded-3xl h-30  md:h-50 flex items-center justify-between px-8">
+            <p className="w-1/2 text-center text-base md:text-2xl lg:text-[28px]">
               {whySection.card1Text}
             </p>
             <div className="w-1/2 flex items-center justify-center h-full">
@@ -31,9 +31,9 @@ export const WhySection = () => {
           </div>
 
           {/* Card 2: Two Sub-Cards */}
-          <div className="flex gap-6 text-base sm:text-lg md:text-xl flex-row-reverse">
+          <div className="flex flex-col gap-6 text-base md:text-2xl lg:text-[28px] md:flex-row-reverse">
             {/* Left Sub-Card: Image Top, Title Bottom */}
-            <div className="flex-1 bg-card-bg rounded-3xl h-50 flex flex-col items-center justify-between">
+            <div className="flex-1 bg-card-bg rounded-3xl min-h-30 flex flex-col items-center justify-between">
               <div className="flex-1 flex items-center justify-center">
                 <p className=" ">{whySection.card2LeftTitle}</p>
               </div>
@@ -48,9 +48,9 @@ export const WhySection = () => {
               </div>
             </div>{" "}
             {/* Right Sub-Card: Title Top, Image Bottom */}
-            <div className="flex-1 bg-card-bg rounded-3xl h-50 flex justify-between">
+            <div className="flex-1 bg-card-bg rounded-3xl min-h-30 flex flex-col md:flex-row justify-between">
               <div className="flex flex-col items-end justify-end p-6">
-                <p className=" text-right text-xl ">
+                <p className=" text-right text-base md:text-2xl lg:text-[28px] ">
                   {whySection.card2RightTitleLine1}
                   <br />
                   {whySection.card2RightTitleLine2}
@@ -69,7 +69,7 @@ export const WhySection = () => {
           </div>
 
           {/* Card 3: Text Left, Image Right */}
-          <div className="bg-card-bg rounded-3xl h-50 flex items-center justify-between">
+          <div className="bg-card-bg rounded-3xl h-30  md:h-50 flex items-center justify-between">
             <div className="flex items-center justify-start h-full">
               <Image
                 src="/sections/why/why-card-3.svg"
@@ -79,7 +79,7 @@ export const WhySection = () => {
                 className="h-full w-full object-contain"
               />
             </div>
-            <p className="w-1/2 text-center text-lg sm:text-xl md:text-2xl lg:text-[28px]">
+            <p className="w-1/2 text-center text-base md:text-2xl lg:text-[28px]">
               {whySection.card3Text}
             </p>
           </div>

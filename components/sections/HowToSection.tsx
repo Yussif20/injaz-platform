@@ -8,7 +8,7 @@ export const HowToSection = () => {
     <section className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal text-text-dark text-center mb-14">
+        <h2 className="text-base md:text-2xl lg:text-4xl font-normal text-center mb-11">
           {howToSection.title}
         </h2>
 

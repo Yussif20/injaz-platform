@@ -16,20 +16,20 @@ export const Navbar = () => {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <nav className="relative flex items-center justify-between px-8 py-6">
-      {/* Logo */}
-      <div className="shrink-0 hidden md:block">
+    <nav className="relative flex items-center justify-between py-2">
+      {/* Logo (always visible) */}
+      <div className="shrink-0">
         <Image
           src="logo/logo-white.svg"
           alt="Logo"
           width={40}
-          height={40}
-          className="h-14 w-14"
+          height={48}
+          className="h-12 w-10"
         />
       </div>
 
-      {/* Tabs */}
-      <div className="hidden md:flex gap-8">
+      {/* Tabs (md and up) */}
+      <div className="hidden lg:flex gap-6">
         <Link
           href="/"
           className={`text-lg font-normal hover:text-primary-500 transition-colors ${
@@ -63,10 +63,10 @@ export const Navbar = () => {
           {nav.howToUse}
         </Link>
       </div>
-      {/* Burger Button (md and below) */}
+      {/* Burger Button (mobile only) */}
       <button
         type="button"
-        className="lg:hidden flex items-center justify-center p-2"
+        className="md:hidden flex items-center justify-center p-2"
         onClick={toggleMenu}
         aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
       >
@@ -131,11 +131,25 @@ export const Navbar = () => {
             >
               {nav.howToUse}
             </Link>
+            <Link
+              href="/sign/in"
+              className="text-lg font-normal hover:text-primary-500 transition-colors text-text-dark"
+              onClick={closeMenu}
+            >
+              {nav.login}
+            </Link>
+            <Link
+              href="/sign/up"
+              className="text-lg font-normal hover:text-primary-500 transition-colors text-text-dark"
+              onClick={closeMenu}
+            >
+              {nav.signup}
+            </Link>
           </div>
         </div>
       )}
-      {/* Auth Buttons (always visible) */}
-      <div className="flex gap-4">
+      {/* Auth Buttons (md and up) */}
+      <div className="hidden md:flex gap-4">
         <Link href="/sign/in">
           <Button variant="primary" size="sm">
             {nav.login}

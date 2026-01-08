@@ -6,7 +6,7 @@ export const Footer = () => {
   const { footer } = content;
 
   return (
-    <footer className="bg-primary-800 text-white py-12">
+    <footer className="bg-primary-800 text-white text-sm md:text-base py-12">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex flex-col md:flex-row gap-12">
           {/* Right Half - Logo & Description */}
