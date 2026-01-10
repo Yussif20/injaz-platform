@@ -1,13 +1,60 @@
 /**
  * Auth feature barrel export
- * Components, hooks, and types will be added here as they are created
  */
 
-// Export components when created
-// export * from "./components";
+// Components
+export {
+  LoginForm,
+  RegisterForm,
+  ForgotPasswordForm,
+  OtpInput,
+  StepIndicator,
+} from "./components";
 
-// Export hooks when created
-// export { useAuth } from "./hooks/useAuth";
+// Hooks
+export {
+  useAuth,
+  useLogin,
+  useRegister,
+  useForgotPassword,
+  useLogout,
+  AUTH_QUERY_KEY,
+} from "./hooks";
 
-// Export types when created
-// export type { User, LoginCredentials } from "./types/auth.types";
+// Context
+export { AuthProvider, useAuthContext } from "./context";
+
+// Types
+export type {
+  User,
+  LoginCredentials,
+  RegisterCredentials,
+  AuthState,
+  RegistrationStep,
+  RegistrationFormData,
+} from "./types/auth.types";
+
+export { Gender, VerificationPurpose, isApiSuccess } from "./types/auth.types";
+
+// Validation schemas
+export {
+  loginSchema,
+  sendOtpSchema,
+  verifyOtpSchema,
+  registerDetailsSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+} from "./validations/auth.schemas";
+
+export type {
+  LoginFormValues,
+  SendOtpFormValues,
+  VerifyOtpFormValues,
+  RegisterDetailsFormValues,
+  RegisterFormValues,
+  ForgotPasswordFormValues,
+  ResetPasswordFormValues,
+  ChangePasswordFormValues,
+} from "./validations/auth.schemas";

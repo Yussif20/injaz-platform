@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Alexandria } from "next/font/google";
+import { Providers } from "@/shared/providers";
 import "./globals.css";
 
 const alexandria = Alexandria({
@@ -18,8 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body className={alexandria.variable}>{children}</body>
+    <html lang="ar" dir="rtl">
+      <body className={alexandria.variable}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
