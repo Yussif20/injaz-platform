@@ -6,9 +6,24 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "../services/auth.service";
-import type { User } from "../types/auth.types";
+import { Gender, type User } from "../types/auth.types";
 
 export const AUTH_QUERY_KEY = ["auth", "user"];
+
+// TODO: Set to false when backend is ready
+const DEV_SKIP_AUTH = true;
+
+// Mock user for development
+const MOCK_USER: User = {
+  userId: "dev-user-123",
+  phone: "+966501234567",
+  fullName: "محمد أحمد",
+  userName: "mohammed_ahmed",
+  role: "teacher",
+  gender: Gender.Male,
+  email: "mohammed@example.com",
+  profileImage: undefined,
+};
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -22,6 +37,10 @@ export function useAuth() {
   } = useQuery({
     queryKey: AUTH_QUERY_KEY,
     queryFn: async () => {
+      // Skip auth in development mode
+      if (DEV_SKIP_AUTH) {
+        return MOCK_USER;
+      }
       const response = await getCurrentUser();
       if (!response.status) {
         throw new Error(response.message);

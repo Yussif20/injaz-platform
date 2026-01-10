@@ -10,6 +10,9 @@ import { logout } from "../services/auth.service";
 import { AUTH_QUERY_KEY } from "./useAuth";
 import { ROUTES } from "@/config";
 
+// TODO: Set to false when backend is ready
+const DEV_SKIP_AUTH = true;
+
 interface UseLogoutOptions {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
@@ -23,6 +26,10 @@ export function useLogout(options: UseLogoutOptions = {}) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // Skip actual logout in development mode
+      if (DEV_SKIP_AUTH) {
+        return { status: true, message: "تم تسجيل الخروج" };
+      }
       const response = await logout();
       if (!response.status) {
         throw new Error(response.message || "فشل تسجيل الخروج");

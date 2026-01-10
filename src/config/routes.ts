@@ -13,8 +13,22 @@ export const ROUTES = {
   SIGN_UP: "/sign/up",
   FORGOT_PASSWORD: "/forgot-password",
 
-  // Protected routes
+  // Dashboard routes
   DASHBOARD: "/dashboard",
+  DASHBOARD_PROFILE_NEW: "/dashboard/profile/new",
+
+  // Dashboard account routes
+  DASHBOARD_ACCOUNT: "/dashboard/account",
+  DASHBOARD_ACCOUNT_INFO: "/dashboard/account/info",
+  DASHBOARD_ACCOUNT_PROFILE_DATA: "/dashboard/account/profile-data",
+  DASHBOARD_ACCOUNT_SUBSCRIPTION: "/dashboard/account/subscription",
+  DASHBOARD_ACCOUNT_SUPPORT: "/dashboard/account/support",
+  DASHBOARD_ACCOUNT_TERMS: "/dashboard/account/terms",
+  DASHBOARD_ACCOUNT_HOW_TO_USE: "/dashboard/account/how-to-use",
+  DASHBOARD_ACCOUNT_FILE_PASSWORD: "/dashboard/account/file-password",
+  DASHBOARD_ACCOUNT_CHANGE_PASSWORD: "/dashboard/account/change-password",
+
+  // Legacy profile routes (kept for compatibility)
   PROFILES: "/profiles",
   PROFILE_NEW: "/profiles/new",
   PROFILE_DETAIL: (id: string) => `/profiles/${id}`,

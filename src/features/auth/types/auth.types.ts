@@ -21,6 +21,10 @@ export interface User {
   fullName: string;
   userName: string;
   role: string;
+  // Optional fields for account settings
+  gender?: Gender;
+  email?: string;
+  profileImage?: string;
 }
 
 // API response wrapper (backend returns status as string: "Success" | "Failure")
