@@ -29,29 +29,17 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       label: sidebar.home,
       href: ROUTES.DASHBOARD,
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          />
-        </svg>
-      ),
+      icon: <img src="/icons/home.svg" alt="home" className="w-5 h-5" />,
     },
     {
       label: sidebar.createProfile,
       href: ROUTES.DASHBOARD_PROFILE_NEW,
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
+        <img
+          src="/icons/plus-sign-circle.svg"
+          alt="create profile"
+          className="w-5 h-5"
+        />
       ),
     },
     {
@@ -59,14 +47,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       href: ROUTES.DASHBOARD_ACCOUNT,
       matchPrefix: ROUTES.DASHBOARD_ACCOUNT,
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
+        <img src="/icons/profile.svg" alt="my account" className="w-5 h-5" />
       ),
     },
   ];
@@ -141,7 +122,9 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                       }
                     `}
                   >
-                    <span className={active ? "text-primary-500" : "text-grey-500"}>
+                    <span
+                      className={active ? "text-primary-500" : "text-grey-500"}
+                    >
                       {item.icon}
                     </span>
                     <span className="font-normal">{item.label}</span>

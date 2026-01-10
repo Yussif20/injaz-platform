@@ -118,24 +118,17 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
         <div className="flex items-center gap-4">
           {/* Logout button */}
           <Button
-            variant="primary"
+            variant="warning"
             size="sm"
             onClick={() => setShowLogoutModal(true)}
             className="w-auto h-10 px-4 flex items-center gap-2"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
+            <Image
+              src="/icons/logout.svg"
+              alt="logout"
+              width={13}
+              height={13}
+            />
             <span className="hidden sm:inline">{navbar.logout}</span>
           </Button>
 
@@ -180,7 +173,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
         message={modals.logout.message}
         confirmText={modals.logout.confirm}
         cancelText={modals.logout.cancel}
-        variant="primary"
+        variant="warning"
         isLoading={isLoggingOut}
       />
     </>

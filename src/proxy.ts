@@ -1,5 +1,5 @@
 /**
- * Next.js Middleware for route protection
+ * Next.js Proxy for route protection
  */
 
 import { NextResponse } from "next/server";
@@ -25,7 +25,7 @@ const AUTH_ROUTES = [
   "/forgot-password",
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Skip all auth checks in development mode
   if (DEV_SKIP_AUTH) {
     return NextResponse.next();

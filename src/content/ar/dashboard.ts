@@ -104,4 +104,104 @@ export const dashboardContent = {
     passwordChanged: "تم تغيير كلمة المرور بنجاح",
     accountDeleted: "تم حذف الحساب بنجاح",
   },
+
+  // How to use page
+  howToUse: {
+    pageTitle: "شاهد المقطع لمعرفة كيفية الإستخدام",
+    playVideo: "تشغيل الفيديو",
+    steps: [
+      {
+        title: "ابدأ بإضافة بياناتك من خلال حسابي > بيانات ملفي",
+        description: "",
+      },
+      {
+        title: "بعد إضافة بياناتك أنشئ ملفك واملئ البيانات الأساسية",
+        description: "",
+      },
+      {
+        title: "إضافة بنود للملف من خلال بطاقة الملف",
+        description: "مرفق من إعداد ومتابعة الدروس والواجبات والاختبارات",
+      },
+      {
+        title: "معاينة الملف واختيار قالب تصميم",
+        description: "",
+      },
+      {
+        title: "نشر الملف، عند نشر ملفك يمكنك مشاركته او تحميله PDF",
+        description: "",
+      },
+    ],
+    buttons: {
+      addItems: "إضافة بنود",
+      previewFile: "معاينة الملف",
+      saveAsDraft: "حفظ كمسودة",
+      preview: "معاينة الملف",
+      customizeTemplate: "تخصيص القالب",
+      published: "منشور",
+    },
+  },
+
+  // Profile data page (بيانات ملفي)
+  profileData: {
+    tabs: {
+      myData: "بياناتي",
+      education: "بيانات علمية",
+      job: "بيانات وظيفية",
+    },
+    edit: "تعديل",
+    saveChanges: "حفظ التغيرات",
+    cancel: "إلغاء",
+
+    // Sub navigation
+    subNav: {
+      myData: "بياناتي",
+      educationData: "البيانات العلمية",
+      jobData: "البيانات الوظيفية",
+    },
+
+    // My Data section
+    generalData: "بيانات عامة",
+    contactData: "بيانات التواصل",
+    fields: {
+      nationalId: "رقم الهوية",
+      origin: "المنشأ",
+      birthDate: "تاريخ الميلاد",
+      workEmail: "البريد الإلكتروني للعمل",
+      whatsappNumber: "رقم واتساب",
+    },
+
+    // Education section
+    educationTitle: "المؤهلات العلمية",
+    certificationsTitle: "الشهادات والدورات",
+    educationFields: {
+      degree: "الدرجة العلمية",
+      specialization: "التخصص",
+      university: "الجامعة",
+      graduationYear: "سنة التخرج",
+      certName: "اسم الشهادة",
+      certIssuer: "الجهة المانحة",
+      certYear: "السنة",
+    },
+    academicDegrees: [
+      { value: "diploma", label: "دبلوم" },
+      { value: "bachelor", label: "بكالوريوس" },
+      { value: "master", label: "ماجستير" },
+      { value: "doctorate", label: "دكتوراه" },
+    ],
+
+    // Job section
+    jobTitle: "الخبرات الوظيفية",
+    jobFields: {
+      schoolName: "اسم المدرسة",
+      position: "المسمى الوظيفي",
+      department: "القسم/الإدارة",
+      startDate: "تاريخ البداية",
+      endDate: "تاريخ النهاية",
+      currentJob: "الوظيفة الحالية",
+    },
+    addPosition: "إضافة وظيفة",
+    addCertification: "إضافة شهادة",
+    removeCertification: "حذف",
+    removePosition: "حذف",
+  },
 };

@@ -102,8 +102,10 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         aria-labelledby="modal-title"
       >
         {/* Icon */}
-        <div className="flex justify-center mb-4">
-          <div className={`w-16 h-16 rounded-full bg-grey-100 flex items-center justify-center ${styles.icon}`}>
+        {/* <div className="flex justify-center mb-4">
+          <div
+            className={`w-16 h-16 rounded-full bg-grey-100 flex items-center justify-center ${styles.icon}`}
+          >
             {variant === "danger" || variant === "warning" ? (
               <svg
                 className="w-8 h-8"
@@ -134,15 +136,15 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               </svg>
             )}
           </div>
-        </div>
+        </div> */}
 
-        {/* Title */}
+        {/* Title
         <h2
           id="modal-title"
           className="text-xl font-medium text-center text-secondary-800 mb-2"
         >
           {title}
-        </h2>
+        </h2> */}
 
         {/* Message */}
         <p className="text-grey-600 text-center mb-6">{message}</p>
@@ -150,20 +152,20 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         {/* Actions */}
         <div className="flex gap-3 justify-center">
           <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isLoading}
-            className="flex-1 max-w-[140px]"
-          >
-            {cancelText}
-          </Button>
-          <Button
             variant={styles.button}
             onClick={onConfirm}
             isLoading={isLoading}
-            className="flex-1 max-w-[140px]"
+            className="flex-1 max-w-35"
           >
             {confirmText}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 max-w-35"
+          >
+            {cancelText}
           </Button>
         </div>
       </div>

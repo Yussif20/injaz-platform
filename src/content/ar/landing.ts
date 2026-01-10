@@ -73,4 +73,83 @@ export const landingContent = {
     downloadText: "حمله الآن! متوفر على:",
     imageAlt: "Mobile App Preview",
   },
+
+  faqSection: {
+    title: "عندك سؤال؟ خلنا نجاوبك",
+    contactUs: "تواصل معنا",
+    contactDescription: "إذا لم تتمكن من العثور على اجابتك",
+    supportButton: "الدعم الفني",
+    questions: [
+      {
+        id: "1",
+        question: "هل يمكنني إنشاء أكثر من ملف للسنة الواحدة؟",
+        answer: "الإجابة ستضاف لاحقاً",
+      },
+      {
+        id: "2",
+        question: "هل خدمة إنشاء ملف إنجاز مجانية؟",
+        answer: "الإجابة ستضاف لاحقاً",
+      },
+      {
+        id: "3",
+        question: "هل يمكنني إنشاء أكثر من حساب؟",
+        answer: "الإجابة ستضاف لاحقاً",
+      },
+    ],
+  },
+
+  testimonialsSection: {
+    testimonials: [
+      {
+        id: "1",
+        rating: 5,
+        text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
+        name: "نورا عبدالله",
+        role: "وكيلة مدرسة",
+        avatar: "/pages/landing/testimonials/avatar.svg",
+      },
+      {
+        id: "2",
+        rating: 5,
+        text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
+        name: "نورا عبدالله",
+        role: "وكيلة مدرسة",
+        avatar: "/pages/landing/testimonials/avatar.svg",
+      },
+      {
+        id: "3",
+        rating: 5,
+        text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
+        name: "نورا عبدالله",
+        role: "وكيلة مدرسة",
+        avatar: "/pages/landing/testimonials/avatar.svg",
+      },
+      {
+        id: "4",
+        rating: 5,
+        text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
+        name: "نورا عبدالله",
+        role: "وكيلة مدرسة",
+        avatar: "/pages/landing/testimonials/avatar.svg",
+      },
+    ],
+  },
+
+  shareExperienceSection: {
+    title: "شاركنا تجربتك!",
+    subtitle: "رأيك يهمنا، شاركنا تجربتك ورأيك وانضم لمجتمعنا",
+    nameLabel: "الاسم",
+    namePlaceholder: "مثال: محمد العتيبي",
+    jobTitleLabel: "المسمى الوظيفية",
+    jobTitlePlaceholder: "مثال: معلم خبير",
+    experienceLabel: "شاركنا تجربتك",
+    experiencePlaceholder: "شاركنا تجربتك هنا",
+    submitButton: "مشاركة",
+    jobTitles: [
+      { value: "teacher", label: "معلم" },
+      { value: "senior_teacher", label: "معلم خبير" },
+      { value: "principal", label: "مدير مدرسة" },
+      { value: "vice_principal", label: "وكيل/وكيلة مدرسة" },
+    ],
+  },
 };

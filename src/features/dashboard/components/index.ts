@@ -7,3 +7,15 @@ export { DashboardSidebar } from "./DashboardSidebar";
 export { AccountSidebar } from "./AccountSidebar";
 export { AccountInfoForm } from "./AccountInfoForm";
 export { ChangePasswordForm } from "./ChangePasswordForm";
+
+// How to use page components
+export { VideoPlaceholder } from "./VideoPlaceholder";
+export { TutorialStep } from "./TutorialStep";
+export { HowToUseContent } from "./HowToUseContent";
+
+// Profile data page components
+export { DataCard } from "./DataCard";
+export { ProfileDataTab } from "./ProfileDataTab";
+export { EducationDataTab } from "./EducationDataTab";
+export { JobDataTab } from "./JobDataTab";
+export { ProfileDataTabs } from "./ProfileDataTabs";

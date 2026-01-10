@@ -15,7 +15,10 @@ import { useAuth, Gender } from "@/features/auth";
 // Form validation schema
 const accountInfoSchema = z.object({
   gender: z.enum(["male", "female"]),
-  email: z.string().email(dashboardContent.errors.invalidEmail).or(z.literal("")),
+  email: z
+    .string()
+    .email(dashboardContent.errors.invalidEmail)
+    .or(z.literal("")),
 });
 
 type AccountInfoFormData = z.infer<typeof accountInfoSchema>;
@@ -31,7 +34,12 @@ export const AccountInfoForm: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
 
-  const { accountInfo, modals, errors: errorMessages, success } = dashboardContent;
+  const {
+    accountInfo,
+    modals,
+    errors: errorMessages,
+    success,
+  } = dashboardContent;
 
   // Map user gender to form value
   const getInitialGender = (): "male" | "female" => {
@@ -114,41 +122,33 @@ export const AccountInfoForm: React.FC = () => {
       <div className="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Profile Image */}
-          <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4 mb-8">
+          <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
             <div className="relative">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-grey-200">
                 {profileImage ? (
                   <Image
                     src={profileImage}
                     alt={accountInfo.profileImageAlt}
-                    width={96}
-                    height={96}
+                    width={70}
+                    height={70}
                     className="w-full h-full object-cover"
                   />
                 ) : user?.profileImage ? (
                   <Image
                     src={user.profileImage}
                     alt={accountInfo.profileImageAlt}
-                    width={96}
-                    height={96}
+                    width={70}
+                    height={70}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-grey-200">
-                    <svg
-                      className="w-12 h-12 text-grey-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
+                  <Image
+                    src="/pages/dashboard/avatar.svg"
+                    alt={accountInfo.profileImageAlt}
+                    width={70}
+                    height={70}
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
               <input
@@ -162,25 +162,14 @@ export const AccountInfoForm: React.FC = () => {
             <button
               type="button"
               onClick={handleImageClick}
-              className="flex items-center gap-2 text-primary-500 hover:text-primary-700 transition-colors"
+              className="flex items-center gap-2 transition-colors hover:opacity-80"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
-              </svg>
-              <span className="text-sm font-normal">{accountInfo.editImage}</span>
+              <Image src="/icons/edit.svg" alt="edit" width={24} height={24} />
+              <span className="text-primary-500 font-light text-lg">
+                {accountInfo.editImage}
+              </span>
             </button>
           </div>
-
           {/* Form Fields Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">
             {/* Name (readonly) */}
@@ -218,30 +207,21 @@ export const AccountInfoForm: React.FC = () => {
               className="text-left"
             />
           </div>
-
           {/* Change Password Link */}
           <div className="pt-2">
             <Link
               href={ROUTES.DASHBOARD_ACCOUNT_CHANGE_PASSWORD}
               className="inline-flex items-center gap-2 text-primary-500 hover:text-primary-700 transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+              <Image
+                src="/icons/lock-primary-color.svg"
+                alt="change password"
+                width={24}
+                height={24}
+              />
               <span className="font-normal">{accountInfo.changePassword}</span>
             </Link>
           </div>
-
           {/* Save Button */}
           <div className="pt-4">
             <Button
@@ -249,7 +229,7 @@ export const AccountInfoForm: React.FC = () => {
               variant="primary"
               disabled={!hasChanges || isSaving}
               isLoading={isSaving}
-              className="w-full !rounded-xl h-12"
+              className="w-full rounded-xl h-12"
             >
               {accountInfo.saveChanges}
             </Button>
@@ -257,7 +237,7 @@ export const AccountInfoForm: React.FC = () => {
         </form>
 
         {/* Delete Account */}
-        <div className="mt-8 pt-6 border-t border-grey-200">
+        <div className="mt-8 pt-6 border-grey-200 flex justify-end">
           <button
             type="button"
             onClick={() => setShowDeleteModal(true)}

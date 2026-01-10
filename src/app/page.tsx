@@ -6,6 +6,9 @@ import {
   HowToSection,
   DesignChoiceSection,
   MobileAppSection,
+  TestimonialsSection,
+  FAQSection,
+  ShareExperienceSection,
 } from "@/features/landing";
 
 export default function Home() {
@@ -26,6 +29,9 @@ export default function Home() {
         <BannerSection />
         <DesignChoiceSection />
         <MobileAppSection />
+        <TestimonialsSection />
+        <FAQSection />
+        <ShareExperienceSection />
         <Footer />
       </div>
     </main>
