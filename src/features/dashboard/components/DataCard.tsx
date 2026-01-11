@@ -14,11 +14,9 @@ export const DataCard: React.FC<DataCardProps> = ({
   return (
     <div className={`text-right ${className}`}>
       {/* Label */}
-      <div className="text-sm sm:text-base font-medium text-text-dark mb-1">
-        {label}
-      </div>
+      <div className="text-lg font-normal text-text-dark mb-1">{label}</div>
       {/* Value */}
-      <div className="text-sm sm:text-base text-grey-600">{value}</div>
+      <div className="text-lg font-light text-grey-600">{value}</div>
     </div>
   );
 };

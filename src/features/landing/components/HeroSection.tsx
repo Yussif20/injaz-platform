@@ -6,7 +6,7 @@ export const HeroSection = () => {
   const { hero } = landingContent;
 
   return (
-    <section className="flex flex-col gap-10 items-center justify-center py-10 ">
+    <section className="flex flex-col gap-10 items-center justify-center py-12 sm:py-16 lg:py-20">
       {/* Hero Title with Highlight */}
       <h1 className="text-center max-w-4xl ">
         <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-text-dark">

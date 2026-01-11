@@ -5,28 +5,22 @@ export function MobileAppSection() {
   const { mobileAppSection } = landingContent;
 
   return (
-    <section className=" ">
+    <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-0">
       <div className="max-w-[90%] lg:max-w-screen mx-auto lg:mx-0 bg-[#E3EFEF] rounded-[28px] lg:rounded-none py-6 lg:py-12 px-4 lg:px-0">
         {/* Title */}
-        <h2 className="text-base md:text-2xl lg:text-4xl font-normal text-center mb-11 text-text-dark">
+        <h2 className="text-lg md:text-2xl lg:text-4xl font-normal text-center mb-5 md:mb-7 lg:mb-9 text-text-dark">
           {mobileAppSection.title}
         </h2>
 
         {/* Two Halves */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Half - Image (shown first) */}
-          <div className="relative h-25 md:h-87.5 w-full order-1">
+          <div className="relative w-full aspect-video order-1">
             <Image
               src="/sections/mobile-app/mobile-app-preview-tablet.svg"
               alt={mobileAppSection.imageAlt}
               fill
-              className="object-contain lg:hidden"
-            />
-            <Image
-              src="/sections/mobile-app/mobile-app-preview-tablet.svg"
-              alt={mobileAppSection.imageAlt}
-              fill
-              className="object-contain hidden lg:block"
+              className="object-contain"
             />
           </div>
 
@@ -52,7 +46,7 @@ export function MobileAppSection() {
             </ul>
 
             {/* Download Text */}
-            <p className="mx-auto lg:mx-0 text-lg sm:text-xl md:text-2xl font-normal text-primary-500 mt-8">
+            <p className="lg:mx-0 text-lg sm:text-xl md:text-2xl font-normal text-primary-500 mt-8">
               {mobileAppSection.downloadText}
             </p>
 
@@ -62,7 +56,7 @@ export function MobileAppSection() {
                 href="https://apps.apple.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-opacity hover:opacity-80 "
+                className="transition-opacity hover:opacity-80 bg-white rounded-lg"
               >
                 <Image
                   src="/sections/mobile-app/app-store-button.svg"
@@ -75,7 +69,7 @@ export function MobileAppSection() {
                 href="https://play.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-opacity hover:opacity-80"
+                className="transition-opacity hover:opacity-80 rounded-lg"
               >
                 <Image
                   src="/sections/mobile-app/play-store-button.svg"

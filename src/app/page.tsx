@@ -8,6 +8,7 @@ import {
   MobileAppSection,
   TestimonialsSection,
   FAQSection,
+  SubscriptionSection,
   ShareExperienceSection,
 } from "@/features/landing";
 
@@ -23,17 +24,16 @@ export default function Home() {
       </div>
 
       {/* White Background Sections */}
-      <div className="flex flex-col gap-20">
-        <WhySection />
-        <HowToSection />
-        <BannerSection />
-        <DesignChoiceSection />
-        <MobileAppSection />
-        <TestimonialsSection />
-        <FAQSection />
-        <ShareExperienceSection />
-        <Footer />
-      </div>
+      <WhySection />
+      <HowToSection />
+      <BannerSection />
+      <DesignChoiceSection />
+      <MobileAppSection />
+      <SubscriptionSection />
+      <FAQSection />
+      <TestimonialsSection />
+      <ShareExperienceSection />
+      <Footer />
     </main>
   );
 }

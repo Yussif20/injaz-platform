@@ -8,7 +8,7 @@ export const Footer = () => {
   return (
     <footer className="bg-primary-800 text-white text-sm md:text-base py-12">
       <div className="max-w-7xl mx-auto px-8">
-        <div className="flex flex-col md:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-12">
           {/* Right Half - Logo & Description */}
           <div className="flex-1 flex flex-col gap-6">
             {/* Logo */}
@@ -21,15 +21,15 @@ export const Footer = () => {
             />
 
             {/* Description */}
-            <p className="text-base font-normal text-right leading-relaxed">
+            <p className="text-sm md:text-base font-normal text-right leading-relaxed">
               {footer.description}
             </p>
           </div>
 
           {/* Left Half - Links & Socials */}
-          <div className="flex-1 flex flex-col items-start justify-center gap-8">
+          <div className="flex-1 flex flex-col items-center lg:items-start justify-center gap-8">
             {/* Navigation Links */}
-            <nav className="flex gap-8 justify-between text-right">
+            <nav className="flex flex-col md:flex-row items-center gap-8 justify-between text-right">
               <Link
                 href="/sign/up"
                 className="text-base font-normal hover:text-primary-300 transition-colors"

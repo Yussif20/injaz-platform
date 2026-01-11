@@ -35,7 +35,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title,
+  // title,
   message,
   confirmText = "تأكيد",
   cancelText = "إلغاء",

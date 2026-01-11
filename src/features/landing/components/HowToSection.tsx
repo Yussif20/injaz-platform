@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Button } from "@/shared/components/ui";
 import { landingContent } from "@/content";
 
@@ -5,16 +6,16 @@ export const HowToSection = () => {
   const { howToSection } = landingContent;
 
   return (
-    <section className="py-16 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-0">
+      <div className="max-w-[90%] mx-auto">
         {/* Section Title */}
-        <h2 className="text-base md:text-2xl lg:text-4xl font-normal text-center mb-11">
+        <h2 className="text-base md:text-2xl lg:text-4xl font-normal text-center mb-5 md:mb-7 lg:mb-9">
           {howToSection.title}
         </h2>
 
-        <div className="flex flex-col md:flex-row gap-12 items-stretch">
+        <div className="flex flex-col md:flex-row gap-5 md:gap-7 lg:gap-11 items-stretch">
           {/* Steps - Left Side */}
-          <div className="flex-1 order-1 space-y-8">
+          <div className="flex-1 order-1 space-y-5">
             {howToSection.steps.map((step, index) => (
               <div key={index} className="flex gap-4">
                 {/* Step Number Badge */}
@@ -24,10 +25,10 @@ export const HowToSection = () => {
 
                 {/* Step Content */}
                 <div className="flex-1">
-                  <p className="text-base sm:text-lg font-normal text-right text-text-dark mb-2">
+                  <p className="text-sm md:text-lg font-normal text-right text-text-dark mb-2">
                     {step.main}
                   </p>
-                  <p className="text-sm sm:text-base md:text-lg font-light text-right text-text-dark">
+                  <p className="text-sm md:text-lg font-light text-right text-[#666]">
                     {step.sub}
                   </p>
                 </div>
@@ -36,7 +37,7 @@ export const HowToSection = () => {
 
             {/* CTA Button */}
             <div className="pt-4">
-              <Button variant="outline" size="lg" className="w-full">
+              <Button variant="outline" size="lg" className="w-full font-light">
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -74,16 +75,24 @@ export const HowToSection = () => {
 
           {/* Video - Right Side */}
           <div className="flex-1 min-h-96">
-            <div className="bg-card-bg rounded-3xl h-full flex items-center justify-center overflow-hidden">
-              {/* Video Placeholder */}
-              <video
+            <div className="bg-card-bg rounded-3xl relative w-full min-h-96 overflow-hidden">
+              {/* Thumbnail Image */}
+              <Image
+                src="/sections/how/video-thumbnail.png"
+                alt="How to tutorial thumbnail"
+                fill
+                className="object-cover"
+              />
+
+              {/* Video (Commented Out) */}
+              {/* <video
                 controls
                 className="w-full h-full object-cover"
                 poster="/sections/how/video-thumbnail.png"
               >
                 <source src="/sections/how/how-to.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
-              </video>
+              </video> */}
             </div>
           </div>
         </div>

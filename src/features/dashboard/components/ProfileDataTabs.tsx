@@ -56,14 +56,16 @@ export const ProfileDataTabs: React.FC = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className={`flex items-center gap-2 text-sm transition-colors ${
+            className={`flex items-center gap-2 transition-colors ${
               isEditing
                 ? "text-warning-500 hover:text-warning-700"
                 : "text-primary-500 hover:text-primary-700"
             }`}
           >
-            <img src="/icons/edit.svg" alt="edit" className="w-4 h-4" />
-            <span>{isEditing ? profileData.cancel : profileData.edit}</span>
+            <img src="/icons/edit.svg" alt="edit" className="w-6 h-6" />
+            <span className="text-lg font-light">
+              {isEditing ? profileData.cancel : profileData.edit}
+            </span>
           </button>
         }
       />

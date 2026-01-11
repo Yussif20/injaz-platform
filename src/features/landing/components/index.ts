@@ -10,4 +10,5 @@ export { DesignChoiceSection } from "./DesignChoiceSection";
 export { MobileAppSection } from "./MobileAppSection";
 export { TestimonialsSection } from "./TestimonialsSection";
 export { FAQSection } from "./FAQSection";
+export { SubscriptionSection } from "./SubscriptionSection";
 export { ShareExperienceSection } from "./ShareExperienceSection";

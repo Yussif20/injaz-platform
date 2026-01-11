@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
@@ -21,17 +22,23 @@ export const AccountSidebar: React.FC = () => {
       label: accountSidebar.accountInfo,
       href: ROUTES.DASHBOARD_ACCOUNT_INFO,
       icon: (
-        <img src="/icons/profile.svg" alt="account info" className="w-5 h-5" />
+        <Image
+          src="/icons/profile.svg"
+          alt="account info"
+          width={20}
+          height={20}
+        />
       ),
     },
     {
       label: accountSidebar.profileData,
       href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA,
       icon: (
-        <img
+        <Image
           src="/icons/file-edit.svg"
           alt="profile data"
-          className="w-5 h-5"
+          width={20}
+          height={20}
         />
       ),
     },
@@ -39,40 +46,64 @@ export const AccountSidebar: React.FC = () => {
       label: accountSidebar.subscription,
       href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION,
       icon: (
-        <img
+        <Image
           src="/icons/subscription.svg"
           alt="subscription"
-          className="w-5 h-5"
+          width={20}
+          height={20}
         />
       ),
     },
     {
       label: accountSidebar.support,
       href: ROUTES.DASHBOARD_ACCOUNT_SUPPORT,
-      icon: <img src="/icons/support.svg" alt="support" className="w-5 h-5" />,
+      icon: (
+        <Image src="/icons/support.svg" alt="support" width={20} height={20} />
+      ),
     },
     {
       label: accountSidebar.terms,
       href: ROUTES.DASHBOARD_ACCOUNT_TERMS,
-      icon: <img src="/icons/policy.svg" alt="terms" className="w-5 h-5" />,
+      icon: (
+        <Image src="/icons/policy.svg" alt="terms" width={20} height={20} />
+      ),
     },
     {
       label: accountSidebar.howToUse,
       href: ROUTES.DASHBOARD_ACCOUNT_HOW_TO_USE,
       icon: (
-        <img src="/icons/youtube.svg" alt="how to use" className="w-5 h-5" />
+        <Image
+          src="/icons/youtube.svg"
+          alt="how to use"
+          width={20}
+          height={20}
+        />
       ),
     },
     {
       label: accountSidebar.filePassword,
       href: ROUTES.DASHBOARD_ACCOUNT_FILE_PASSWORD,
       icon: (
-        <img src="/icons/lock.svg" alt="file password" className="w-5 h-5" />
+        <Image
+          src="/icons/lock.svg"
+          alt="file password"
+          width={20}
+          height={20}
+        />
       ),
     },
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    if (href === ROUTES.DASHBOARD_ACCOUNT_INFO) {
+      // Highlight Account Info when on change password page as well
+      return (
+        pathname === href ||
+        pathname === ROUTES.DASHBOARD_ACCOUNT_CHANGE_PASSWORD
+      );
+    }
+    return pathname === href;
+  };
 
   return (
     <aside className="w-full lg:w-64 bg-white rounded-xl lg:rounded-2xl p-4">

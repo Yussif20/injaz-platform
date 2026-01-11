@@ -13,7 +13,10 @@ interface AccordionProps {
   className?: string;
 }
 
-export const Accordion: React.FC<AccordionProps> = ({ items, className = "" }) => {
+export const Accordion: React.FC<AccordionProps> = ({
+  items,
+  className = "",
+}) => {
   const [openId, setOpenId] = useState<string | null>(null);
 
   const toggleItem = (id: string) => {
@@ -27,12 +30,12 @@ export const Accordion: React.FC<AccordionProps> = ({ items, className = "" }) =
         return (
           <div
             key={item.id}
-            className="bg-[#F5F5F5] rounded-xl overflow-hidden"
+            className="bg-[#F2F2F2] rounded-2xl overflow-hidden"
           >
             <button
               type="button"
               onClick={() => toggleItem(item.id)}
-              className="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-right"
+              className="w-full h-15 flex items-center justify-between px-3 sm:px-7 text-right"
             >
               <svg
                 className={`w-5 h-5 text-grey-500 transition-transform duration-300 ${
@@ -49,7 +52,7 @@ export const Accordion: React.FC<AccordionProps> = ({ items, className = "" }) =
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
-              <span className="text-sm sm:text-base text-[#333] font-normal flex-1 text-right pr-4">
+              <span className="text-xs sm:text-lg text-[#333] font-normal flex-1 text-right pr-4">
                 {item.title}
               </span>
             </button>

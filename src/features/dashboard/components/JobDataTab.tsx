@@ -224,7 +224,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({
         {dummyData.positions.map((position) => (
           <div
             key={position.id}
-            className="bg-shade-100 rounded-xl p-4 sm:p-6 space-y-4 mb-4"
+            className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
           >
             <div className="flex items-center gap-3">
               <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
@@ -274,7 +274,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({
         type="button"
         variant="outline"
         disabled
-        className="w-full rounded-xl h-12"
+        className="w-full rounded-xl h-12 !bg-[#EBEBEB] !text-[#666] text-lg font-light !border-none"
       >
         {profileData.saveChanges}
       </Button>

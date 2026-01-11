@@ -208,7 +208,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
           {profileData.educationTitle}
         </h3>
-        <div className="bg-shade-100 rounded-xl p-4 sm:p-6 space-y-4">
+        <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
             <DataCard
@@ -248,7 +248,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         {dummyData.certifications.map((cert, index) => (
           <div
             key={cert.id}
-            className="bg-shade-100 rounded-xl p-4 sm:p-6 space-y-4 mb-4"
+            className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
           >
             <div className="flex items-center gap-3">
               <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
@@ -280,7 +280,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         type="button"
         variant="outline"
         disabled
-        className="w-full rounded-xl h-12"
+        className="w-full rounded-xl h-12 !bg-[#EBEBEB] !text-[#666] text-lg font-light !border-none"
       >
         {profileData.saveChanges}
       </Button>

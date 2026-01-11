@@ -140,35 +140,23 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
         <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
           {profileData.generalData}
         </h3>
-        <div className="bg-shade-100 rounded-xl p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.nationalId}
-              value={dummyData.nationalId}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.origin}
-              value={dummyData.origin}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.birthDate}
-              value={dummyData.birthDate}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.workEmail}
-              value={dummyData.workEmail}
-            />
-          </div>
+        <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
+          <DataCard
+            label={profileData.fields.nationalId}
+            value={dummyData.nationalId}
+          />
+          <DataCard
+            label={profileData.fields.origin}
+            value={dummyData.origin}
+          />
+          <DataCard
+            label={profileData.fields.birthDate}
+            value={dummyData.birthDate}
+          />
+          <DataCard
+            label={profileData.fields.workEmail}
+            value={dummyData.workEmail}
+          />
         </div>
       </div>
 
@@ -177,14 +165,11 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
         <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
           {profileData.contactData}
         </h3>
-        <div className="bg-shade-100 rounded-xl p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.whatsappNumber}
-              value={dummyData.whatsappNumber}
-            />
-          </div>
+        <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
+          <DataCard
+            label={profileData.fields.whatsappNumber}
+            value={dummyData.whatsappNumber}
+          />
         </div>
       </div>
 
@@ -193,7 +178,7 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
         type="button"
         variant="outline"
         disabled
-        className="w-full rounded-xl h-12"
+        className="w-full rounded-xl h-12 !bg-[#EBEBEB] !text-[#666] text-lg font-light !border-none"
       >
         {profileData.saveChanges}
       </Button>

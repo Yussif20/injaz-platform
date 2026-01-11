@@ -135,6 +135,14 @@ export const landingContent = {
     ],
   },
 
+  subscriptionSection: {
+    title: "اشترك الحين وابدأ رحلة انشاء ملف انجازك",
+    subtitle: "سهلناها عليك! بطرق دفع آمنة ومتنوعة",
+    ctaButton: "اشترك الآن",
+    successBadge: "تم الاشتراك بنجاح!",
+    imageAlt: "معلم مشترك",
+  },
+
   shareExperienceSection: {
     title: "شاركنا تجربتك!",
     subtitle: "رأيك يهمنا، شاركنا تجربتك ورأيك وانضم لمجتمعنا",

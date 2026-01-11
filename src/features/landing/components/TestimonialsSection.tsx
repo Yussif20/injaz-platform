@@ -6,18 +6,16 @@ import { landingContent } from "@/content";
 
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
   return (
-    <div className="flex gap-1 justify-end">
+    <div className="flex gap-1 justify-start">
       {[1, 2, 3, 4, 5].map((star) => (
-        <svg
+        <Image
           key={star}
-          className={`w-5 h-5 ${
-            star <= rating ? "text-[#FFD700]" : "text-grey-300"
-          }`}
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
+          src="/pages/landing/testimonials/star.svg"
+          alt="star"
+          width={20}
+          height={20}
+          className={star <= rating ? "opacity-100" : "opacity-30"}
+        />
       ))}
     </div>
   );
@@ -42,7 +40,7 @@ export const TestimonialsSection: React.FC = () => {
         {duplicatedTestimonials.map((testimonial, index) => (
           <div
             key={`${testimonial.id}-${index}`}
-            className="bg-shade-100 rounded-2xl p-4 sm:p-6 w-70 sm:w-[320px] shrink-0"
+            className="bg-white shadow-md rounded-2xl p-4 sm:p-6 w-70 sm:w-[320px] shrink-0"
           >
             {/* Star Rating */}
             <div className="mb-4">
@@ -50,7 +48,7 @@ export const TestimonialsSection: React.FC = () => {
             </div>
 
             {/* Testimonial Text */}
-            <p className="text-sm sm:text-base text-[#333] text-right mb-6 leading-relaxed">
+            <p className="text-xs md:text-base lg:text-lg font-light text-[#666] text-right mb-6 leading-relaxed">
               {testimonial.text}
             </p>
 
@@ -66,10 +64,10 @@ export const TestimonialsSection: React.FC = () => {
                 />
               </div>
               <div className="text-right">
-                <p className="text-primary-500 font-medium text-sm sm:text-base">
+                <p className="text-primary-500 font-medium text-[10px] md:text-sm lg:text-lg">
                   {testimonial.name}
                 </p>
-                <p className="text-grey-500 text-xs sm:text-sm">
+                <p className="text-grey-500 text-[10px] md:text-sm lg:text-lg font-light">
                   {testimonial.role}
                 </p>
               </div>

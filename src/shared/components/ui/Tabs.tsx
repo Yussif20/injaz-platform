@@ -23,9 +23,7 @@ export const Tabs: React.FC<TabsProps> = ({
   className = "",
 }) => {
   return (
-    <div
-      className={`flex flex-row-reverse items-center justify-between gap-4 ${className}`}
-    >
+    <div className={`flex items-center justify-between gap-4 ${className}`}>
       {/* Tab buttons */}
       <div className="flex items-center gap-1 sm:gap-2">
         {tabs.map((tab) => (
@@ -33,10 +31,10 @@ export const Tabs: React.FC<TabsProps> = ({
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-normal transition-colors duration-200 whitespace-nowrap ${
+            className={`px-3 sm:px-4 py-2 rounded-xl text-base font-normal transition-colors duration-200 whitespace-nowrap ${
               activeTab === tab.id
                 ? "bg-shade-100 text-primary-500"
-                : "text-grey-600 hover:text-grey-800 hover:bg-grey-100"
+                : "text-[#666] hover:text-grey-800 hover:bg-grey-100"
             }`}
           >
             {tab.label}
@@ -45,7 +43,7 @@ export const Tabs: React.FC<TabsProps> = ({
       </div>
 
       {/* Right content (Edit button) */}
-      {rightContent && <div className="flex-shrink-0">{rightContent}</div>}
+      {rightContent && <div className="shrink-0">{rightContent}</div>}
     </div>
   );
 };
