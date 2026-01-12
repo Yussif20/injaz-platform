@@ -93,8 +93,8 @@ export function RegisterForm() {
 
   // Step 2: Handle OTP verification then complete registration
   const handleOtpVerify = async () => {
-    if (otpCode.length !== 5) {
-      setOtpError(otp.errorLength5);
+    if (otpCode.length !== 6) {
+      setOtpError(otp.errorLength6);
       return;
     }
 
@@ -148,14 +148,10 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-5">
-      {/* Step Indicator removed */}
-
-      {/* Phone step removed; combined with details */}
-
+    <div className="flex flex-col gap-5 sm:gap-6">
       {/* Step 2: OTP Verification */}
       {step === "otp" && (
-        <div className="flex flex-col gap-4 sm:gap-5 text-right">
+        <div className="flex flex-col gap-5 sm:gap-6 text-right max-w-md mx-auto lg:mx-0 lg:max-w-none">
           {verifyOtpError && (
             <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
               {verifyOtpError.message}
@@ -163,29 +159,29 @@ export function RegisterForm() {
           )}
 
           <div className="text-center">
-            <h2 className="text-base sm:text-lg lg:text-xl font-medium text-text-dark mb-2">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-medium text-text-dark mb-3">
               {otp.titleConfirm}
             </h2>
-            <p className="text-sm sm:text-base text-grey-600 mb-4">
+            <p className="text-sm sm:text-base text-grey-500 mb-6">
               {otp.subtitleRegister} <span dir="ltr">{phone}</span>
             </p>
           </div>
 
           <OtpInput
-            length={5}
+            length={6}
             value={otpCode}
             onChange={setOtpCode}
             error={otpError}
             disabled={isVerifyingOtp}
           />
 
-          <div className="flex justify-center gap-2 text-sm">
+          <div className="flex justify-center gap-2 text-sm sm:text-base mt-2">
             <span className="text-grey-500">{otp.resendText}</span>
             <button
               type="button"
               onClick={handleResendOtp}
               disabled={resendTimer > 0}
-              className={`text-primary-500 ${
+              className={`text-primary-500 font-medium ${
                 resendTimer > 0
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:underline"
@@ -197,12 +193,12 @@ export function RegisterForm() {
             </button>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 mt-4">
             <Button
               type="button"
               variant="outline"
               onClick={handleBack}
-              className="flex-1 py-2 sm:py-3 rounded-xl sm:rounded-2xl"
+              className="flex-1 py-3 sm:py-3.5 rounded-xl"
             >
               {buttons.back}
             </Button>
@@ -210,8 +206,8 @@ export function RegisterForm() {
               type="button"
               onClick={handleOtpVerify}
               isLoading={isVerifyingOtp}
-              disabled={isVerifyingOtp || otpCode.length !== 5}
-              className="flex-1 bg-primary-500 text-white py-2 sm:py-3 rounded-xl sm:rounded-2xl"
+              disabled={isVerifyingOtp || otpCode.length !== 6}
+              className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 sm:py-3.5 rounded-xl transition-colors"
             >
               {otp.verifyButton}
             </Button>
@@ -223,7 +219,7 @@ export function RegisterForm() {
       {step === "details" && (
         <form
           onSubmit={detailsForm.handleSubmit(handleDetailsSubmit)}
-          className="flex flex-col gap-4 sm:gap-5 text-right"
+          className="flex flex-col gap-5 sm:gap-6 text-right"
         >
           {sendOtpError && (
             <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
@@ -236,15 +232,18 @@ export function RegisterForm() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-4 sm:gap-y-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-5">
             {/* Full Name */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="fullName"
               >
                 {signUp.fullNameLabel}
-                <span className="text-warning-500"> {signUp.fullNameNote}</span>
+                <span className="text-warning-500 text-xs sm:text-sm font-normal">
+                  {" "}
+                  {signUp.fullNameNote}
+                </span>
               </label>
               <input
                 id="fullName"
@@ -252,9 +251,9 @@ export function RegisterForm() {
                 placeholder={signUp.fullNamePlaceholder}
                 {...detailsForm.register("fullName")}
                 className={`
-                  bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-                  px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none text-right
-                  border-2 ${
+                  bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                  px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
+                  border-2 transition-colors duration-200 ${
                     detailsForm.formState.errors.fullName
                       ? "border-warning-500"
                       : "border-transparent focus:border-primary-500"
@@ -262,20 +261,23 @@ export function RegisterForm() {
                 `}
               />
               {detailsForm.formState.errors.fullName && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.fullName.message}
                 </p>
               )}
             </div>
 
             {/* Phone */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="phone"
               >
                 {signUp.phoneLabel}
-                <span className="text-warning-500"> {signUp.phoneNote}</span>
+                <span className="text-warning-500 text-xs sm:text-sm font-normal">
+                  {" "}
+                  {signUp.phoneNote}
+                </span>
               </label>
               <input
                 id="phone"
@@ -285,8 +287,8 @@ export function RegisterForm() {
                   onChange: handlePhoneInput,
                 })}
                 className={`
-                  bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-                  px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none text-right
+                  bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                  px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
                   border-2 transition-colors duration-200
                   ${
                     detailsForm.formState.errors.phone
@@ -296,20 +298,20 @@ export function RegisterForm() {
                 `}
               />
               {detailsForm.formState.errors.phone && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.phone.message}
                 </p>
               )}
             </div>
 
             {/* Gender */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="gender"
               >
                 {signUp.genderLabel}
-                <span className="text-warning-500">
+                <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.genderRequired}
                 </span>
@@ -318,9 +320,9 @@ export function RegisterForm() {
                 id="gender"
                 {...detailsForm.register("gender", { valueAsNumber: true })}
                 className={`
-                  bg-[#EBEBEB] text-text-dark text-xs sm:text-sm lg:text-[14px]
-                  pr-2 sm:pr-3 pl-7 sm:pl-10 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none text-right appearance-none
-                  border-2 ${
+                  bg-grey-100 text-text-dark text-sm sm:text-base
+                  pr-4 pl-10 py-2.5 sm:py-3 rounded-xl outline-none text-right appearance-none cursor-pointer
+                  border-2 transition-colors duration-200 ${
                     detailsForm.formState.errors.gender
                       ? "border-warning-500"
                       : "border-transparent focus:border-primary-500"
@@ -329,8 +331,8 @@ export function RegisterForm() {
                 style={{
                   backgroundImage: "url('/pages/sign/arrow-down.svg')",
                   backgroundRepeat: "no-repeat",
-                  backgroundPosition: "left 0.5rem center",
-                  backgroundSize: "14px 14px",
+                  backgroundPosition: "left 0.75rem center",
+                  backgroundSize: "16px 16px",
                 }}
               >
                 <option value="">{signUp.genderPlaceholder}</option>
@@ -338,16 +340,16 @@ export function RegisterForm() {
                 <option value={Gender.Female}>{signUp.genderFemale}</option>
               </select>
               {detailsForm.formState.errors.gender && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.gender.message}
                 </p>
               )}
             </div>
 
             {/* Email */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="email"
               >
                 {signUp.emailLabel}
@@ -358,9 +360,9 @@ export function RegisterForm() {
                 placeholder={signUp.emailPlaceholder}
                 {...detailsForm.register("email")}
                 className={`
-                  bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-                  px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none text-right
-                  border-2 ${
+                  bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                  px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
+                  border-2 transition-colors duration-200 ${
                     detailsForm.formState.errors.email
                       ? "border-warning-500"
                       : "border-transparent focus:border-primary-500"
@@ -368,20 +370,20 @@ export function RegisterForm() {
                 `}
               />
               {detailsForm.formState.errors.email && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.email.message}
                 </p>
               )}
             </div>
 
             {/* Password */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="password"
               >
                 {signUp.passwordLabel}
-                <span className="text-warning-500">
+                <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.passwordRequired}
                 </span>
@@ -393,9 +395,9 @@ export function RegisterForm() {
                   placeholder={signUp.passwordPlaceholder}
                   {...detailsForm.register("password")}
                   className={`
-                    w-full bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-                    pr-2 sm:pr-3 pl-7 sm:pl-10 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none
-                    border-2 ${
+                    w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                    pr-4 pl-10 py-2.5 sm:py-3 rounded-xl outline-none
+                    border-2 transition-colors duration-200 ${
                       detailsForm.formState.errors.password
                         ? "border-warning-500"
                         : "border-transparent focus:border-primary-500"
@@ -405,32 +407,34 @@ export function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
                   tabIndex={-1}
                 >
                   <Image
-                    src="/pages/sign/lock.svg"
-                    alt="toggle password"
-                    width={16}
-                    height={16}
+                    src={
+                      showPassword ? "/icons/lock-open.svg" : "/icons/lock.svg"
+                    }
+                    alt="toggle password visibility"
+                    width={18}
+                    height={18}
                   />
                 </button>
               </div>
               {detailsForm.formState.errors.password && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.password.message}
                 </p>
               )}
             </div>
 
             {/* Confirm Password */}
-            <div className="flex flex-col gap-2 sm:gap-3">
+            <div className="flex flex-col gap-2">
               <label
-                className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+                className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="confirmPassword"
               >
                 {signUp.confirmPasswordLabel}
-                <span className="text-warning-500">
+                <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.confirmPasswordRequired}
                 </span>
@@ -442,9 +446,9 @@ export function RegisterForm() {
                   placeholder={signUp.confirmPasswordPlaceholder}
                   {...detailsForm.register("confirmPassword")}
                   className={`
-                    w-full bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-                    pr-2 sm:pr-3 pl-7 sm:pl-10 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none
-                    border-2 ${
+                    w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                    pr-4 pl-10 py-2.5 sm:py-3 rounded-xl outline-none
+                    border-2 transition-colors duration-200 ${
                       detailsForm.formState.errors.confirmPassword
                         ? "border-warning-500"
                         : "border-transparent focus:border-primary-500"
@@ -454,29 +458,33 @@ export function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
                   tabIndex={-1}
                 >
                   <Image
-                    src="/pages/sign/lock.svg"
-                    alt="toggle password"
-                    width={16}
-                    height={16}
+                    src={
+                      showConfirmPassword
+                        ? "/icons/lock-open.svg"
+                        : "/icons/lock.svg"
+                    }
+                    alt="toggle password visibility"
+                    width={18}
+                    height={18}
                   />
                 </button>
               </div>
               {detailsForm.formState.errors.confirmPassword && (
-                <p className="text-warning-500 text-xs">
+                <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.confirmPassword.message}
                 </p>
               )}
             </div>
 
             {/* Terms Checkbox */}
-            <div className="flex flex-row-reverse items-center justify-end gap-2 sm:gap-3 lg:col-span-2">
+            <div className="flex flex-row-reverse items-center justify-end gap-3 lg:col-span-2 mt-2">
               <label
                 htmlFor="acceptTerms"
-                className="text-xs sm:text-base lg:text-[18px] text-primary-500 cursor-pointer"
+                className="text-sm sm:text-base text-primary-500 cursor-pointer hover:underline"
               >
                 {signUp.termsLabel}
               </label>
@@ -484,7 +492,7 @@ export function RegisterForm() {
                 id="acceptTerms"
                 type="checkbox"
                 {...detailsForm.register("acceptTerms")}
-                className="cursor-pointer h-4 sm:h-5 w-4 sm:w-5 rounded-sm border border-primary-500 accent-primary-500"
+                className="cursor-pointer h-5 w-5 rounded border-2 border-primary-500 accent-primary-500"
               />
             </div>
             {detailsForm.formState.errors.acceptTerms && (
@@ -494,19 +502,24 @@ export function RegisterForm() {
             )}
           </div>
 
-          <div className="mt-2">
+          <div className="mt-4">
             <Button
               type="submit"
               isLoading={isSendingOtp}
               disabled={isSendingOtp || !isTermsAccepted}
-              className="w-full bg-primary-500 text-white py-2 sm:py-3 rounded-xl sm:rounded-2xl"
+              className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
             >
               {signUp.submitButton}
             </Button>
           </div>
 
-          <div className="text-right text-primary-500 text-xs sm:text-base lg:text-[18px] font-light mt-2">
-            <Link href={ROUTES.SIGN_IN}>{signUp.signInLink}</Link>
+          <div className="text-center lg:text-right text-primary-500 text-sm sm:text-base font-light mt-2">
+            <Link
+              href={ROUTES.SIGN_IN}
+              className="hover:underline transition-colors"
+            >
+              {signUp.signInLink}
+            </Link>
           </div>
         </form>
       )}

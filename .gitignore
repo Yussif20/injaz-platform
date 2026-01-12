@@ -42,3 +42,7 @@ next-env.d.ts
 
 .mcp.json
 frontend-markdown.md
+
+/docs
+CLAUDE.md
+/.claude

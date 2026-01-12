@@ -11,6 +11,62 @@ export const dashboardContent = {
     myAccount: "حسابي",
   },
 
+  // Welcome header
+  welcomeHeader: {
+    greeting: "مرحبًا بك،",
+    subtext: "ابدء رحلتك معنا بتجميع إنجازاتك لكل سنة",
+  },
+
+  // Files section
+  filesSection: {
+    title: "الملفات",
+    creationDate: "تاريخ الإنشاء:",
+    addEvidence: "اضافة شواهد",
+    previewFile: "معاينة الملف",
+    noFiles: "لا توجد ملفات حتى الآن",
+    createFirstFile: "أنشئ ملفك الأول",
+  },
+
+  // File status badges
+  fileStatus: {
+    incomplete: "ملف غير مكتمل",
+    unpublished: "ملف غير منشور",
+    published: "ملف منشور",
+  },
+
+  // File options menu
+  fileOptions: {
+    editBasicData: "تعديل بيانات الملف الأساسية",
+    editMyData: "تعديل بياناتي",
+    createPassword: "إنشاء كلمة مرور للملف",
+    changePassword: "إعدادات كلمة المرور",
+    unpublish: "إلغاء النشر",
+    deleteFile: "حذف الملف",
+  },
+
+  // Filters section
+  filters: {
+    filterByYear: "تصنيف حسب السنة",
+    filterByStatus: "تصنيف حسب حالة الملف",
+    filterButton: "تصنيف",
+    gregorian: "تاريخ ميلادي",
+    hijri: "تاريخ هجري",
+    years: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"],
+  },
+
+  // File password modals
+  filePasswordModal: {
+    setTitle: "تعيين كلمة مرور الملف",
+    setDescription: "لا يمكن لأحد الإطلاع على ملفك إلا بعد إدخال كلمة المرور",
+    changeTitle: "إعدادات كلمة المرور",
+    currentPasswordLabel: "كلمة المرور الحالية",
+    passwordLabel: "كلمة المرور",
+    passwordPlaceholder: "مثال: Am@234",
+    activateButton: "تفعيل",
+    saveChangesButton: "حفظ التغييرات",
+    deactivateButton: "إلغاء التفعيل",
+  },
+
   // Top navbar
   navbar: {
     logout: "تسجيل الخروج",
@@ -19,6 +75,7 @@ export const dashboardContent = {
 
   // Breadcrumb
   breadcrumb: {
+    home: "الرئيسية",
     account: "حسابي",
     accountInfo: "بيانات الحساب",
     profileData: "بيانات ملفي",
@@ -28,6 +85,7 @@ export const dashboardContent = {
     howToUse: "كيفية الإستخدام",
     filePassword: "تعيين كلمة مرور للملفات",
     changePassword: "تغيير كلمة المرور",
+    createFile: "انشاء ملف انجاز",
   },
 
   // Account inner sidebar
@@ -82,6 +140,17 @@ export const dashboardContent = {
       title: "حذف الحساب",
       message: "هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.",
       confirm: "حذف الحساب",
+      cancel: "إلغاء",
+    },
+    deleteFile: {
+      title: "هل انت متأكد من حذف الملف نهائياً؟",
+      confirm: "حذف الملف",
+      cancel: "إلغاء",
+    },
+    editDataWarning: {
+      title: "عند تعديل البيانات يتم حذف بنود الملف",
+      message: "سيتعين عليك إضافة بنود جديدة تبعاً للبيانات الجديدة",
+      confirm: "تعديل البيانات",
       cancel: "إلغاء",
     },
   },
@@ -139,6 +208,48 @@ export const dashboardContent = {
       customizeTemplate: "تخصيص القالب",
       published: "منشور",
     },
+  },
+
+  // Create file page (انشاء ملف انجاز)
+  createFile: {
+    pageTitle: "انشاء ملف انجاز",
+    imageLabel: "صورة الملف",
+    imageHint: "(صورة شخصية او عادية)",
+    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
+    uploadImage: "تحميل الصورة",
+    changeImage: "تغيير الصورة",
+    yearLabel: "حدد العام الدراسي",
+    yearPlaceholder: "مثال: 2025",
+    jobRankLabel: "حدد الرتبة الوظيفية",
+    jobRankPlaceholder: "مثال: معلم خبير",
+    createFileButton: "إنشاء الملف",
+    saveChangesButton: "حفظ التغييرات",
+    editPageTitle: "تعديل بيانات الملف",
+    dateTypes: {
+      gregorian: "تاريخ ميلادي",
+      hijri: "تاريخ هجري",
+    },
+    jobRanks: [
+      { value: "معلم ممارس", label: "معلم ممارس" },
+      { value: "معلم متقدم", label: "معلم متقدم" },
+      { value: "معلم خبير", label: "معلم خبير" },
+    ],
+    gregorianYears: [
+      { value: "2024", label: "2024" },
+      { value: "2025", label: "2025" },
+      { value: "2026", label: "2026" },
+    ],
+    hijriYears: [
+      { value: "1442هـ", label: "1442هـ" },
+      { value: "1443هـ", label: "1443هـ" },
+      { value: "1444هـ", label: "1444هـ" },
+    ],
+    // Promo sidebar
+    promoTitle: "أنشئ ملفك",
+    promoSubtitle: "بسهولة من جوالك",
+    promoDescription: "تطبيقنا متوفر على",
+    playStore: "Get it from Play Store",
+    appStore: "Get it from App Store",
   },
 
   // Profile data page (بيانات ملفي)

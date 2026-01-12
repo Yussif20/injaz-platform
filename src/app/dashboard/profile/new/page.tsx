@@ -1,16 +1,63 @@
-import { dashboardContent } from "@/content";
+"use client";
 
-export default function CreateProfilePage() {
-  const { sidebar } = dashboardContent;
+import { useSearchParams, useRouter } from "next/navigation";
+import {
+  CreateFileForm,
+  MobilePromoSidebar,
+  EditFileData,
+} from "@/features/dashboard";
+import { ROUTES } from "@/config";
+
+export default function CreateFilePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Check if we're in edit mode
+  const isEditMode = searchParams.get("edit") === "true";
+  const fileId = searchParams.get("fileId");
+  const year = searchParams.get("year");
+  const jobRank = searchParams.get("jobRank");
+  const imageUrl = searchParams.get("imageUrl");
+
+  // Build initial data for edit mode
+  const initialData: EditFileData | undefined =
+    isEditMode && fileId
+      ? {
+          id: fileId,
+          year: year || "",
+          jobRank: jobRank || "",
+          imageUrl: imageUrl || undefined,
+        }
+      : undefined;
+
+  const handleSubmit = (
+    data: { year: string; jobRank: string },
+    editFileId?: string
+  ) => {
+    if (isEditMode && editFileId) {
+      console.log("Saving changes for file:", editFileId, data);
+      // TODO: Implement API call to update file
+      router.push(ROUTES.DASHBOARD);
+    } else {
+      console.log("Creating new file:", data);
+      // TODO: Implement API call to create file
+      router.push(ROUTES.DASHBOARD);
+    }
+  };
 
   return (
-    <div className="text-right" dir="rtl">
-      <h1 className="text-2xl font-medium text-secondary-800 mb-4">
-        {sidebar.createProfile}
-      </h1>
-      <p className="text-grey-600">
-        صفحة إنشاء ملف جديد - قريباً
-      </p>
+    <div className="flex gap-8" dir="rtl">
+      {/* Main Form Area */}
+      <div className="flex-1">
+        <CreateFileForm
+          isEditMode={isEditMode}
+          initialData={initialData}
+          onSubmit={handleSubmit}
+        />
+      </div>
+
+      {/* Promotional Sidebar - Desktop Only */}
+      <MobilePromoSidebar />
     </div>
   );
 }
