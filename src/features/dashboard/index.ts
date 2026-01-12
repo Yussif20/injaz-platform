@@ -17,7 +17,15 @@ export {
   EducationDataTab,
   JobDataTab,
   ProfileDataTabs,
+  CreateFileForm,
+  MobilePromoSidebar,
+  FileCard,
+  FileFilters,
+  FilePasswordModal,
+  ConfirmationModal,
 } from "./components";
+
+export type { FileData, FileStatus, EditFileData } from "./components";
 
 // Types
 export * from "./types";

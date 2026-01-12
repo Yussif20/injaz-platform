@@ -27,6 +27,23 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
   // Generate breadcrumb based on current path
   const getBreadcrumb = () => {
+    // Create file page breadcrumb
+    if (pathname === ROUTES.DASHBOARD_PROFILE_NEW) {
+      return (
+        <>
+          <Link
+            href={ROUTES.DASHBOARD}
+            className="text-grey-500 hover:text-primary-500 transition-colors"
+          >
+            {breadcrumb.home}
+          </Link>
+          <span className="text-grey-400 mx-2">&lt;</span>
+          <span className="text-secondary-800">{breadcrumb.createFile}</span>
+        </>
+      );
+    }
+
+    // Account pages breadcrumb
     if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT)) {
       const segments = pathname.split("/").filter(Boolean);
       const lastSegment = segments[segments.length - 1];

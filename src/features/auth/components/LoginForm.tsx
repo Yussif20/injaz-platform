@@ -4,9 +4,11 @@
 
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
@@ -20,6 +22,7 @@ interface LoginFormProps {
 export function LoginForm({ onForgotPassword }: LoginFormProps) {
   const { signIn } = authContent;
   const { login, isLoading, error, reset } = useLogin();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -46,7 +49,10 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 sm:gap-5 lg:gap-10 text-right">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-5 sm:gap-6 lg:gap-8 text-right"
+    >
       {/* API Error */}
       {error && (
         <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
@@ -55,9 +61,9 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
       )}
 
       {/* Phone Input */}
-      <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="flex flex-col gap-2">
         <label
-          className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+          className="text-sm sm:text-base font-medium text-text-dark"
           htmlFor="phone"
         >
           {signIn.phoneLabel}
@@ -70,61 +76,82 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
             onChange: handlePhoneInput,
           })}
           className={`
-            bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-            px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none text-right
+            bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+            px-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
             border-2 transition-colors duration-200
-            ${errors.phone ? "border-warning-500" : "border-transparent focus:border-primary-500"}
+            ${
+              errors.phone
+                ? "border-warning-500"
+                : "border-transparent focus:border-primary-500"
+            }
           `}
         />
         {errors.phone && (
-          <p className="text-warning-500 text-xs">{errors.phone.message}</p>
+          <p className="text-warning-500 text-xs mt-1">
+            {errors.phone.message}
+          </p>
         )}
       </div>
 
       {/* Password Input */}
-      <div className="flex flex-col gap-2 sm:gap-3">
+      <div className="flex flex-col gap-2">
         <label
-          className="text-xs sm:text-sm lg:text-[16px] font-normal text-text-dark"
+          className="text-sm sm:text-base font-medium text-text-dark"
           htmlFor="password"
         >
           {signIn.passwordLabel}
         </label>
-        <input
-          id="password"
-          type="password"
-          placeholder={signIn.passwordPlaceholder}
-          {...register("password")}
-          className={`
-            bg-[#EBEBEB] text-text-dark placeholder-[#B3B3B3] text-xs sm:text-sm lg:text-[14px]
-            pr-2 sm:pr-3 pl-7 sm:pl-10 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl outline-none
-            border-2 transition-colors duration-200
-            ${errors.password ? "border-warning-500" : "border-transparent focus:border-primary-500"}
-          `}
-          style={{
-            backgroundImage: "url('/pages/sign/lock.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "left 0.5rem center",
-            backgroundSize: "16px 16px",
-          }}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder={signIn.passwordPlaceholder}
+            {...register("password")}
+            className={`
+              w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+              pr-4 pl-10 sm:pl-12 py-3 sm:py-3.5 rounded-xl outline-none
+              border-2 transition-colors duration-200
+              ${
+                errors.password
+                  ? "border-warning-500"
+                  : "border-transparent focus:border-primary-500"
+              }
+            `}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
+            tabIndex={-1}
+          >
+            <Image
+              src={showPassword ? "/icons/lock-open.svg" : "/icons/lock.svg"}
+              alt="toggle password visibility"
+              width={18}
+              height={18}
+            />
+          </button>
+        </div>
         {errors.password && (
-          <p className="text-warning-500 text-xs">{errors.password.message}</p>
+          <p className="text-warning-500 text-xs mt-1">
+            {errors.password.message}
+          </p>
         )}
 
         {/* Forgot Password Link */}
-        <div className="text-right">
+        <div className="text-right mt-1">
           {onForgotPassword ? (
             <button
               type="button"
               onClick={onForgotPassword}
-              className="text-xs sm:text-base lg:text-[18px] font-light text-primary-500 hover:underline"
+              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-600 hover:underline transition-colors"
             >
               {signIn.forgotPassword}
             </button>
           ) : (
             <Link
               href={ROUTES.FORGOT_PASSWORD}
-              className="text-xs sm:text-base lg:text-[18px] font-light text-primary-500 hover:underline"
+              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-600 hover:underline transition-colors"
             >
               {signIn.forgotPassword}
             </Link>
@@ -133,20 +160,25 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
       </div>
 
       {/* Submit Button */}
-      <div className="w-full flex justify-center mt-1 sm:mt-2">
+      <div className="w-full mt-2">
         <Button
           type="submit"
           isLoading={isLoading}
           disabled={isLoading}
-          className="w-full bg-primary-500 text-white text-xs sm:text-base lg:text-[18px] font-light py-2 sm:py-3 rounded-xl sm:rounded-2xl"
+          className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
         >
           {signIn.submitButton}
         </Button>
       </div>
 
       {/* Sign Up Link */}
-      <div className="text-right text-primary-500 text-xs sm:text-base lg:text-[18px] font-light">
-        <Link href={ROUTES.SIGN_UP}>{signIn.signUpLink}</Link>
+      <div className="text-center lg:text-right text-primary-500 text-sm sm:text-base font-light">
+        <Link
+          href={ROUTES.SIGN_UP}
+          className="hover:underline transition-colors"
+        >
+          {signIn.signUpLink}
+        </Link>
       </div>
     </form>
   );

@@ -10,29 +10,30 @@ export default function SignLayout({
         {/* Background image anchored to the left, full height */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 w-full z-0 bg-no-repeat bg-left bg-contain"
+          className="pointer-events-none absolute inset-y-0 left-0 w-full z-0 bg-no-repeat bg-left bg-cover lg:bg-contain"
           style={{ backgroundImage: "url('/pages/sign/sign-bg.svg')" }}
         />
 
-        {/* Foreground: form overlay, takes 1/2 width */}
+        {/* Foreground: form overlay */}
         <div className="relative z-10 min-h-screen w-full flex items-stretch">
-          <div className="w-7/12">{children}</div>
+          <div className="w-full lg:w-1/2 xl:w-5/12">{children}</div>
         </div>
       </div>
 
       {/* Small and medium screens: stacked layout with image at top, form below */}
-      <div className="lg:hidden flex flex-col bg-primary-500">
-        {/* Background image at top, full width */}
+      <div className="lg:hidden flex flex-col min-h-screen bg-primary-500">
+        {/* Background image at top */}
         <div
-          className="w-full bg-no-repeat bg-top"
+          className="w-full bg-no-repeat bg-center bg-contain shrink-0"
           style={{
             backgroundImage: "url('/pages/sign/sign-bg.svg')",
-            height: "30vh",
+            height: "25vh",
+            minHeight: "150px",
           }}
         />
 
         {/* Form below image */}
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 flex flex-col">{children}</div>
       </div>
     </>
   );
