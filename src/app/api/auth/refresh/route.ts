@@ -1,6 +1,14 @@
 /**
  * Refresh Token API route
  * POST /api/auth/refresh
+ *
+ * Backend response format:
+ * {
+ *   status: "Success",
+ *   message: "Token refreshed successfully",
+ *   data: { userId, phone, fullName, userName, role, token, refreshToken },
+ *   errors: []
+ * }
  */
 
 import { NextResponse } from "next/server";
@@ -58,8 +66,15 @@ export async function POST() {
     await clearAuthCookies();
 
     if (error && typeof error === "object" && "response" in error) {
-      const axiosError = error as { response?: { data?: ApiResponse<null> } };
+      const axiosError = error as {
+        response?: {
+          data?: ApiResponse<null>;
+          status?: number;
+        }
+      };
       const errorData = axiosError.response?.data;
+      const statusCode = axiosError.response?.status || 401;
+
       return NextResponse.json(
         {
           status: false,
@@ -67,7 +82,7 @@ export async function POST() {
           errors: errorData?.errors || null,
           data: null,
         },
-        { status: 401 }
+        { status: statusCode }
       );
     }
 

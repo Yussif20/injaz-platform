@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { Button } from "@/shared/components/ui";
+import { useChangePassword } from "../hooks";
 
 const {
   changePassword: content,
@@ -91,10 +92,12 @@ PasswordInput.displayName = "PasswordInput";
 
 export const ChangePasswordForm: React.FC = () => {
   const router = useRouter();
-  const [isSaving, setIsSaving] = useState(false);
+  const { changePassword, isLoading: isSaving } = useChangePassword();
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -110,25 +113,64 @@ export const ChangePasswordForm: React.FC = () => {
     },
   });
 
-  const onSubmit = async (data: ChangePasswordFormData) => {
-    setIsSaving(true);
-    try {
-      // TODO: Implement API call to change password
-      console.log("Changing password:", data);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(success.passwordChanged);
-      router.push(ROUTES.DASHBOARD_ACCOUNT_INFO);
-    } catch (error) {
-      console.error("Failed to change password:", error);
-      alert(errorMessages.updateFailed);
-    } finally {
-      setIsSaving(false);
+  // Clear messages after timeout
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        router.push(ROUTES.DASHBOARD_ACCOUNT_INFO);
+      }, 2000);
+      return () => clearTimeout(timer);
     }
+  }, [successMessage, router]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
+  const onSubmit = async (data: ChangePasswordFormData) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    changePassword(
+      {
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+        confirmNewPassword: data.confirmPassword,
+      },
+      {
+        onSuccess: (response) => {
+          if (response.status) {
+            setSuccessMessage(success.passwordChanged);
+          } else {
+            setErrorMessage(response.message || errorMessages.updateFailed);
+          }
+        },
+        onError: (error) => {
+          console.error("Failed to change password:", error);
+          setErrorMessage(errorMessages.updateFailed);
+        },
+      }
+    );
   };
 
   return (
     <div className="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-8">
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="mb-4 p-3 bg-success-100 border border-success-500 text-success-700 rounded-lg text-sm">
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-warning-100 border border-warning-500 text-warning-700 rounded-lg text-sm">
+          {errorMessage}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Old Password */}
         <PasswordInput

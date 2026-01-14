@@ -2,10 +2,11 @@
  * Authentication types
  */
 
-// Gender enum matching backend (male: 1, female: 0)
+// Gender enum matching backend API
+// Backend uses: Male = 1, Female = 2
 export enum Gender {
   Male = 1,
-  Female = 0,
+  Female = 2,
 }
 
 // Verification purpose enum

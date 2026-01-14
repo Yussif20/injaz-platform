@@ -1,16 +1,23 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { Button, ConfirmModal, Input, Select } from "@/shared/components/ui";
-import { useAuth, Gender } from "@/features/auth";
+import { useAuth } from "@/features/auth";
+import {
+  useMyProfile,
+  useUpdateBasicInfo,
+  useUpdatePersonalInfo,
+  useUploadProfileImage,
+  useDeleteAccount,
+} from "../hooks";
+import { genderToFormValue, formValueToGender } from "../types/me.types";
 
 // Form validation schema
 const accountInfoSchema = z.object({
@@ -24,15 +31,22 @@ const accountInfoSchema = z.object({
 type AccountInfoFormData = z.infer<typeof accountInfoSchema>;
 
 export const AccountInfoForm: React.FC = () => {
-  const router = useRouter();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // API hooks
+  const { profile, isLoading: isLoadingProfile } = useMyProfile();
+  const { updateBasicInfo, isLoading: isUpdatingBasicInfo } = useUpdateBasicInfo();
+  const { updatePersonalInfo, isLoading: isUpdatingPersonalInfo } = useUpdatePersonalInfo();
+  const { uploadImage, isLoading: isUploadingImage } = useUploadProfileImage();
+  const { deleteAccount, isLoading: isDeletingAccount } = useDeleteAccount();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     accountInfo,
@@ -41,26 +55,50 @@ export const AccountInfoForm: React.FC = () => {
     success,
   } = dashboardContent;
 
-  // Map user gender to form value
-  const getInitialGender = (): "male" | "female" => {
-    if (user?.gender === Gender.Male) return "male";
-    return "female";
-  };
-
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
+    reset,
   } = useForm<AccountInfoFormData>({
     resolver: zodResolver(accountInfoSchema),
     defaultValues: {
-      gender: getInitialGender(),
+      gender: genderToFormValue(user?.gender) || "male",
       email: user?.email || "",
     },
   });
 
+  // Update form when profile or user data changes
+  useEffect(() => {
+    // Profile uses nested personalInfo for email, fallback to user data
+    const gender = profile?.gender ?? user?.gender;
+    const email = profile?.personalInfo?.email || user?.email || "";
+    reset({
+      gender: genderToFormValue(gender) || "male",
+      email: email,
+    });
+  }, [profile, user, reset]);
+
+  // Combined loading state
+  const isSaving = isUpdatingBasicInfo || isUpdatingPersonalInfo || isUploadingImage;
+
   // Check if form has any changes (including image)
   const hasChanges = isDirty || imageChanged;
+
+  // Clear messages after timeout
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -69,6 +107,7 @@ export const AccountInfoForm: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
@@ -79,37 +118,96 @@ export const AccountInfoForm: React.FC = () => {
   };
 
   const onSubmit = async (data: AccountInfoFormData) => {
-    setIsSaving(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
     try {
-      // TODO: Implement API call to update profile
-      console.log("Saving profile:", { ...data, profileImage });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(success.profileUpdated);
+      // Upload image if changed
+      if (imageChanged && selectedImageFile) {
+        await new Promise<void>((resolve, reject) => {
+          uploadImage(selectedImageFile, {
+            onSuccess: (response) => {
+              if (response.status) {
+                resolve();
+              } else {
+                reject(new Error(response.message));
+              }
+            },
+            onError: (error) => reject(error),
+          });
+        });
+      }
+
+      // Update basic info (gender) if changed
+      // Backend uses: Male = 1, Female = 2
+      const genderValue = formValueToGender(data.gender);
+
+      if (genderValue !== displayData.gender) {
+        await new Promise<void>((resolve, reject) => {
+          updateBasicInfo(
+            {
+              fullName: displayData.fullName,
+              gender: genderValue,
+            },
+            {
+              onSuccess: (response) => {
+                if (response.status) {
+                  resolve();
+                } else {
+                  reject(new Error(response.message));
+                }
+              },
+              onError: (error) => reject(error),
+            }
+          );
+        });
+      }
+
+      // Update personal info (email) if changed
+      if (data.email !== displayData.email) {
+        await new Promise<void>((resolve, reject) => {
+          updatePersonalInfo(
+            { email: data.email || undefined },
+            {
+              onSuccess: (response) => {
+                if (response.status) {
+                  resolve();
+                } else {
+                  reject(new Error(response.message));
+                }
+              },
+              onError: (error) => reject(error),
+            }
+          );
+        });
+      }
+
+      // Reset image change state
+      setImageChanged(false);
+      setSelectedImageFile(null);
+      setSuccessMessage(success.profileUpdated);
     } catch (error) {
       console.error("Failed to save profile:", error);
-      alert(errorMessages.updateFailed);
-    } finally {
-      setIsSaving(false);
+      setErrorMessage(
+        error instanceof Error ? error.message : errorMessages.updateFailed
+      );
     }
   };
 
   const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      // TODO: Implement API call to delete account
-      console.log("Deleting account...");
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(success.accountDeleted);
-      router.push(ROUTES.SIGN_IN);
-    } catch (error) {
-      console.error("Failed to delete account:", error);
-      alert(errorMessages.deleteAccountFailed);
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-    }
+    deleteAccount(undefined, {
+      onSuccess: (response) => {
+        if (!response.status) {
+          setErrorMessage(response.message || errorMessages.deleteAccountFailed);
+        }
+        setShowDeleteModal(false);
+      },
+      onError: (error) => {
+        console.error("Failed to delete account:", error);
+        setErrorMessage(errorMessages.deleteAccountFailed);
+        setShowDeleteModal(false);
+      },
+    });
   };
 
   const genderOptions = [
@@ -117,9 +215,52 @@ export const AccountInfoForm: React.FC = () => {
     { value: "female", label: accountInfo.genderFemale },
   ];
 
+  // Show loading skeleton only if we don't have any user data yet
+  if (isLoadingProfile && !user) {
+    return (
+      <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8 animate-pulse">
+        <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
+          <div className="w-24 h-24 rounded-full bg-grey-200" />
+          <div className="h-6 w-32 bg-grey-200 rounded" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-4 w-24 bg-grey-200 rounded" />
+              <div className="h-10 bg-grey-200 rounded-xl" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Use profile data if available, otherwise fall back to auth user data
+  // Note: Backend uses nested structure with personalInfo for email
+  // and imageUrl for profile image
+  const displayData = {
+    fullName: profile?.fullName || user?.fullName || "",
+    phone: profile?.phone || user?.phone || "",
+    gender: profile?.gender ?? user?.gender,
+    email: profile?.personalInfo?.email || user?.email || "",
+    profileImage: profile?.imageUrl || user?.profileImage || null,
+  };
+
   return (
     <>
       <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <div className="mb-4 p-3 bg-success-100 border border-success-500 text-success-700 rounded-lg text-sm">
+            {successMessage}
+          </div>
+        )}
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-warning-100 border border-warning-500 text-warning-700 rounded-lg text-sm">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Profile Image */}
           <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
@@ -133,9 +274,9 @@ export const AccountInfoForm: React.FC = () => {
                     height={70}
                     className="w-full h-full object-cover"
                   />
-                ) : user?.profileImage ? (
+                ) : displayData.profileImage ? (
                   <Image
-                    src={user.profileImage}
+                    src={displayData.profileImage}
                     alt={accountInfo.profileImageAlt}
                     width={70}
                     height={70}
@@ -175,7 +316,7 @@ export const AccountInfoForm: React.FC = () => {
             {/* Name (readonly) */}
             <Input
               label={accountInfo.nameLabel}
-              value={user?.fullName || ""}
+              value={displayData.fullName}
               disabled
               readOnly
             />
@@ -200,7 +341,7 @@ export const AccountInfoForm: React.FC = () => {
             {/* Phone (readonly) */}
             <Input
               label={accountInfo.phoneLabel}
-              value={user?.phone || ""}
+              value={displayData.phone}
               disabled
               readOnly
               dir="ltr"
@@ -268,7 +409,7 @@ export const AccountInfoForm: React.FC = () => {
         confirmText={modals.deleteAccount.confirm}
         cancelText={modals.deleteAccount.cancel}
         variant="danger"
-        isLoading={isDeleting}
+        isLoading={isDeletingAccount}
       />
     </>
   );

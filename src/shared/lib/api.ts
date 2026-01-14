@@ -37,4 +37,12 @@ export const API_ENDPOINTS = {
   RESET_PASSWORD_WITH_OTP: "/api/Auth/reset-password-with-otp",
   CHANGE_PASSWORD: "/api/Auth/change-password",
   REFRESH_TOKEN: "/api/Auth/refresh-token",
+
+  // Me endpoints (backend)
+  ME: "/api/Me",
+  MY_PROFILE: "/api/Me/profile",
+  MY_PERSONAL_INFO: "/api/Me/personal-info",
+  MY_BASIC_INFO: "/api/Me/basic-info",
+  MY_IMAGE: "/api/Me/image",
+  PROFILE_COMPLETENESS: "/api/Me/profile-completeness",
 } as const;
