@@ -1,13 +1,12 @@
 /**
  * Profiles feature barrel export
- * Components, hooks, and types will be added here as they are created
  */
 
-// Export components when created
-// export * from "./components";
+// Export types
+export * from "./types";
 
-// Export hooks when created
-// export { useProfiles } from "./hooks/useProfiles";
+// Export services
+export * from "./services";
 
-// Export types when created
-// export type { Profile, ProfileSection } from "./types/profile.types";
+// Export hooks
+export * from "./hooks";

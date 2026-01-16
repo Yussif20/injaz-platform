@@ -51,4 +51,18 @@ export const API_ENDPOINTS = {
 
   // Qualifications endpoints (backend)
   MY_QUALIFICATIONS: "/api/my-qualifications",
+
+  // Profiles endpoints (backend)
+  MY_PROFILES: "/api/my-profiles",
+
+  // Reference Data endpoints (backend)
+  ACADEMIC_YEARS: "/api/AcademicYears",
+  ACADEMIC_YEARS_ACTIVE: "/api/AcademicYears/active",
+  PROFILE_TYPES: "/api/ProfileTypes",
+  PROFILE_TYPES_AVAILABLE: "/api/ProfileTypes/available",
+  PROFILE_TYPES_ACTIVE: "/api/ProfileTypes/active",
+  RANKS: "/api/Ranks",
+
+  // Profile Management endpoints (backend)
+  PROFILES: "/api/Profiles",
 } as const;

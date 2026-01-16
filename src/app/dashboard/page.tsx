@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,42 +13,57 @@ import {
   FileData,
   FileStatus,
 } from "@/features/dashboard";
+import { useMyProfiles, useUnpublishProfile } from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
+import type { Profile } from "@/features/profiles/types";
 
-// Mock data for demonstration
-const mockFiles: FileData[] = [
-  {
-    id: "1",
-    title: "معلم خبير",
-    ownerName: "محمد أحمد العتيبي",
-    year: "2023",
-    creationDate: "19/6/2020",
-    status: "incomplete",
-    hasPassword: false,
-  },
-  {
-    id: "2",
-    title: "معلم خبير",
-    ownerName: "محمد أحمد العتيبي",
-    year: "2023",
-    creationDate: "19/6/2020",
-    status: "unpublished",
-    hasPassword: false,
-  },
-  {
-    id: "3",
-    title: "معلم خبير",
-    ownerName: "محمد أحمد العتيبي",
-    year: "2023",
-    creationDate: "19/6/2020",
-    status: "published",
-    hasPassword: true,
-  },
-];
+// Helper function to map Profile status to FileStatus
+function mapProfileStatusToFileStatus(status: string | null): FileStatus {
+  switch (status) {
+    case "Published":
+      return "published";
+    case "Unpublished":
+      return "unpublished";
+    case "Draft":
+    default:
+      return "incomplete";
+  }
+}
+
+// Helper function to format date
+function formatDate(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ar-SA", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  } catch {
+    return dateString;
+  }
+}
+
+// Helper function to map Profile to FileData
+function mapProfileToFileData(profile: Profile): FileData {
+  return {
+    id: String(profile.id),
+    title: profile.profileTypeName || "ملف",
+    ownerName: profile.userFullName || "",
+    year: profile.academicYearName || "",
+    creationDate: formatDate(profile.createdAt),
+    status: mapProfileStatusToFileStatus(profile.status),
+    hasPassword: profile.isPasswordProtected,
+  };
+}
 
 export default function DashboardPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { profiles, isLoading: profilesLoading, refetch: refetchProfiles } = useMyProfiles();
+  const { unpublish } = useUnpublishProfile();
+
+  const isLoading = authLoading || profilesLoading;
   const router = useRouter();
   const { welcomeHeader, filesSection } = dashboardContent;
 
@@ -70,12 +85,18 @@ export default function DashboardPage() {
   const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const [fileToEdit, setFileToEdit] = useState<string | null>(null);
 
-  // Filter files based on selected filters
-  const filteredFiles = mockFiles.filter((file) => {
-    if (selectedYear && file.year !== selectedYear) return false;
-    if (selectedStatus && file.status !== selectedStatus) return false;
-    return true;
-  });
+  // Map profiles to file data and filter
+  const fileData = useMemo(() => {
+    return profiles.map(mapProfileToFileData);
+  }, [profiles]);
+
+  const filteredFiles = useMemo(() => {
+    return fileData.filter((file) => {
+      if (selectedYear && file.year !== selectedYear) return false;
+      if (selectedStatus && file.status !== selectedStatus) return false;
+      return true;
+    });
+  }, [fileData, selectedYear, selectedStatus]);
 
   const handleSetPassword = (fileId: string) => {
     setSelectedFileId(fileId);
@@ -125,21 +146,31 @@ export default function DashboardPage() {
 
   const handleConfirmEditBasicData = () => {
     if (fileToEdit) {
-      // Find the file data to pass to the edit page
-      const fileData = mockFiles.find((f) => f.id === fileToEdit);
-      if (fileData) {
-        // Build URL with file data as search params
+      // Find the profile to pass to the edit page
+      const profile = profiles.find((p) => String(p.id) === fileToEdit);
+      if (profile) {
+        // Build URL with profile data as search params
         const params = new URLSearchParams({
           edit: "true",
-          fileId: fileData.id,
-          year: fileData.year,
-          jobRank: fileData.title,
+          fileId: String(profile.id),
+          year: profile.academicYearName || "",
+          jobRank: profile.profileTypeName || "",
         });
         router.push(`${ROUTES.DASHBOARD_PROFILE_NEW}?${params.toString()}`);
       }
     }
     setEditDataModalOpen(false);
     setFileToEdit(null);
+  };
+
+  const handleUnpublish = async (fileId: string) => {
+    try {
+      const response = await unpublish(Number(fileId));
+      // Refetch profiles after unpublishing
+      refetchProfiles();
+    } catch (error) {
+      console.error("Error unpublishing profile:", error);
+    }
   };
 
   if (isLoading) {
@@ -194,7 +225,7 @@ export default function DashboardPage() {
                   onEditMyData={(id) => console.log("Edit my data:", id)}
                   onSetPassword={handleSetPassword}
                   onChangePassword={handleChangePassword}
-                  onUnpublish={(id) => console.log("Unpublish:", id)}
+                  onUnpublish={handleUnpublish}
                   onDelete={handleDeleteClick}
                 />
               ))}

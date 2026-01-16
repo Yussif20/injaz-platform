@@ -1,0 +1,87 @@
+/**
+ * Profile Image API routes
+ * POST /api/profiles/[id]/image - Upload profile image
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { getAccessToken } from "@/shared/lib/cookies";
+import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
+import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
+import type { Profile } from "@/features/profiles/types";
+
+/**
+ * POST /api/profiles/[id]/image - Upload profile image
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const accessToken = await getAccessToken();
+
+    if (!accessToken) {
+      return NextResponse.json(
+        { status: false, message: "غير مصرح", data: null },
+        { status: 401 }
+      );
+    }
+
+    const formData = await request.formData();
+
+    const response = await serverApi.post<ApiResponse<Profile>>(
+      `${API_ENDPOINTS.MY_PROFILES}/${id}/image`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (isApiSuccess(response.data.status)) {
+      return NextResponse.json({
+        status: true,
+        message: response.data.message || "تم رفع الصورة بنجاح",
+        data: response.data.data,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        status: false,
+        message: response.data.message || "فشل في رفع الصورة",
+        errors: response.data.errors,
+      },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("Upload profile image error:", error);
+
+    if (error && typeof error === "object" && "response" in error) {
+      const axiosError = error as {
+        response?: {
+          data?: ApiResponse<null>;
+          status?: number;
+        };
+      };
+      const errorData = axiosError.response?.data;
+      const statusCode = axiosError.response?.status || 500;
+
+      return NextResponse.json(
+        {
+          status: false,
+          message: errorData?.message || "فشل في رفع الصورة",
+          errors: errorData?.errors || null,
+        },
+        { status: statusCode }
+      );
+    }
+
+    return NextResponse.json(
+      { status: false, message: "حدث خطأ غير متوقع", data: null },
+      { status: 500 }
+    );
+  }
+}
