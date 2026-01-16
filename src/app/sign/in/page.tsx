@@ -47,7 +47,7 @@ export default function SignInPage() {
             className="h-14 w-14 sm:h-16 sm:w-16 lg:h-18 lg:w-18 rounded-full bg-primary-500 hover:bg-primary-600 transition-colors duration-200 flex items-center justify-center shadow-lg"
           >
             <Image
-              src="/pages/sign/customer-service.svg"
+              src="/icons/ui/customer-service.svg"
               alt={signIn.customerServiceAlt}
               width={32}
               height={32}

@@ -8,6 +8,14 @@ import { getAccessToken, getRefreshToken, setAuthCookies, clearAuthCookies } fro
 import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse, type AuthData, type User } from "@/features/auth/types/auth.types";
 
+// Microsoft-style JWT claim URIs
+const JWT_CLAIMS = {
+  PHONE: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone",
+  NAME: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
+  ROLE: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+  USERNAME: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+};
+
 // Decode JWT to get user info (without verification - server handles that)
 function decodeJWT(token: string): User | null {
   try {
@@ -21,12 +29,13 @@ function decodeJWT(token: string): User | null {
     );
     const payload = JSON.parse(jsonPayload);
 
+    // Support both Microsoft-style URI claims and simple claim names
     return {
-      userId: payload.nameid || payload.sub || "",
-      phone: payload.phone || "",
-      fullName: payload.name || payload.fullName || "",
-      userName: payload.unique_name || payload.userName || "",
-      role: payload.role || "",
+      userId: payload.UserId || payload.nameid || payload.sub || "",
+      phone: payload[JWT_CLAIMS.PHONE] || payload.phone || "",
+      fullName: payload[JWT_CLAIMS.NAME] || payload.name || payload.fullName || "",
+      userName: payload[JWT_CLAIMS.USERNAME] || payload.unique_name || payload.userName || "",
+      role: payload[JWT_CLAIMS.ROLE] || payload.role || "",
     };
   } catch {
     return null;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
+import Image from "next/image";
 
 interface DashboardSidebarProps {
   isOpen?: boolean;
@@ -29,16 +30,19 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       label: sidebar.home,
       href: ROUTES.DASHBOARD,
-      icon: <img src="/icons/home.svg" alt="home" className="w-5 h-5" />,
+      icon: (
+        <Image src="/icons/ui/home.svg" alt="home" width={20} height={20} />
+      ),
     },
     {
       label: sidebar.createProfile,
       href: ROUTES.DASHBOARD_PROFILE_NEW,
       icon: (
-        <img
-          src="/icons/plus-sign-circle.svg"
+        <Image
+          src="/icons/ui/plus-sign-circle.svg"
           alt="create profile"
-          className="w-5 h-5"
+          width={20}
+          height={20}
         />
       ),
     },
@@ -47,7 +51,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       href: ROUTES.DASHBOARD_ACCOUNT,
       matchPrefix: ROUTES.DASHBOARD_ACCOUNT,
       icon: (
-        <img src="/icons/profile.svg" alt="my account" className="w-5 h-5" />
+        <Image
+          src="/icons/ui/profile.svg"
+          alt="my account"
+          width={20}
+          height={20}
+        />
       ),
     },
   ];

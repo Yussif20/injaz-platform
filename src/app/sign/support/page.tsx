@@ -25,7 +25,7 @@ export default function SupportPage() {
             aria-label={support.backAlt}
           >
             <Image
-              src="/pages/sign/right-arrow.svg"
+              src="/icons/ui/right-arrow.svg"
               alt={support.backAlt}
               width={24}
               height={24}
@@ -48,7 +48,7 @@ export default function SupportPage() {
         {/* Support Illustration */}
         <div className="flex justify-start">
           <Image
-            src="/pages/sign/support-illustration.svg"
+            src="/images/auth/support-illustration.svg"
             alt={support.title}
             width={292}
             height={245}
@@ -81,7 +81,7 @@ export default function SupportPage() {
             966548635554
           </span>
           <Image
-            src="/pages/sign/whatsapp.svg"
+            src="/images/auth/whatsapp.svg"
             alt={support.whatsappAlt}
             width={24}
             height={24}

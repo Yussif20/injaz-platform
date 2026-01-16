@@ -17,7 +17,7 @@ export function MobileAppSection() {
           {/* Left Half - Image (shown first) */}
           <div className="relative w-full aspect-video order-1">
             <Image
-              src="/sections/mobile-app/mobile-app-preview-tablet.svg"
+              src="/images/landing/mobile-app/mobile-app-preview-tablet.svg"
               alt={mobileAppSection.imageAlt}
               fill
               className="object-contain"
@@ -32,7 +32,7 @@ export function MobileAppSection() {
                 <li key={index} className="flex items-start gap-3">
                   <div className="shrink-0 mt-1 w-4.5 h-4.5 md:w-6 md:h-6 relative">
                     <Image
-                      src="/sections/mobile-app/checkmark-badge.svg"
+                      src="/images/landing/mobile-app/checkmark-badge.svg"
                       alt="checkmark"
                       fill
                       className="object-contain"
@@ -59,7 +59,7 @@ export function MobileAppSection() {
                 className="transition-opacity hover:opacity-80 bg-white rounded-lg"
               >
                 <Image
-                  src="/sections/mobile-app/app-store-button.svg"
+                  src="/images/landing/mobile-app/app-store-button.svg"
                   alt="Download on App Store"
                   width={160}
                   height={32}
@@ -72,7 +72,7 @@ export function MobileAppSection() {
                 className="transition-opacity hover:opacity-80 rounded-lg"
               >
                 <Image
-                  src="/sections/mobile-app/play-store-button.svg"
+                  src="/images/landing/mobile-app/play-store-button.svg"
                   alt="Get it on Google Play"
                   width={160}
                   height={32}

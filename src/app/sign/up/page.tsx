@@ -45,8 +45,8 @@ export default function SignUpPage() {
             className="h-14 w-14 sm:h-16 sm:w-16 lg:h-18 lg:w-18 rounded-full bg-primary-500 hover:bg-primary-600 transition-colors duration-200 flex items-center justify-center shadow-lg"
           >
             <Image
-              src="/pages/sign/customer-service.svg"
-              alt="خدمة العملاء"
+              src="/icons/ui/customer-service.svg"
+              alt={signUp.customerServiceAlt}
               width={32}
               height={32}
               className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9"

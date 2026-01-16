@@ -141,7 +141,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
             className="w-auto h-10 px-4 flex items-center gap-2"
           >
             <Image
-              src="/icons/logout.svg"
+              src="/icons/ui/logout.svg"
               alt="logout"
               width={13}
               height={13}

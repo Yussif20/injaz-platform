@@ -10,7 +10,7 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
       {[1, 2, 3, 4, 5].map((star) => (
         <Image
           key={star}
-          src="/pages/landing/testimonials/star.svg"
+          src="/images/landing/testimonials/star.svg"
           alt="star"
           width={20}
           height={20}

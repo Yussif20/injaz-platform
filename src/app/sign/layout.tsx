@@ -11,7 +11,7 @@ export default function SignLayout({
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 w-full z-0 bg-no-repeat bg-left bg-cover lg:bg-contain"
-          style={{ backgroundImage: "url('/pages/sign/sign-bg.svg')" }}
+          style={{ backgroundImage: "url('/images/auth/sign-bg.svg')" }}
         />
 
         {/* Foreground: form overlay */}
@@ -26,8 +26,8 @@ export default function SignLayout({
         <div
           className="w-full bg-no-repeat bg-center bg-contain shrink-0"
           style={{
-            backgroundImage: "url('/pages/sign/sign-bg.svg')",
-            height: "25vh",
+            backgroundImage: "url('/images/auth/sign-bg.svg')",
+            height: "40vh",
             minHeight: "150px",
           }}
         />

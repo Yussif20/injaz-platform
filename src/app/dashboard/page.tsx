@@ -59,7 +59,9 @@ export default function DashboardPage() {
 
   // Password modal states
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">("set");
+  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">(
+    "set"
+  );
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
   // Confirmation modal states
@@ -151,22 +153,22 @@ export default function DashboardPage() {
   return (
     <div className="text-right" dir="rtl">
       {/* Welcome Header */}
-      <div className="flex items-center justify-end gap-4 mb-8">
+      <div className="flex items-center justify-start gap-4 mb-8">
+        <div className="w-14 h-14 rounded-full bg-grey-100 overflow-hidden shrink-0 flex items-center justify-center">
+          <Image
+            src="/icons/ui/user.svg"
+            alt="صورة الملف الشخصي"
+            width={32}
+            height={32}
+            className="opacity-50"
+          />
+        </div>
         <div className="text-right">
           <h1 className="text-xl font-semibold text-secondary-800">
             {welcomeHeader.greeting} {user?.fullName || "محمد"}
             <span className="mr-2">&#128075;</span>
           </h1>
           <p className="text-grey-500 text-sm">{welcomeHeader.subtext}</p>
-        </div>
-        <div className="w-14 h-14 rounded-full bg-grey-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
-          <Image
-            src="/icons/user.svg"
-            alt="صورة الملف الشخصي"
-            width={32}
-            height={32}
-            className="opacity-50"
-          />
         </div>
       </div>
 

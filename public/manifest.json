@@ -1,0 +1,27 @@
+{
+  "name": "Injaz Al-Moalem",
+  "short_name": "Injaz",
+  "description": "منصة إنجاز المعلم لإنشاء السيرة الذاتية المهنية للمعلمين",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "business"],
+  "lang": "ar",
+  "dir": "rtl"
+}

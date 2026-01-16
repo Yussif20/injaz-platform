@@ -412,7 +412,9 @@ export function RegisterForm() {
                 >
                   <Image
                     src={
-                      showPassword ? "/icons/lock-open.svg" : "/icons/lock.svg"
+                      showPassword
+                        ? "/icons/ui/lock-open.svg"
+                        : "/icons/ui/lock.svg"
                     }
                     alt="toggle password visibility"
                     width={18}
@@ -464,8 +466,8 @@ export function RegisterForm() {
                   <Image
                     src={
                       showConfirmPassword
-                        ? "/icons/lock-open.svg"
-                        : "/icons/lock.svg"
+                        ? "/icons/ui/lock-open.svg"
+                        : "/icons/ui/lock.svg"
                     }
                     alt="toggle password visibility"
                     width={18}

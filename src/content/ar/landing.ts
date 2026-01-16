@@ -106,7 +106,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/pages/landing/testimonials/avatar.svg",
+        avatar: "/images/landing/testimonials/avatar.svg",
       },
       {
         id: "2",
@@ -114,7 +114,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/pages/landing/testimonials/avatar.svg",
+        avatar: "/images/landing/testimonials/avatar.svg",
       },
       {
         id: "3",
@@ -122,7 +122,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/pages/landing/testimonials/avatar.svg",
+        avatar: "/images/landing/testimonials/avatar.svg",
       },
       {
         id: "4",
@@ -130,7 +130,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/pages/landing/testimonials/avatar.svg",
+        avatar: "/images/landing/testimonials/avatar.svg",
       },
     ],
   },
@@ -140,7 +140,7 @@ export const landingContent = {
     subtitle: "سهلناها عليك! بطرق دفع آمنة ومتنوعة",
     ctaButton: "اشترك الآن",
     successBadge: "تم الاشتراك بنجاح!",
-    imageAlt: "معلم مشترك",
+    imageAlt: "اشترك الآن",
   },
 
   shareExperienceSection: {

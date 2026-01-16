@@ -5,9 +5,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// TODO: Set to false when backend is ready
-const DEV_SKIP_AUTH = true;
-
 // Cookie name for auth token
 const AUTH_COOKIE = "auth_token";
 
@@ -26,11 +23,6 @@ const AUTH_ROUTES = [
 ];
 
 export function proxy(request: NextRequest) {
-  // Skip all auth checks in development mode
-  if (DEV_SKIP_AUTH) {
-    return NextResponse.next();
-  }
-
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(AUTH_COOKIE)?.value;
 

@@ -1,0 +1,14 @@
+# Robots.txt
+# This file tells search engines which pages to crawl and which to avoid
+
+# Allow all crawlers by default
+User-agent: *
+Allow: /
+
+# Disallow crawling of private/dynamic routes
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+
+# Sitemap location
+Sitemap: https://yourdomain.com/sitemap.xml
