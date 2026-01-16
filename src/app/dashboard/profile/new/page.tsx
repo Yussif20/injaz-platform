@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   CreateFileForm,
@@ -8,7 +9,7 @@ import {
 } from "@/features/dashboard";
 import { ROUTES } from "@/config";
 
-export default function CreateFilePage() {
+function CreateFileContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -59,5 +60,19 @@ export default function CreateFilePage() {
       {/* Promotional Sidebar - Desktop Only */}
       <MobilePromoSidebar />
     </div>
+  );
+}
+
+export default function CreateFilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+        </div>
+      }
+    >
+      <CreateFileContent />
+    </Suspense>
   );
 }

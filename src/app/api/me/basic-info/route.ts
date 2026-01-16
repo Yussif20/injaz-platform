@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAccessToken } from "@/shared/lib/cookies";
 import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
-import type { BasicInfo, UpdateBasicInfoRequest } from "@/features/dashboard/types/me.types";
+import type { UserProfile, UpdateBasicInfoRequest } from "@/features/dashboard/types/me.types";
 
 function handleAxiosError(error: unknown, defaultMessage: string) {
   if (error && typeof error === "object" && "response" in error) {
@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
 
     const body: UpdateBasicInfoRequest = await request.json();
 
-    const response = await serverApi.put<ApiResponse<BasicInfo>>(
+    const response = await serverApi.put<ApiResponse<UserProfile>>(
       API_ENDPOINTS.MY_BASIC_INFO,
       body,
       {

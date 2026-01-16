@@ -1,7 +1,6 @@
 import { Button } from "@/shared/components/ui";
 import { landingContent } from "@/content";
 import Image from "next/image";
-import { ASSETS } from "@/config/assets";
 
 export const HeroSection = () => {
   const { hero } = landingContent;

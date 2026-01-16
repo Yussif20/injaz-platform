@@ -15,13 +15,18 @@ const {
   changePassword: content,
   errors: errorMessages,
   success,
+  passwordRequirements,
 } = dashboardContent;
 
-// Form validation schema
+// Form validation schema with password requirements
 const changePasswordSchema = z
   .object({
     oldPassword: z.string().min(1, errorMessages.oldPasswordRequired),
-    newPassword: z.string().min(6, errorMessages.passwordTooShort),
+    newPassword: z
+      .string()
+      .min(6, errorMessages.passwordTooShort)
+      .regex(/[A-Z]/, errorMessages.passwordNeedsUppercase)
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, errorMessages.passwordNeedsSpecialChar),
     confirmPassword: z.string().min(1, errorMessages.confirmPasswordRequired),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -92,7 +97,7 @@ PasswordInput.displayName = "PasswordInput";
 
 export const ChangePasswordForm: React.FC = () => {
   const router = useRouter();
-  const { changePassword, isLoading: isSaving } = useChangePassword();
+  const { changePasswordAsync, isLoading: isSaving } = useChangePassword();
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -135,26 +140,31 @@ export const ChangePasswordForm: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    changePassword(
-      {
+    try {
+      const response = await changePasswordAsync({
         oldPassword: data.oldPassword,
         newPassword: data.newPassword,
         confirmNewPassword: data.confirmPassword,
-      },
-      {
-        onSuccess: (response) => {
-          if (response.status) {
-            setSuccessMessage(success.passwordChanged);
-          } else {
-            setErrorMessage(response.message || errorMessages.updateFailed);
-          }
-        },
-        onError: (error) => {
-          console.error("Failed to change password:", error);
-          setErrorMessage(errorMessages.updateFailed);
-        },
+      });
+
+      if (response.status) {
+        setSuccessMessage(success.passwordChanged);
+      } else {
+        setErrorMessage(response.message || errorMessages.updateFailed);
       }
-    );
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      // Try to extract error message from axios error
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        const message = axiosError.response?.data?.message;
+        setErrorMessage(message || errorMessages.updateFailed);
+      } else {
+        setErrorMessage(errorMessages.updateFailed);
+      }
+    }
   };
 
   return (
@@ -183,14 +193,25 @@ export const ChangePasswordForm: React.FC = () => {
         />
 
         {/* New Password */}
-        <PasswordInput
-          label={content.newPasswordLabel}
-          placeholder={content.newPasswordPlaceholder}
-          error={errors.newPassword?.message}
-          showPassword={showNewPassword}
-          onTogglePassword={() => setShowNewPassword(!showNewPassword)}
-          {...register("newPassword")}
-        />
+        <div className="space-y-2">
+          <PasswordInput
+            label={content.newPasswordLabel}
+            placeholder={content.newPasswordPlaceholder}
+            error={errors.newPassword?.message}
+            showPassword={showNewPassword}
+            onTogglePassword={() => setShowNewPassword(!showNewPassword)}
+            {...register("newPassword")}
+          />
+          {/* Password Requirements Hint */}
+          {/* <div className="bg-shade-100 rounded-lg p-3 text-right">
+            <p className="text-xs font-medium text-grey-600 mb-1">{passwordRequirements.title}</p>
+            <ul className="text-xs text-grey-500 space-y-0.5 list-disc list-inside">
+              <li>{passwordRequirements.minLength}</li>
+              <li>{passwordRequirements.uppercase}</li>
+              <li>{passwordRequirements.specialChar}</li>
+            </ul>
+          </div> */}
+        </div>
 
         {/* Confirm New Password */}
         <PasswordInput

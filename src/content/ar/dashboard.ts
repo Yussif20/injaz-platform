@@ -162,9 +162,19 @@ export const dashboardContent = {
     confirmPasswordRequired: "تأكيد كلمة المرور مطلوب",
     passwordMismatch: "كلمات المرور غير متطابقة",
     passwordTooShort: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    passwordNeedsUppercase: "كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل",
+    passwordNeedsSpecialChar: "كلمة المرور يجب أن تحتوي على رمز خاص واحد على الأقل (!@#$%^&*)",
     invalidEmail: "البريد الإلكتروني غير صالح",
     updateFailed: "فشل تحديث البيانات",
     deleteAccountFailed: "فشل حذف الحساب",
+  },
+
+  // Password requirements hint
+  passwordRequirements: {
+    title: "متطلبات كلمة المرور:",
+    minLength: "6 أحرف على الأقل",
+    uppercase: "حرف كبير واحد على الأقل (A-Z)",
+    specialChar: "رمز خاص واحد على الأقل (!@#$%^&*)",
   },
 
   // Success messages

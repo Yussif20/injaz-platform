@@ -1,184 +1,311 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { Button, Input, Select } from "@/shared/components/ui";
 import { DataCard } from "./DataCard";
-import type { EducationData, Certification } from "../types";
+import {
+  useQualifications,
+  useAddQualification,
+  useUpdateQualification,
+  useDeleteQualification,
+} from "../hooks";
+import type { Qualification, CreateQualificationRequest } from "../types/me.types";
 
-// Validation schema
-const educationSchema = z.object({
-  academicDegree: z.string().min(1, "الدرجة العلمية مطلوبة"),
-  specialization: z.string().min(1, "التخصص مطلوب"),
-  university: z.string().min(1, "الجامعة مطلوبة"),
-  graduationYear: z.string().min(1, "سنة التخرج مطلوبة"),
-  certifications: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string().min(1, "اسم الشهادة مطلوب"),
-      issuer: z.string().min(1, "الجهة المانحة مطلوبة"),
-      year: z.string().min(1, "السنة مطلوبة"),
-    })
-  ),
+// Validation schema for qualification form
+const qualificationSchema = z.object({
+  degreeType: z.string().min(1, "نوع الشهادة مطلوب"),
+  title: z.string().min(1, "التخصص مطلوب"),
+  grade: z.string().optional(),
+  graduationDate: z.string().min(1, "تاريخ التخرج مطلوب"),
 });
 
-type EducationFormData = z.infer<typeof educationSchema>;
+type QualificationFormData = z.infer<typeof qualificationSchema>;
 
 interface EducationDataTabProps {
   isEditing: boolean;
-  onSave?: (data: EducationFormData) => void;
+  onSave?: () => void;
 }
 
-// Dummy data
-const dummyData: EducationData = {
-  academicDegree: "bachelor",
-  specialization: "تقنية المعلومات",
-  university: "جامعة الملك سعود",
-  graduationYear: "2010",
-  certifications: [
-    {
-      id: "1",
-      name: "شهادة ICDL",
-      issuer: "المعهد البريطاني",
-      year: "2015",
-    },
-    {
-      id: "2",
-      name: "دورة تطوير المناهج",
-      issuer: "وزارة التعليم",
-      year: "2018",
-    },
-  ],
-};
+// Degree types in Arabic
+const DEGREE_TYPES = [
+  { value: "diploma", label: "دبلوم" },
+  { value: "bachelor", label: "بكالوريوس" },
+  { value: "master", label: "ماجستير" },
+  { value: "doctorate", label: "دكتوراه" },
+  { value: "higher_diploma", label: "دبلوم عالي" },
+  { value: "professional", label: "شهادة مهنية" },
+];
 
 export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   isEditing,
   onSave,
 }) => {
   const { profileData } = dashboardContent;
-  const [isSaving, setIsSaving] = useState(false);
+  const [editingQualification, setEditingQualification] = useState<Qualification | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Hooks
+  const { qualifications, isLoading, refetch } = useQualifications();
+  const { addQualificationAsync, isLoading: isAdding } = useAddQualification();
+  const { updateQualificationAsync, isLoading: isUpdating } = useUpdateQualification();
+  const { deleteQualificationAsync, isLoading: isDeleting } = useDeleteQualification();
 
   const {
     register,
     handleSubmit,
-    control,
-    formState: { errors, isDirty },
-  } = useForm<EducationFormData>({
-    resolver: zodResolver(educationSchema),
-    defaultValues: dummyData,
+    reset,
+    formState: { errors },
+  } = useForm<QualificationFormData>({
+    resolver: zodResolver(qualificationSchema),
+    defaultValues: {
+      degreeType: "",
+      title: "",
+      grade: "",
+      graduationDate: "",
+    },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "certifications",
-  });
+  const isSaving = isAdding || isUpdating;
 
-  const handleSave = async (data: EducationFormData) => {
-    setIsSaving(true);
+  // Reset form when editing qualification changes
+  useEffect(() => {
+    if (editingQualification) {
+      reset({
+        degreeType: editingQualification.degreeType || "",
+        title: editingQualification.title || "",
+        grade: editingQualification.grade || "",
+        graduationDate: editingQualification.graduationDate
+          ? editingQualification.graduationDate.split("T")[0]
+          : "",
+      });
+    } else if (isAddingNew) {
+      reset({
+        degreeType: "",
+        title: "",
+        grade: "",
+        graduationDate: "",
+      });
+    }
+  }, [editingQualification, isAddingNew, reset]);
+
+  const handleSaveQualification = async (data: QualificationFormData) => {
+    setError(null);
     try {
-      console.log("Saving education data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onSave?.(data);
-    } catch (error) {
-      console.error("Failed to save:", error);
-    } finally {
-      setIsSaving(false);
+      const requestData: CreateQualificationRequest = {
+        degreeType: data.degreeType,
+        title: data.title,
+        grade: data.grade || undefined,
+        graduationDate: data.graduationDate,
+      };
+
+      if (editingQualification) {
+        // Update existing qualification
+        const response = await updateQualificationAsync({
+          id: editingQualification.id,
+          data: requestData,
+        });
+        if (response.status) {
+          setEditingQualification(null);
+          onSave?.();
+        } else {
+          setError(response.message || "فشل في تحديث المؤهل");
+        }
+      } else {
+        // Add new qualification
+        const response = await addQualificationAsync(requestData);
+        if (response.status) {
+          setIsAddingNew(false);
+          reset();
+          onSave?.();
+        } else {
+          setError(response.message || "فشل في إضافة المؤهل");
+        }
+      }
+    } catch (err) {
+      console.error("Save qualification error:", err);
+      setError("حدث خطأ غير متوقع");
     }
   };
 
-  const addCertification = () => {
-    append({
-      id: Date.now().toString(),
-      name: "",
-      issuer: "",
-      year: "",
-    });
+  const handleDeleteQualification = async (id: number) => {
+    setError(null);
+    try {
+      const response = await deleteQualificationAsync(id);
+      if (!response.status) {
+        setError(response.message || "فشل في حذف المؤهل");
+      }
+    } catch (err) {
+      console.error("Delete qualification error:", err);
+      setError("حدث خطأ غير متوقع");
+    }
   };
 
-  const getDegreeLabel = (value: string) => {
-    const degree = profileData.academicDegrees.find((d) => d.value === value);
+  const handleCancelEdit = () => {
+    setEditingQualification(null);
+    setIsAddingNew(false);
+    setError(null);
+    reset();
+  };
+
+  const getDegreeLabel = (value: string | null) => {
+    if (!value) return "-";
+    const degree = DEGREE_TYPES.find((d) => d.value === value);
     return degree?.label || value;
   };
 
-  if (isEditing) {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ar-SA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Loading state
+  if (isLoading) {
     return (
-      <form onSubmit={handleSubmit(handleSave)} className="space-y-6">
-        {/* Academic Qualifications */}
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
+
+  // Form for adding/editing
+  if (isEditing && (isAddingNew || editingQualification)) {
+    return (
+      <form onSubmit={handleSubmit(handleSaveQualification)} className="space-y-6">
         <div>
           <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.educationTitle}
+            {editingQualification ? "تعديل المؤهل" : "إضافة مؤهل جديد"}
           </h3>
-          <div className="space-y-4">
+
+          {error && (
+            <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
+              {error}
+            </div>
+          )}
+
+          <div className="bg-shade-100 rounded-xl p-4 space-y-3">
             <Select
               label={`${profileData.educationFields.degree}*`}
-              options={profileData.academicDegrees}
-              error={errors.academicDegree?.message}
-              {...register("academicDegree")}
+              options={DEGREE_TYPES}
+              error={errors.degreeType?.message}
+              {...register("degreeType")}
             />
             <Input
               label={`${profileData.educationFields.specialization}*`}
-              error={errors.specialization?.message}
-              {...register("specialization")}
+              error={errors.title?.message}
+              {...register("title")}
             />
             <Input
-              label={`${profileData.educationFields.university}*`}
-              error={errors.university?.message}
-              {...register("university")}
+              label="التقدير"
+              error={errors.grade?.message}
+              {...register("grade")}
             />
             <Input
               label={`${profileData.educationFields.graduationYear}*`}
-              error={errors.graduationYear?.message}
-              {...register("graduationYear")}
+              type="date"
+              dir="ltr"
+              className="text-left"
+              error={errors.graduationDate?.message}
+              {...register("graduationDate")}
             />
           </div>
         </div>
 
-        {/* Certifications */}
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCancelEdit}
+            className="flex-1 rounded-xl h-12"
+          >
+            إلغاء
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isSaving}
+            isLoading={isSaving}
+            className="flex-1 rounded-xl h-12"
+          >
+            {editingQualification ? "تحديث" : "إضافة"}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  // Edit mode list view
+  if (isEditing) {
+    return (
+      <div className="space-y-6">
         <div>
           <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.certificationsTitle}
+            {profileData.educationTitle}
           </h3>
+
+          {error && (
+            <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-4">
-            {fields.map((field, index) => (
+            {qualifications.map((qualification) => (
               <div
-                key={field.id}
+                key={qualification.id}
                 className="bg-shade-100 rounded-xl p-4 space-y-3"
               >
                 <div className="flex justify-between items-center mb-2">
-                  <button
-                    type="button"
-                    onClick={() => remove(index)}
-                    className="text-warning-500 hover:text-warning-700 text-sm"
-                  >
-                    {profileData.removeCertification}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteQualification(qualification.id)}
+                      disabled={isDeleting}
+                      className="text-warning-500 hover:text-warning-700 text-sm disabled:opacity-50"
+                    >
+                      {profileData.removeCertification}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingQualification(qualification)}
+                      className="text-primary-500 hover:text-primary-700 text-sm"
+                    >
+                      تعديل
+                    </button>
+                  </div>
                   <span className="text-grey-500 text-sm">
-                    شهادة {index + 1}
+                    {getDegreeLabel(qualification.degreeType)}
                   </span>
                 </div>
-                <Input
-                  label={profileData.educationFields.certName}
-                  error={errors.certifications?.[index]?.name?.message}
-                  {...register(`certifications.${index}.name`)}
-                />
-                <Input
-                  label={profileData.educationFields.certIssuer}
-                  error={errors.certifications?.[index]?.issuer?.message}
-                  {...register(`certifications.${index}.issuer`)}
-                />
-                <Input
-                  label={profileData.educationFields.certYear}
-                  error={errors.certifications?.[index]?.year?.message}
-                  {...register(`certifications.${index}.year`)}
-                />
+                <div className="text-right text-grey-700">
+                  <p>
+                    <strong>التخصص:</strong> {qualification.title || "-"}
+                  </p>
+                  <p>
+                    <strong>التقدير:</strong> {qualification.grade || "-"}
+                  </p>
+                  <p>
+                    <strong>تاريخ التخرج:</strong> {formatDate(qualification.graduationDate)}
+                  </p>
+                </div>
               </div>
             ))}
             <button
               type="button"
-              onClick={addCertification}
+              onClick={() => setIsAddingNew(true)}
               className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors"
             >
               + {profileData.addCertification}
@@ -186,93 +313,67 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
           </div>
         </div>
 
-        {/* Save Button */}
         <Button
-          type="submit"
+          type="button"
           variant="primary"
-          disabled={!isDirty || isSaving}
-          isLoading={isSaving}
+          onClick={() => onSave?.()}
           className="w-full rounded-xl h-12"
         >
           {profileData.saveChanges}
         </Button>
-      </form>
+      </div>
     );
   }
 
   // View Mode
   return (
     <div className="space-y-6">
-      {/* Academic Qualifications */}
       <div>
         <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
           {profileData.educationTitle}
         </h3>
-        <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.educationFields.degree}
-              value={getDegreeLabel(dummyData.academicDegree)}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.educationFields.specialization}
-              value={dummyData.specialization}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.educationFields.university}
-              value={dummyData.university}
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.educationFields.graduationYear}
-              value={dummyData.graduationYear}
-            />
-          </div>
-        </div>
-      </div>
 
-      {/* Certifications */}
-      <div>
-        <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-          {profileData.certificationsTitle}
-        </h3>
-        {dummyData.certifications.map((cert, index) => (
-          <div
-            key={cert.id}
-            className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-              <DataCard
-                label={profileData.educationFields.certName}
-                value={cert.name}
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-              <DataCard
-                label={profileData.educationFields.certIssuer}
-                value={cert.issuer}
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-              <DataCard
-                label={profileData.educationFields.certYear}
-                value={cert.year}
-              />
-            </div>
+        {qualifications.length === 0 ? (
+          <div className="bg-shade-100 rounded-xl py-8 px-6 text-center text-grey-500">
+            لا توجد مؤهلات مسجلة
           </div>
-        ))}
+        ) : (
+          qualifications.map((qualification) => (
+            <div
+              key={qualification.id}
+              className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+                <DataCard
+                  label={profileData.educationFields.degree}
+                  value={getDegreeLabel(qualification.degreeType)}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+                <DataCard
+                  label={profileData.educationFields.specialization}
+                  value={qualification.title || "-"}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+                <DataCard
+                  label="التقدير"
+                  value={qualification.grade || "-"}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+                <DataCard
+                  label={profileData.educationFields.graduationYear}
+                  value={formatDate(qualification.graduationDate)}
+                />
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Save Button (disabled in view mode) */}

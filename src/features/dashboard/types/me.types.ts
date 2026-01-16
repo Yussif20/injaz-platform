@@ -91,6 +91,30 @@ export interface CareerJob {
   endYear: number | null;
 }
 
+/**
+ * Request body for POST /api/my-career-jobs
+ */
+export interface CreateCareerJobRequest {
+  title: string;           // 1-200 chars
+  rank: string;            // 1-100 chars
+  school: string;          // 1-200 chars
+  educationalStage: string; // 1-100 chars
+  startYear: number;       // 1900-2100
+  endYear?: number | null; // 1900-2100, null if current
+}
+
+/**
+ * Request body for PUT /api/my-career-jobs/{id}
+ */
+export interface UpdateCareerJobRequest {
+  title: string;           // 1-200 chars
+  rank: string;            // 1-100 chars
+  school: string;          // 1-200 chars
+  educationalStage: string; // 1-100 chars
+  startYear: number;       // 1900-2100
+  endYear?: number | null; // 1900-2100, null if current
+}
+
 // ============================================
 // Subscription
 // ============================================

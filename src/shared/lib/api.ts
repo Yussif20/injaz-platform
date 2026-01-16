@@ -45,4 +45,10 @@ export const API_ENDPOINTS = {
   MY_BASIC_INFO: "/api/Me/basic-info",
   MY_IMAGE: "/api/Me/image",
   PROFILE_COMPLETENESS: "/api/Me/profile-completeness",
+
+  // Career Jobs endpoints (backend)
+  MY_CAREER_JOBS: "/api/my-career-jobs",
+
+  // Qualifications endpoints (backend)
+  MY_QUALIFICATIONS: "/api/my-qualifications",
 } as const;

@@ -105,6 +105,26 @@ export async function deleteAccount(): Promise<SimpleResponse> {
 export async function changePassword(
   data: ChangePasswordRequest
 ): Promise<SimpleResponse> {
-  const response = await clientApi.post<SimpleResponse>("/api/auth/change-password", data);
-  return response.data;
+  try {
+    const response = await clientApi.post<SimpleResponse>("/api/auth/change-password", data);
+    return response.data;
+  } catch (error) {
+    // Handle axios error - extract response data
+    if (error && typeof error === "object" && "response" in error) {
+      const axiosError = error as { response?: { data?: SimpleResponse; status?: number } };
+      if (axiosError.response?.data) {
+        const responseData = axiosError.response.data;
+        return {
+          status: responseData.status ?? false,
+          message: responseData.message || "فشل في تغيير كلمة المرور",
+          errors: responseData.errors || null,
+        };
+      }
+    }
+    return {
+      status: false,
+      message: "فشل في تغيير كلمة المرور",
+      errors: null,
+    };
+  }
 }

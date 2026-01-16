@@ -7,6 +7,7 @@ import { ProfileDataTab } from "./ProfileDataTab";
 import { EducationDataTab } from "./EducationDataTab";
 import { JobDataTab } from "./JobDataTab";
 import type { ProfileDataTabId } from "../types";
+import Image from "next/image";
 
 export const ProfileDataTabs: React.FC = () => {
   const { profileData } = dashboardContent;
@@ -62,7 +63,7 @@ export const ProfileDataTabs: React.FC = () => {
                 : "text-primary-500 hover:text-primary-700"
             }`}
           >
-            <img src="/icons/edit.svg" alt="edit" className="w-6 h-6" />
+            <Image src="/icons/ui/edit.svg" alt="edit" width={24} height={24} />
             <span className="text-lg font-light">
               {isEditing ? profileData.cancel : profileData.edit}
             </span>

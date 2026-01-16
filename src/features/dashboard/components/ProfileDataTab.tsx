@@ -1,72 +1,124 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { Button, Input } from "@/shared/components/ui";
 import { DataCard } from "./DataCard";
-import type { MyProfileData } from "../types";
+import { useMyProfile, useUpdatePersonalInfo } from "../hooks";
+import type { UpdatePersonalInfoRequest } from "../types/me.types";
 
 // Validation schema
 const myDataSchema = z.object({
   nationalId: z.string().min(1, "رقم الهوية مطلوب"),
-  origin: z.string().min(1, "المنشأ مطلوب"),
+  address: z.string().min(1, "العنوان مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
-  workEmail: z.string().email("البريد الإلكتروني غير صالح").or(z.literal("")),
-  whatsappNumber: z.string().optional(),
+  email: z.string().email("البريد الإلكتروني غير صالح").or(z.literal("")),
 });
 
 type MyDataFormData = z.infer<typeof myDataSchema>;
 
 interface ProfileDataTabProps {
   isEditing: boolean;
-  onSave?: (data: MyDataFormData) => void;
+  onSave?: () => void;
 }
-
-// Dummy data for display
-const dummyData: MyProfileData = {
-  nationalId: "2583691472",
-  origin: "الرياض",
-  birthDate: "2 / 10 / 1988",
-  workEmail: "mohamed@gmail.com",
-  whatsappNumber: "0512345678",
-};
 
 export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
   isEditing,
   onSave,
 }) => {
   const { profileData } = dashboardContent;
-  const [isSaving, setIsSaving] = React.useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Hooks
+  const { profile, isLoading } = useMyProfile();
+  const { updatePersonalInfoAsync, isLoading: isSaving } = useUpdatePersonalInfo();
+
+  const personalInfo = profile?.personalInfo;
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isDirty },
   } = useForm<MyDataFormData>({
     resolver: zodResolver(myDataSchema),
-    defaultValues: dummyData,
+    defaultValues: {
+      nationalId: "",
+      address: "",
+      birthDate: "",
+      email: "",
+    },
   });
 
+  // Reset form when personal info loads
+  useEffect(() => {
+    if (personalInfo) {
+      reset({
+        nationalId: personalInfo.nationalId || "",
+        address: personalInfo.address || "",
+        birthDate: personalInfo.birthDate ? personalInfo.birthDate.split("T")[0] : "",
+        email: personalInfo.email || "",
+      });
+    }
+  }, [personalInfo, reset]);
+
   const handleSave = async (data: MyDataFormData) => {
-    setIsSaving(true);
+    setError(null);
     try {
-      // TODO: Implement API call
-      console.log("Saving data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onSave?.(data);
-    } catch (error) {
-      console.error("Failed to save:", error);
-    } finally {
-      setIsSaving(false);
+      const requestData: UpdatePersonalInfoRequest = {
+        nationalId: data.nationalId,
+        address: data.address,
+        birthDate: data.birthDate,
+        email: data.email || undefined,
+      };
+
+      const response = await updatePersonalInfoAsync(requestData);
+      if (response.status) {
+        onSave?.();
+      } else {
+        setError(response.message || "فشل في حفظ البيانات");
+      }
+    } catch (err) {
+      console.error("Failed to save:", err);
+      setError("حدث خطأ غير متوقع");
     }
   };
+
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ar-SA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
 
   if (isEditing) {
     return (
       <form onSubmit={handleSubmit(handleSave)} className="space-y-6">
+        {error && (
+          <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
+            {error}
+          </div>
+        )}
+
         {/* General Data Section */}
         <div>
           <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
@@ -75,48 +127,45 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
           <div className="space-y-4">
             <Input
               label={`${profileData.fields.nationalId}*`}
-              placeholder={dummyData.nationalId}
               error={errors.nationalId?.message}
               {...register("nationalId")}
             />
             <Input
               label={`${profileData.fields.origin}*`}
-              placeholder={dummyData.origin}
-              error={errors.origin?.message}
-              {...register("origin")}
+              error={errors.address?.message}
+              {...register("address")}
             />
             <Input
               label={`${profileData.fields.birthDate}*`}
-              type="text"
-              placeholder={dummyData.birthDate}
+              type="date"
+              dir="ltr"
+              className="text-left"
               error={errors.birthDate?.message}
               {...register("birthDate")}
             />
             <Input
-              label={`${profileData.fields.workEmail}*`}
+              label={profileData.fields.workEmail}
               type="email"
-              placeholder={dummyData.workEmail}
-              error={errors.workEmail?.message}
-              {...register("workEmail")}
+              error={errors.email?.message}
+              {...register("email")}
             />
           </div>
         </div>
 
-        {/* Contact Data Section */}
-        <div>
-          <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.contactData}
-          </h3>
-          <div className="space-y-4">
-            <Input
-              label={profileData.fields.whatsappNumber}
-              placeholder={dummyData.whatsappNumber}
-              dir="ltr"
-              className="text-left"
-              {...register("whatsappNumber")}
-            />
+        {/* Contact Data Section - Display Only (phone comes from profile) */}
+        {profile?.phone && (
+          <div>
+            <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
+              {profileData.contactData}
+            </h3>
+            <div className="bg-shade-100 rounded-xl py-5 px-6">
+              <DataCard
+                label={profileData.fields.whatsappNumber}
+                value={profile.phone}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Save Button */}
         <Button
@@ -141,22 +190,34 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
           {profileData.generalData}
         </h3>
         <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
-          <DataCard
-            label={profileData.fields.nationalId}
-            value={dummyData.nationalId}
-          />
-          <DataCard
-            label={profileData.fields.origin}
-            value={dummyData.origin}
-          />
-          <DataCard
-            label={profileData.fields.birthDate}
-            value={dummyData.birthDate}
-          />
-          <DataCard
-            label={profileData.fields.workEmail}
-            value={dummyData.workEmail}
-          />
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+            <DataCard
+              label={profileData.fields.nationalId}
+              value={personalInfo?.nationalId || "-"}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+            <DataCard
+              label={profileData.fields.origin}
+              value={personalInfo?.address || "-"}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+            <DataCard
+              label={profileData.fields.birthDate}
+              value={formatDate(personalInfo?.birthDate)}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+            <DataCard
+              label={profileData.fields.workEmail}
+              value={personalInfo?.email || "-"}
+            />
+          </div>
         </div>
       </div>
 
@@ -165,11 +226,14 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
         <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
           {profileData.contactData}
         </h3>
-        <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
-          <DataCard
-            label={profileData.fields.whatsappNumber}
-            value={dummyData.whatsappNumber}
-          />
+        <div className="bg-shade-100 rounded-xl py-5 px-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
+            <DataCard
+              label={profileData.fields.whatsappNumber}
+              value={profile?.phone || "-"}
+            />
+          </div>
         </div>
       </div>
 
