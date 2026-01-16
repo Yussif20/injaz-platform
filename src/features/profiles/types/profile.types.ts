@@ -131,21 +131,21 @@ export interface ProfileSaveValidation {
 
 // Request types
 export interface CreateProfileRequest {
-  profileTypeId: number;
-  academicYearId: number;
-  templateId: number;
+  academicYearId: string;     // GUID
+  profileTypeId: string;      // GUID
+  title?: string;             // Custom title (optional)
 }
 
 export interface UpdateTemplateRequest {
-  templateId: number;
+  templateId: string;
 }
 
 export interface UpdateAcademicYearRequest {
-  academicYearId: number;
+  academicYearId: string;
 }
 
 export interface UpdateProfileTypeRequest {
-  profileTypeId: number;
+  profileTypeId: string;
 }
 
 export interface SetPasswordRequest {

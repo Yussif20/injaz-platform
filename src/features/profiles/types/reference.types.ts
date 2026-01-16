@@ -5,68 +5,71 @@
 
 // Academic Year
 export interface AcademicYear {
-  id: number;
-  yearName: string | null;
-  startDate: string;
-  endDate: string;
-  status: string | null;
+  id: string;                 // GUID
+  name: string;               // e.g., "1445-1446"
+  startDate: string;          // ISO date
+  endDate: string;            // ISO date
+  isActive: boolean;          // Can be used for new profiles
+  isClosed: boolean;          // Year is closed
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Profile Type
 export interface ProfileType {
-  id: number;
-  typeNameMale: string | null;
-  typeNameFemale: string | null;
-  typeName: string | null;
+  id: string;                 // GUID
+  nameMale: string;           // Arabic name for males
+  nameFemale: string;         // Arabic name for females
   description: string | null;
-  availableFor: GenderAvailability;
+  iconUrl: string | null;
   isActive: boolean;
+  forMale: boolean;
+  forFemale: boolean;
   createdAt: string;
-  modifiedAt: string;
-  sections: SectionSummary[] | null;
-}
-
-// Section Summary (for profile type listing)
-export interface SectionSummary {
-  id: number;
-  title: string | null;
-  weightPercent: number;
-  displayOrder: number;
-  subsectionsCount: number;
+  updatedAt: string;
 }
 
 // Full Section (with subsections)
 export interface Section {
-  id: number;
-  profileTypeId: number;
-  title: string | null;
-  weightPercent: number;
-  displayOrder: number;
-  subsections: Subsection[] | null;
+  id: string;                 // GUID
+  profileTypeId: string;      // Parent profile type
+  name: string;               // Section name
+  description: string | null;
+  order: number;              // Display order
+  weight: number;             // Scoring weight (0-100)
+  isRequired: boolean;        // Must have images
+  subsections: Subsection[];  // Ordered list of subsections
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Subsection
 export interface Subsection {
-  id: number;
-  title: string | null;
-  displayOrder: number;
-  maxImageCount: number | null;
-  maxImageSize: number | null;
+  id: string;                 // GUID
+  sectionId: string;          // Parent section
+  name: string;               // Subsection name
+  description: string | null;
+  order: number;              // Display order
+  minImages: number;          // Minimum required images (0 = optional)
+  maxImages: number | null;   // Maximum images (null = unlimited)
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Rank
 export interface Rank {
-  id: number;
-  titleMale: string | null;
-  titleFemale: string | null;
-  title: string | null;
+  id: string;                 // GUID
+  nameMale: string;           // e.g., "معلم"
+  nameFemale: string;         // e.g., "معلمة"
+  order: number;              // Display order
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// Gender Availability Enum
-export enum GenderAvailability {
-  Male = 1,
-  Female = 2,
-  Both = 3,
+// Profile Type with Sections
+export interface ProfileTypeWithSections extends ProfileType {
+  sections: Section[];
 }
 
 // API Response types

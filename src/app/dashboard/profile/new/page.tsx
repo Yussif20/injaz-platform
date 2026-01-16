@@ -23,8 +23,8 @@ function CreateFileContent() {
   const { createProfileAsync, isLoading: creating } = useCreateProfile();
 
   // Form state
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedType, setSelectedType] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +42,6 @@ function CreateFileContent() {
       const response = await createProfileAsync({
         academicYearId: selectedYear!,
         profileTypeId: selectedType!,
-        templateId: 1, // Default template
       });
 
       if (response.status) {
@@ -56,8 +55,8 @@ function CreateFileContent() {
     }
   };
 
-  const selectedYearName = academicYears.find((y) => y.id === selectedYear)?.yearName;
-  const selectedTypeName = profileTypes.find((t) => t.id === selectedType)?.typeName;
+  const selectedYearName = academicYears.find((y) => y.id === selectedYear)?.name;
+  const selectedTypeName = profileTypes.find((t) => t.id === selectedType)?.nameMale;
 
   if (isLoading) {
     return (
@@ -155,7 +154,7 @@ function CreateFileContent() {
                               />
                             </svg>
                           )}
-                          <span className="text-secondary-800">{year.yearName}</span>
+                          <span className="text-secondary-800">{year.name}</span>
                         </button>
                       ))
                     )}
@@ -236,7 +235,7 @@ function CreateFileContent() {
                               />
                             </svg>
                           )}
-                          <span className="text-secondary-800">{type.typeName}</span>
+                          <span className="text-secondary-800">{type.nameMale}</span>
                         </button>
                       ))
                     )}
