@@ -76,7 +76,7 @@ const PasswordInput = React.forwardRef<
           tabIndex={-1}
         >
           <Image
-            src={showPassword ? "/icons/unlock.svg" : "/icons/lock.svg"}
+            src={showPassword ? "/icons/ui/unlock.svg" : "/icons/ui/lock.svg"}
             alt={showPassword ? "hide password" : "show password"}
             width={20}
             height={20}

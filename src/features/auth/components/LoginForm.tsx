@@ -125,7 +125,9 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
             tabIndex={-1}
           >
             <Image
-              src={showPassword ? "/icons/lock-open.svg" : "/icons/lock.svg"}
+              src={
+                showPassword ? "/icons/ui/lock-open.svg" : "/icons/ui/lock.svg"
+              }
               alt="toggle password visibility"
               width={18}
               height={18}

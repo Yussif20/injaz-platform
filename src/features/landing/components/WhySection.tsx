@@ -21,7 +21,7 @@ export const WhySection = () => {
             </p>
             <div className="h-full">
               <Image
-                src="/sections/why/why-card-1.svg"
+                src="/images/landing/why/why-card-1.svg"
                 alt="Card 1"
                 width={300}
                 height={200}
@@ -39,7 +39,7 @@ export const WhySection = () => {
               </p>
               <div className="w-full flex justify-center">
                 <Image
-                  src="/sections/why/why-card-2-left.svg"
+                  src="/images/landing/why/why-card-2-left.svg"
                   alt="Card 2 Left"
                   width={200}
                   height={120}
@@ -59,7 +59,7 @@ export const WhySection = () => {
               </div>
               <div className="w-full sm:w-auto sm:h-full">
                 <Image
-                  src="/sections/why/why-card-2-right.svg"
+                  src="/images/landing/why/why-card-2-right.svg"
                   alt="Card 2 Right"
                   width={180}
                   height={180}
@@ -73,7 +73,7 @@ export const WhySection = () => {
           <div className="bg-card-bg rounded-2xl sm:rounded-3xl h-30 sm:h-37.5 md:h-50 flex flex-row items-center overflow-hidden">
             <div className="h-full">
               <Image
-                src="/sections/why/why-card-3.svg"
+                src="/images/landing/why/why-card-3.svg"
                 alt="Card 3"
                 width={300}
                 height={200}

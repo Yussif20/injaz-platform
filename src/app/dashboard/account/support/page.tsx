@@ -11,11 +11,11 @@ export default function CustomerSupportPage() {
       {/* Support Illustration */}
       <div className="flex justify-center mb-6">
         <Image
-          src="/pages/sign/support-illustration.svg"
+          src="/images/auth/support-illustration.svg"
           alt={support.title}
           width={292}
           height={245}
-          className="w-auto h-auto max-w-[250px] sm:max-w-[292px]"
+          className="w-auto h-auto max-w-62.5 sm:max-w-73"
         />
       </div>
 
@@ -45,7 +45,7 @@ export default function CustomerSupportPage() {
           966548635554
         </span>
         <Image
-          src="/pages/sign/whatsapp.svg"
+          src="/images/auth/whatsapp.svg"
           alt={support.whatsappAlt}
           width={24}
           height={24}

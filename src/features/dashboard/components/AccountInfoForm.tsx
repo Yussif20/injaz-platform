@@ -36,8 +36,10 @@ export const AccountInfoForm: React.FC = () => {
 
   // API hooks
   const { profile, isLoading: isLoadingProfile } = useMyProfile();
-  const { updateBasicInfo, isLoading: isUpdatingBasicInfo } = useUpdateBasicInfo();
-  const { updatePersonalInfo, isLoading: isUpdatingPersonalInfo } = useUpdatePersonalInfo();
+  const { updateBasicInfo, isLoading: isUpdatingBasicInfo } =
+    useUpdateBasicInfo();
+  const { updatePersonalInfo, isLoading: isUpdatingPersonalInfo } =
+    useUpdatePersonalInfo();
   const { uploadImage, isLoading: isUploadingImage } = useUploadProfileImage();
   const { deleteAccount, isLoading: isDeletingAccount } = useDeleteAccount();
 
@@ -80,7 +82,8 @@ export const AccountInfoForm: React.FC = () => {
   }, [profile, user, reset]);
 
   // Combined loading state
-  const isSaving = isUpdatingBasicInfo || isUpdatingPersonalInfo || isUploadingImage;
+  const isSaving =
+    isUpdatingBasicInfo || isUpdatingPersonalInfo || isUploadingImage;
 
   // Check if form has any changes (including image)
   const hasChanges = isDirty || imageChanged;
@@ -198,7 +201,9 @@ export const AccountInfoForm: React.FC = () => {
     deleteAccount(undefined, {
       onSuccess: (response) => {
         if (!response.status) {
-          setErrorMessage(response.message || errorMessages.deleteAccountFailed);
+          setErrorMessage(
+            response.message || errorMessages.deleteAccountFailed
+          );
         }
         setShowDeleteModal(false);
       },
@@ -284,7 +289,7 @@ export const AccountInfoForm: React.FC = () => {
                   />
                 ) : (
                   <Image
-                    src="/pages/dashboard/avatar.svg"
+                    src="/images/dashboard/account-info/avatar.svg"
                     alt={accountInfo.profileImageAlt}
                     width={70}
                     height={70}
@@ -305,7 +310,12 @@ export const AccountInfoForm: React.FC = () => {
               onClick={handleImageClick}
               className="flex items-center gap-2 transition-colors hover:opacity-80"
             >
-              <Image src="/icons/edit.svg" alt="edit" width={24} height={24} />
+              <Image
+                src="/icons/ui/edit.svg"
+                alt="edit"
+                width={24}
+                height={24}
+              />
               <span className="text-primary-500 font-light text-lg">
                 {accountInfo.editImage}
               </span>
@@ -355,7 +365,7 @@ export const AccountInfoForm: React.FC = () => {
               className="inline-flex items-center gap-2 text-primary-500 hover:text-primary-700 transition-colors"
             >
               <Image
-                src="/icons/lock-primary-color.svg"
+                src="/icons/ui/lock-primary-color.svg"
                 alt="change password"
                 width={24}
                 height={24}
@@ -387,7 +397,7 @@ export const AccountInfoForm: React.FC = () => {
             className="flex items-center gap-2 text-warning-500 hover:text-warning-700 transition-colors"
           >
             <Image
-              src="/icons/delete.svg"
+              src="/icons/ui/delete.svg"
               alt="delete account"
               width={24}
               height={24}

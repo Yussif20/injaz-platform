@@ -73,14 +73,14 @@ export const Navbar = () => {
       >
         {isOpen ? (
           <Image
-            src="/icons/cancel.svg"
+            src="/icons/ui/cancel.svg"
             alt="أغلق القائمة"
             width={28}
             height={28}
           />
         ) : (
           <Image
-            src="/icons/menu.svg"
+            src="/icons/ui/menu.svg"
             alt="افتح القائمة"
             width={28}
             height={28}

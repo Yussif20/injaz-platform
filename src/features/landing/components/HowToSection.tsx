@@ -78,7 +78,7 @@ export const HowToSection = () => {
             <div className="bg-card-bg rounded-3xl relative w-full min-h-96 overflow-hidden">
               {/* Thumbnail Image */}
               <Image
-                src="/sections/how/video-thumbnail.png"
+                src="/images/landing/how/video-thumbnail.png"
                 alt="How to tutorial thumbnail"
                 fill
                 className="object-cover"

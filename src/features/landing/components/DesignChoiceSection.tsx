@@ -21,7 +21,7 @@ export function DesignChoiceSection() {
           {/* Image - flush with bottom edge */}
           <div className="w-full mt-4 sm:mt-6">
             <Image
-              src="/sections/design-choice/smartphones.svg"
+              src="/images/landing/design-choice/smartphones.svg"
               alt={designChoiceSection.imageAlt}
               width={1200}
               height={400}

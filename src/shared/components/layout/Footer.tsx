@@ -65,7 +65,7 @@ export const Footer = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Image
-                  src="/socials/instagram.svg"
+                  src="icons/social/instagram.svg"
                   alt="Instagram"
                   width={35}
                   height={35}
@@ -78,7 +78,7 @@ export const Footer = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Image
-                  src="/socials/tiktok.svg"
+                  src="icons/social/tiktok.svg"
                   alt="TikTok"
                   width={35}
                   height={35}
@@ -91,7 +91,7 @@ export const Footer = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Image
-                  src="/socials/whatsapp.svg"
+                  src="icons/social/whatsapp.svg"
                   alt="WhatsApp"
                   width={35}
                   height={35}
@@ -103,7 +103,12 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 className="hover:opacity-80 transition-opacity"
               >
-                <Image src="/socials/x.svg" alt="X" width={35} height={35} />
+                <Image
+                  src="icons/social/x.svg"
+                  alt="X"
+                  width={35}
+                  height={35}
+                />
               </a>
             </div>
           </div>

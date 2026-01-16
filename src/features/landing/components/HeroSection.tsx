@@ -1,6 +1,7 @@
 import { Button } from "@/shared/components/ui";
 import { landingContent } from "@/content";
 import Image from "next/image";
+import { ASSETS } from "@/config/assets";
 
 export const HeroSection = () => {
   const { hero } = landingContent;
@@ -39,9 +40,11 @@ export const HeroSection = () => {
       </Button>
 
       {/* Hero Image */}
-      <div className="py-8 w-full max-w-3xl bg-[url('/sections/hero/bg-blocks.png')] bg-no-repeat bg-center bg-cover">
+      <div
+        className={`py-8 w-full max-w-3xl bg-[url('/images/landing/hero/hero-background.png')] bg-no-repeat bg-center bg-cover`}
+      >
         <Image
-          src="/sections/hero/hero-image.svg"
+          src="/images/landing/hero/hero-illustration.svg"
           alt={hero.imageAlt}
           width={1200}
           height={675}

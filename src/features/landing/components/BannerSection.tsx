@@ -7,7 +7,7 @@ export const BannerSection = () => {
   return (
     <section className="w-full">
       <Image
-        src="/sections/banner/banner-mobile.svg"
+        src="/images/landing/banner/banner-mobile.svg"
         alt={bannerSection.title}
         width={1920}
         height={600}
@@ -16,7 +16,7 @@ export const BannerSection = () => {
         sizes="100vw"
       />
       <Image
-        src="/sections/banner/banner.svg"
+        src="/images/landing/banner/banner.svg"
         alt={bannerSection.title}
         width={1920}
         height={600}

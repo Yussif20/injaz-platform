@@ -23,7 +23,7 @@ export const AccountSidebar: React.FC = () => {
       href: ROUTES.DASHBOARD_ACCOUNT_INFO,
       icon: (
         <Image
-          src="/icons/profile.svg"
+          src="/icons/ui/profile.svg"
           alt="account info"
           width={20}
           height={20}
@@ -35,7 +35,7 @@ export const AccountSidebar: React.FC = () => {
       href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA,
       icon: (
         <Image
-          src="/icons/file-edit.svg"
+          src="/icons/ui/file-edit.svg"
           alt="profile data"
           width={20}
           height={20}
@@ -47,7 +47,7 @@ export const AccountSidebar: React.FC = () => {
       href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION,
       icon: (
         <Image
-          src="/icons/subscription.svg"
+          src="/icons/ui/subscription.svg"
           alt="subscription"
           width={20}
           height={20}
@@ -58,14 +58,19 @@ export const AccountSidebar: React.FC = () => {
       label: accountSidebar.support,
       href: ROUTES.DASHBOARD_ACCOUNT_SUPPORT,
       icon: (
-        <Image src="/icons/support.svg" alt="support" width={20} height={20} />
+        <Image
+          src="/icons/ui/support.svg"
+          alt="support"
+          width={20}
+          height={20}
+        />
       ),
     },
     {
       label: accountSidebar.terms,
       href: ROUTES.DASHBOARD_ACCOUNT_TERMS,
       icon: (
-        <Image src="/icons/policy.svg" alt="terms" width={20} height={20} />
+        <Image src="/icons/ui/policy.svg" alt="terms" width={20} height={20} />
       ),
     },
     {
@@ -73,7 +78,7 @@ export const AccountSidebar: React.FC = () => {
       href: ROUTES.DASHBOARD_ACCOUNT_HOW_TO_USE,
       icon: (
         <Image
-          src="/icons/youtube.svg"
+          src="/icons/ui/youtube.svg"
           alt="how to use"
           width={20}
           height={20}
@@ -85,7 +90,7 @@ export const AccountSidebar: React.FC = () => {
       href: ROUTES.DASHBOARD_ACCOUNT_FILE_PASSWORD,
       icon: (
         <Image
-          src="/icons/lock.svg"
+          src="/icons/ui/lock.svg"
           alt="file password"
           width={20}
           height={20}
