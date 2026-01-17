@@ -65,4 +65,11 @@ export const API_ENDPOINTS = {
 
   // Profile Management endpoints (backend)
   PROFILES: "/api/Profiles",
+
+  // Images endpoints (backend)
+  IMAGES: "/api/Images",
+  IMAGES_UPLOAD: "/api/Images/upload",
+
+  // Share Links endpoints (backend)
+  SHARE_LINKS: "/api/ShareLinks",
 } as const;

@@ -24,7 +24,8 @@ interface UseRegisterOptions {
 export function useRegister(options: UseRegisterOptions = {}) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { redirectTo = ROUTES.DASHBOARD } = options;
+  // After registration, redirect to onboarding to fill basic info
+  const { redirectTo = ROUTES.ONBOARDING } = options;
 
   // Step 1: Send OTP
   const sendOtpMutation = useMutation({

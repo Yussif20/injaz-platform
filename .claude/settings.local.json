@@ -7,7 +7,14 @@
       "Bash(git checkout:*)",
       "Bash(git merge:*)",
       "Bash(npx tsc:*)",
-      "WebFetch(domain:staging.enjazfile.com)"
+      "WebFetch(domain:staging.enjazfile.com)",
+      "Bash(npx playwright test:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "Bash(npm.cmd install:*)",
+      "Bash(npx.cmd playwright install:*)",
+      "Bash(npx.cmd playwright test:*)",
+      "Bash(npm run lint)"
     ]
   }
 }

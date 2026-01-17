@@ -7,6 +7,8 @@ export {
   LoginForm,
   RegisterForm,
   ForgotPasswordForm,
+  ForgotPasswordFlow,
+  OnboardingFlow,
   OtpInput,
   StepIndicator,
 } from "./components";
