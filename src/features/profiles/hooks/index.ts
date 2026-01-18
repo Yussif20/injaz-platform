@@ -15,6 +15,7 @@ export * from "./useProfileDetails";
 export * from "./useUploadProfileImage";
 export * from "./useProfilePassword";
 export * from "./useProfilePublishing";
+export * from "./useDeleteProfile";
 
 // Image hooks
 export * from "./useProfileImages";

@@ -3,6 +3,9 @@
  */
 
 import { clientApi } from "@/shared/lib/api";
+// TODO: BYPASS - Remove before production
+import { BYPASS_PHONE, BYPASS_PASSWORD, BYPASS_USER } from "@/shared/lib/mock-data";
+import { isBypassUser, setBypassUser, clearBypassUser } from "@/shared/lib/bypass-storage";
 import type {
   User,
   LoginCredentials,
@@ -30,6 +33,17 @@ interface SimpleResponse {
  * Login user
  */
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
+  // TODO: BYPASS - Remove before production
+  // Test bypass: use phone "00001234567" and password "123456" to login without API
+  if (credentials.phone === BYPASS_PHONE && credentials.password === BYPASS_PASSWORD) {
+    setBypassUser(BYPASS_USER);
+    return {
+      status: true,
+      message: "Test bypass - Login successful",
+      data: BYPASS_USER,
+    };
+  }
+
   const response = await clientApi.post<AuthResponse>("/api/auth/login", credentials);
   return response.data;
 }
@@ -125,6 +139,16 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<SimpleR
  * Get current user
  */
 export async function getCurrentUser(): Promise<AuthResponse> {
+  // TODO: BYPASS - Remove before production
+  // Return bypass user if bypass flag is set
+  if (isBypassUser()) {
+    return {
+      status: true,
+      message: "Test bypass - User authenticated",
+      data: BYPASS_USER,
+    };
+  }
+
   const response = await clientApi.get<AuthResponse>("/api/auth/me");
   return response.data;
 }
@@ -133,6 +157,9 @@ export async function getCurrentUser(): Promise<AuthResponse> {
  * Logout user
  */
 export async function logout(): Promise<SimpleResponse> {
+  // TODO: BYPASS - Remove before production
+  clearBypassUser();
+
   const response = await clientApi.post<SimpleResponse>("/api/auth/logout");
   return response.data;
 }

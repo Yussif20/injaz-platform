@@ -14,7 +14,8 @@
       "Bash(npm.cmd install:*)",
       "Bash(npx.cmd playwright install:*)",
       "Bash(npx.cmd playwright test:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)"
     ]
   }
 }

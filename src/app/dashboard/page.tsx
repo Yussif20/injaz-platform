@@ -13,7 +13,7 @@ import {
   FileData,
   FileStatus,
 } from "@/features/dashboard";
-import { useMyProfiles, useUnpublishProfile } from "@/features/profiles";
+import { useMyProfiles, useUnpublishProfile, useDeleteProfile } from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import type { Profile } from "@/features/profiles/types";
@@ -62,6 +62,7 @@ export default function DashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { profiles, isLoading: profilesLoading, refetch: refetchProfiles } = useMyProfiles();
   const { unpublish } = useUnpublishProfile();
+  const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
 
   const isLoading = authLoading || profilesLoading;
   const router = useRouter();
@@ -131,11 +132,21 @@ export default function DashboardPage() {
     setDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log("Deleting file:", fileToDelete);
-    // TODO: Implement actual delete logic
-    setDeleteModalOpen(false);
-    setFileToDelete(null);
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete) return;
+
+    try {
+      const response = await deleteProfileAsync(Number(fileToDelete));
+      if (response.status) {
+        // Refetch profiles to update the list
+        refetchProfiles();
+      }
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+    } finally {
+      setDeleteModalOpen(false);
+      setFileToDelete(null);
+    }
   };
 
   // Edit basic data warning handlers
@@ -305,13 +316,16 @@ export default function DashboardPage() {
       <ConfirmationModal
         isOpen={deleteModalOpen}
         onClose={() => {
-          setDeleteModalOpen(false);
-          setFileToDelete(null);
+          if (!isDeleting) {
+            setDeleteModalOpen(false);
+            setFileToDelete(null);
+          }
         }}
         title={dashboardContent.modals.deleteFile.title}
         confirmText={dashboardContent.modals.deleteFile.confirm}
         cancelText={dashboardContent.modals.deleteFile.cancel}
         onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
         variant="danger"
       />
 
