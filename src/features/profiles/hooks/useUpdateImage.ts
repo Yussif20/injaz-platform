@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateImage } from "../services/images.service";
 import { PROFILE_IMAGES_QUERY_KEY } from "./useProfileImages";
 import { SUBSECTION_IMAGES_QUERY_KEY } from "./useSubsectionImages";
+import { PROFILE_DETAILS_QUERY_KEY } from "./useProfileDetails";
 
 interface UpdateImageParams {
   imageId: number;
@@ -22,11 +23,14 @@ export function useUpdateImage() {
 
   const mutation = useMutation({
     mutationFn: (params: UpdateImageParams) =>
-      updateImage(params.imageId, params.data, params.file),
+      updateImage(params.imageId, params.data, params.file, params.profileId),
     onSuccess: (response, variables) => {
       if (response.status === "Success") {
         // Invalidate relevant caches if provided
         if (variables.profileId) {
+          queryClient.invalidateQueries({
+            queryKey: [...PROFILE_DETAILS_QUERY_KEY, variables.profileId],
+          });
           queryClient.invalidateQueries({
             queryKey: [PROFILE_IMAGES_QUERY_KEY, variables.profileId],
           });

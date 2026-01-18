@@ -184,6 +184,48 @@ export const dashboardContent = {
     accountDeleted: "تم حذف الحساب بنجاح",
   },
 
+  // Sections page (البنود)
+  sectionsPage: {
+    pageTitle: "البنود",
+    subtitle: "قم باختيار و تعديل البنود المرغوب في إضافتها",
+    saveAsDraft: "حفظ كمسودة",
+    previewFile: "معاينة الملف",
+    weightLabel: "الوزن النسبي:",
+    addEvidence: "إضافة شاهد",
+    addAnotherEvidence: "إضافة شاهد آخر",
+    breadcrumb: {
+      home: "الرئيسية",
+      addEvidence: "اضافة شواهد",
+      sections: "البنود",
+    },
+  },
+
+  // Add Evidence Modal
+  addEvidenceModal: {
+    title: "بيانات الشاهد",
+    imageTitleLabel: "عنوان الصورة",
+    imageTitlePlaceholder: "ادخل وصف مناسب للصورة",
+    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
+    uploadImage: "تحميل الصورة",
+    submitButton: "اضافة الشاهد",
+    changeImage: "تغيير الصورة",
+  },
+
+  // Edit Evidence Modal
+  editEvidenceModal: {
+    title: "تعديل الشاهد",
+    submitButton: "حفظ التغييرات",
+  },
+
+  // Image Actions
+  imageActions: {
+    edit: "تعديل",
+    delete: "حذف",
+    deleteConfirmMessage: "هل انت متأكد من حذف الصورة؟",
+    deleteConfirmButton: "حذف",
+    cancelButton: "إلغاء",
+  },
+
   // How to use page
   howToUse: {
     pageTitle: "شاهد المقطع لمعرفة كيفية الإستخدام",

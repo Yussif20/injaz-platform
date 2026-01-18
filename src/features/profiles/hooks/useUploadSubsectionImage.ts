@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadImage } from "../services/images.service";
 import { PROFILE_IMAGES_QUERY_KEY } from "./useProfileImages";
 import { SUBSECTION_IMAGES_QUERY_KEY } from "./useSubsectionImages";
+import { PROFILE_DETAILS_QUERY_KEY } from "./useProfileDetails";
 
 interface UploadImageParams {
   profileId: number;
@@ -31,7 +32,10 @@ export function useUploadSubsectionImage() {
       ),
     onSuccess: (response, variables) => {
       if (response.status === "Success") {
-        // Invalidate both profile and subsection images cache
+        // Invalidate profile details, profile images, and subsection images cache
+        queryClient.invalidateQueries({
+          queryKey: [...PROFILE_DETAILS_QUERY_KEY, variables.profileId],
+        });
         queryClient.invalidateQueries({
           queryKey: [PROFILE_IMAGES_QUERY_KEY, variables.profileId],
         });

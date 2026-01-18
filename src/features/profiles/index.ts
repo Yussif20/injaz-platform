@@ -10,3 +10,6 @@ export * from "./services";
 
 // Export hooks
 export * from "./hooks";
+
+// Export components
+export * from "./components";

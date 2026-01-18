@@ -17,6 +17,7 @@ export const ROUTES = {
   // Dashboard routes
   DASHBOARD: "/dashboard",
   DASHBOARD_PROFILE_NEW: "/dashboard/profile/new",
+  DASHBOARD_PROFILE_SECTIONS: (id: string | number) => `/dashboard/profile/${id}/sections`,
 
   // Dashboard account routes
   DASHBOARD_ACCOUNT: "/dashboard/account",

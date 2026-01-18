@@ -230,7 +230,7 @@ export default function DashboardPage() {
                 <FileCard
                   key={file.id}
                   file={file}
-                  onAddEvidence={(id) => console.log("Add evidence:", id)}
+                  onAddEvidence={(id) => router.push(ROUTES.DASHBOARD_PROFILE_SECTIONS(id))}
                   onPreview={(id) => console.log("Preview:", id)}
                   onEditBasicData={handleEditBasicDataClick}
                   onEditMyData={(id) => console.log("Edit my data:", id)}

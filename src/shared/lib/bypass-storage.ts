@@ -316,6 +316,63 @@ export function removeImageFromSubsection(
 }
 
 /**
+ * Update image in subsection
+ */
+export function updateImageInSubsection(
+  profileId: number,
+  imageId: number,
+  updates: { description?: string; displayOrder?: number; publicUrl?: string }
+): boolean {
+  const imagesData = getBypassProfileImages();
+  const sections = imagesData[profileId];
+
+  if (!sections) return false;
+
+  for (const section of sections) {
+    if (!section.subsections) continue;
+    for (const subsection of section.subsections) {
+      if (!subsection.images) continue;
+      const imageIndex = subsection.images.findIndex((img) => img.id === imageId);
+      if (imageIndex !== -1) {
+        subsection.images[imageIndex] = {
+          ...subsection.images[imageIndex],
+          ...updates,
+        };
+        saveBypassProfileImages(imagesData);
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Delete image from any subsection in profile
+ */
+export function deleteImageFromProfile(profileId: number, imageId: number): boolean {
+  const imagesData = getBypassProfileImages();
+  const sections = imagesData[profileId];
+
+  if (!sections) return false;
+
+  for (const section of sections) {
+    if (!section.subsections) continue;
+    for (const subsection of section.subsections) {
+      if (!subsection.images) continue;
+      const imageIndex = subsection.images.findIndex((img) => img.id === imageId);
+      if (imageIndex !== -1) {
+        subsection.images.splice(imageIndex, 1);
+        saveBypassProfileImages(imagesData);
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
  * Reorder images in subsection
  */
 export function reorderSubsectionImages(
