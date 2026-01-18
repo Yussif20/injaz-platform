@@ -19,6 +19,9 @@ export const ROUTES = {
   DASHBOARD_PROFILE_NEW: "/dashboard/profile/new",
   DASHBOARD_PROFILE_SECTIONS: (id: string | number) => `/dashboard/profile/${id}/sections`,
 
+  // Preview route (full-screen, outside dashboard layout)
+  PROFILE_PREVIEW: (id: string | number) => `/preview/${id}`,
+
   // Dashboard account routes
   DASHBOARD_ACCOUNT: "/dashboard/account",
   DASHBOARD_ACCOUNT_INFO: "/dashboard/account/info",
@@ -34,7 +37,6 @@ export const ROUTES = {
   PROFILES: "/profiles",
   PROFILE_NEW: "/profiles/new",
   PROFILE_DETAIL: (id: string) => `/profiles/${id}`,
-  PROFILE_PREVIEW: (id: string) => `/profiles/${id}/preview`,
 
   // Settings routes
   SETTINGS: "/settings",

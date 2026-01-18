@@ -231,7 +231,7 @@ export default function DashboardPage() {
                   key={file.id}
                   file={file}
                   onAddEvidence={(id) => router.push(ROUTES.DASHBOARD_PROFILE_SECTIONS(id))}
-                  onPreview={(id) => console.log("Preview:", id)}
+                  onPreview={(id) => router.push(ROUTES.PROFILE_PREVIEW(id))}
                   onEditBasicData={handleEditBasicDataClick}
                   onEditMyData={(id) => console.log("Edit my data:", id)}
                   onSetPassword={handleSetPassword}

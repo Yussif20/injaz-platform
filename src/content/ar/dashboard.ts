@@ -304,6 +304,65 @@ export const dashboardContent = {
     appStore: "Get it from App Store",
   },
 
+  // Preview Portfolio Page (معاينة الملف)
+  previewPage: {
+    pageTitle: "معاينة الملف",
+    downloadFile: "تحميل الملف",
+    shareFile: "مشاركة الملف",
+    fileTitle: "ملف إنجاز",
+    memberBadge: "عضو في ملتقى المعلمين",
+
+    // Personal Info Section
+    personalInfo: {
+      title: "بياناتي",
+      birthday: "تاريخ الميلاد",
+      email: "البريد الإلكتروني",
+      nationalId: "الهوية الوطنية",
+      origin: "المنشأ",
+    },
+
+    // Education Section
+    education: {
+      title: "البيانات العلمية",
+      subtitle: "تعرف على المؤهلات العلمية للمعلم/ة في",
+    },
+
+    // Career Section
+    career: {
+      title: "البيانات الوظيفية",
+      subtitle: "تعرف على المسيرة الوظيفية للمعلم/ة في",
+    },
+
+    // Achievements Section
+    achievements: {
+      title: "مهام وإنجازات المعلم",
+      subtitle: "الوزن النسبي لهذا القسم",
+      weightLabel: "الوزن النسبي",
+    },
+
+    // Contact Section
+    contact: {
+      title: "تواصل معي",
+    },
+
+    // Theme Selector
+    themeSelector: {
+      title: "تخصيص القالب",
+      themes: {
+        default: "افتراضي",
+        dark: "داكن",
+        heritage: "تراثي",
+        arabic: "عربي",
+      },
+      customizeButton: "تخصيص القالب",
+    },
+
+    // Loading & Error
+    loading: "جاري التحميل...",
+    notFound: "لم يتم العثور على الملف",
+    backHome: "العودة للرئيسية",
+  },
+
   // Profile data page (بيانات ملفي)
   profileData: {
     tabs: {

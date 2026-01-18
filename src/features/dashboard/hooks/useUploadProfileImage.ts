@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useUploadProfileImage hook - Upload profile image mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadProfileImage } from "../services/me.service";

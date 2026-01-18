@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useDeleteCareerJob hook - Delete career job mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCareerJob } from "../services/career.service";

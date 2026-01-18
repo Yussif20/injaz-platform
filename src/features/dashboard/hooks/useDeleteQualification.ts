@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useDeleteQualification hook - Delete qualification mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteQualification } from "../services/qualifications.service";

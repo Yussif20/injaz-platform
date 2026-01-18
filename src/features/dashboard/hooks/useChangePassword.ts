@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useChangePassword hook - Change password mutation
  */
-
-"use client";
 
 import { useMutation } from "@tanstack/react-query";
 import { changePassword } from "../services/me.service";

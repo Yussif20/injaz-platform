@@ -668,7 +668,7 @@ export const MOCK_PROFILE_DETAILS: ProfileDetails = {
   id: 1,
   userName: "فاطمة أحمد",
   profileTypeName: "ملف إنجاز المعلمة",
-  academicYearName: "1446-1447",
+  academicYearName: "1446-1447 هـ | 2024-2025 م",
   templateId: 1,
   personalInfo: MOCK_PERSONAL_INFO,
   qualifications: MOCK_QUALIFICATIONS,

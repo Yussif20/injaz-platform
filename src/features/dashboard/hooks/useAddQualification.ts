@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useAddQualification hook - Add qualification mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addQualification } from "../services/qualifications.service";

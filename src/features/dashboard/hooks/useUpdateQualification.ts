@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useUpdateQualification hook - Update qualification mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateQualification } from "../services/qualifications.service";

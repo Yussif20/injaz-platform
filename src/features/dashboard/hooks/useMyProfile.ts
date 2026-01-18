@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useMyProfile hook - Fetch user profile data
  */
-
-"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { getMyProfile } from "../services/me.service";

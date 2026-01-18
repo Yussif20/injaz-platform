@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useUpdatePersonalInfo hook - Update personal info mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updatePersonalInfo } from "../services/me.service";

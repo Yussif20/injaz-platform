@@ -141,7 +141,7 @@ export default function ProfileSectionsPage() {
   };
 
   const handlePreviewFile = () => {
-    console.log("Preview file:", profileId);
+    router.push(ROUTES.PROFILE_PREVIEW(profileId));
   };
 
   if (isLoading) {

@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useCareerJobs hook - Fetch career jobs data
  */
-
-"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { getCareerJobs } from "../services/career.service";

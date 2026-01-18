@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useUpdateBasicInfo hook - Update basic info mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBasicInfo } from "../services/me.service";

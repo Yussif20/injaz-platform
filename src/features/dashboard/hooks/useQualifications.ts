@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useQualifications hook - Fetch qualifications data
  */
-
-"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { getQualifications } from "../services/qualifications.service";

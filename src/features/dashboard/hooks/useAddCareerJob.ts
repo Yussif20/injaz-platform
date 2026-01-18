@@ -1,8 +1,8 @@
+"use client";
+
 /**
  * useAddCareerJob hook - Add career job mutation
  */
-
-"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addCareerJob } from "../services/career.service";
