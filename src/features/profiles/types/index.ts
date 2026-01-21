@@ -6,3 +6,5 @@ export * from "./reference.types";
 export * from "./profile.types";
 export * from "./image.types";
 export * from "./share-link.types";
+export * from "./template.types";
+export * from "./theme.types";

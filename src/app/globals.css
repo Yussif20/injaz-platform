@@ -87,6 +87,7 @@
 
   /* Text Colors */
   --color-text-dark: #333333;
+  --color-text-muted: #4d4d4d;
 }
 
 html {
@@ -98,7 +99,9 @@ html {
 a,
 button {
   cursor: pointer;
-  transition: color 0.3s ease, background-color 0.3s ease;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
 }
 
 /* Scrollbar Styles */

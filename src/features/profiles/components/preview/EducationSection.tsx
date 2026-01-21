@@ -34,19 +34,13 @@ export const EducationSection = ({
           className="w-1 h-6 rounded-full"
           style={{ backgroundColor: theme.primary }}
         />
-        <h2
-          className="text-lg font-semibold"
-          style={{ color: theme.text }}
-        >
+        <h2 className="text-lg font-semibold" style={{ color: theme.text }}>
           {content.title}
         </h2>
       </div>
 
       {/* Subtitle */}
-      <p
-        className="text-sm mb-4 mr-3"
-        style={{ color: theme.textMuted }}
-      >
+      <p className="text-sm mb-4 mr-3" style={{ color: theme.textMuted }}>
         {content.subtitle}
       </p>
 
@@ -61,10 +55,7 @@ export const EducationSection = ({
         {/* Qualification Items */}
         <div className="space-y-4">
           {qualifications.map((qual, index) => (
-            <div
-              key={qual.id}
-              className="relative pr-8"
-            >
+            <div key={qual.id} className="relative pr-8">
               {/* Timeline Dot */}
               <div
                 className="absolute right-0 top-2 w-6 h-6 rounded-full flex items-center justify-center"
@@ -110,10 +101,7 @@ export const EducationSection = ({
                 </h3>
 
                 {/* Grade & Year */}
-                <p
-                  className="text-xs"
-                  style={{ color: theme.textMuted }}
-                >
+                <p className="text-xs" style={{ color: theme.textMuted }}>
                   {qual.grade && `${qual.grade} - `}
                   {formatYear(qual.graduationDate)}
                 </p>

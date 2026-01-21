@@ -10,6 +10,8 @@ import type { User, Gender } from "@/features/auth/types/auth.types";
 import type { UserProfile, PersonalInfo, Qualification, CareerJob, ProfileCompleteness } from "@/features/dashboard/types/me.types";
 import type { AcademicYear, ProfileType, Rank, Section, Subsection } from "@/features/profiles/types/reference.types";
 import type { Profile, ProfileDetails, ProfileSection, ProfileSubsection } from "@/features/profiles/types/profile.types";
+import type { Template } from "@/features/profiles/types/template.types";
+import { TEMPLATE_CONFIGS, TemplateId } from "@/features/profiles/types/template.types";
 
 // ============================================
 // Bypass User Data
@@ -677,6 +679,22 @@ export const MOCK_PROFILE_DETAILS: ProfileDetails = {
   status: "Draft",
   publishedAt: null,
 };
+
+// ============================================
+// Mock Templates
+// ============================================
+
+export const MOCK_TEMPLATES: Template[] = [
+  TEMPLATE_CONFIGS[TemplateId.Classic],
+  TEMPLATE_CONFIGS[TemplateId.Modern],
+  TEMPLATE_CONFIGS[TemplateId.Elegant],
+  TEMPLATE_CONFIGS[TemplateId.Creative],
+];
+
+// Helper to get template by ID
+export function getMockTemplateById(templateId: number): Template | undefined {
+  return MOCK_TEMPLATES.find(t => t.id === templateId);
+}
 
 // ============================================
 // Helper function to generate unique IDs

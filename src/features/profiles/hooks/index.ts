@@ -8,6 +8,10 @@ export * from "./useProfileTypes";
 export * from "./useProfileTypeWithSections";
 export * from "./useRanks";
 
+// Template hooks
+export * from "./useTemplates";
+export * from "./useUpdateProfileTemplate";
+
 // Profile hooks
 export * from "./useMyProfiles";
 export * from "./useCreateProfile";

@@ -11,9 +11,16 @@ import {
   AchievementsSection,
   ContactButton,
   ThemeSelector,
+  // Classic Template Components
+  ClassicEducationSection,
+  ClassicCareerSection,
 } from "@/features/profiles";
 import { useProfileDetails } from "@/features/profiles/hooks";
-import { PORTFOLIO_THEMES, type ThemeName } from "@/features/profiles/types/theme.types";
+import {
+  PORTFOLIO_THEMES,
+  type ThemeName,
+} from "@/features/profiles/types/theme.types";
+import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 
@@ -52,8 +59,12 @@ export default function ProfilePreviewPage() {
       const { jsPDF } = await import("jspdf");
 
       // Hide floating buttons during capture
-      const backButton = document.querySelector("[data-back-button]") as HTMLElement;
-      const themeButton = document.querySelector("[data-theme-button]") as HTMLElement;
+      const backButton = document.querySelector(
+        "[data-back-button]",
+      ) as HTMLElement;
+      const themeButton = document.querySelector(
+        "[data-theme-button]",
+      ) as HTMLElement;
       if (backButton) backButton.style.visibility = "hidden";
       if (themeButton) themeButton.style.visibility = "hidden";
 
@@ -230,19 +241,35 @@ export default function ProfilePreviewPage() {
           theme={theme}
         />
 
-        {/* Education Section */}
-        <EducationSection
-          qualifications={profileDetails.qualifications}
-          content={previewPage.education}
-          theme={theme}
-        />
+        {/* Education Section - Template-aware */}
+        {profileDetails.templateId === TemplateId.Classic ? (
+          <ClassicEducationSection
+            qualifications={profileDetails.qualifications}
+            content={previewPage.education}
+            theme={theme}
+          />
+        ) : (
+          <EducationSection
+            qualifications={profileDetails.qualifications}
+            content={previewPage.education}
+            theme={theme}
+          />
+        )}
 
-        {/* Career Section */}
-        <CareerSection
-          careerJobs={profileDetails.careerJobs}
-          content={previewPage.career}
-          theme={theme}
-        />
+        {/* Career Section - Template-aware */}
+        {profileDetails.templateId === TemplateId.Classic ? (
+          <ClassicCareerSection
+            careerJobs={profileDetails.careerJobs}
+            content={previewPage.career}
+            theme={theme}
+          />
+        ) : (
+          <CareerSection
+            careerJobs={profileDetails.careerJobs}
+            content={previewPage.career}
+            theme={theme}
+          />
+        )}
 
         {/* Achievements Section */}
         <AchievementsSection

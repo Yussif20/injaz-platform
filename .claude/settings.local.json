@@ -17,5 +17,10 @@
       "Bash(npm run lint)",
       "Bash(npm run build:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "puppeteer",
+    "context7"
+  ],
+  "enableAllProjectMcpServers": true
 }

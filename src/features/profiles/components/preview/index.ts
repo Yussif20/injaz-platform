@@ -5,3 +5,6 @@ export { CareerSection } from "./CareerSection";
 export { AchievementsSection } from "./AchievementsSection";
 export { ContactButton } from "./ContactButton";
 export { ThemeSelector } from "./ThemeSelector";
+
+// Template-specific components
+export * from "./templates";
