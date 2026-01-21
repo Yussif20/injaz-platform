@@ -3,5 +3,14 @@
  * Each template has its own folder with template-specific components
  */
 
-// Classic Template
-export * from "./classic";
+// Default Template
+export * from "./default";
+
+// Dark Template
+export * from "./dark";
+
+// Heritage Template
+export * from "./heritage";
+
+// Arabic Template
+export * from "./arabic";

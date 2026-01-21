@@ -9,24 +9,24 @@
 
 // Template IDs - matches backend values
 export enum TemplateId {
-  Classic = 1,
-  Modern = 2,
-  Elegant = 3,
-  Creative = 4,
+  Default = 1,
+  Dark = 2,
+  Heritage = 3,
+  Arabic = 4,
 }
 
 // Template layout types
-export type TemplateLayoutType = "classic" | "modern" | "elegant" | "creative";
+export type TemplateLayoutType = "default" | "dark" | "heritage" | "arabic";
 
 // Template feature flags
 export interface TemplateFeatures {
-  hasHeaderCurve: boolean;           // Curved shape behind header
-  hasProfileImageBorder: boolean;    // Border around profile image
-  hasSectionIcons: boolean;          // Icons in section headers
-  hasCardShadows: boolean;           // Shadow on cards
-  hasRoundedCards: boolean;          // Rounded corners on cards
-  hasDividers: boolean;              // Dividers between sections
-  hasBackgroundPattern: boolean;     // Background pattern/texture
+  hasHeaderCurve: boolean; // Curved shape behind header
+  hasProfileImageBorder: boolean; // Border around profile image
+  hasSectionIcons: boolean; // Icons in section headers
+  hasCardShadows: boolean; // Shadow on cards
+  hasRoundedCards: boolean; // Rounded corners on cards
+  hasDividers: boolean; // Dividers between sections
+  hasBackgroundPattern: boolean; // Background pattern/texture
 }
 
 // Template style configuration
@@ -42,10 +42,10 @@ export interface TemplateStyleConfig {
 // Full template configuration
 export interface Template {
   id: number;
-  name: string;                      // Internal name (e.g., "classic")
-  nameArabic: string;                // Arabic display name
-  description: string;               // Arabic description
-  previewImageUrl: string | null;    // Template preview image
+  name: string; // Internal name (e.g., "classic")
+  nameArabic: string; // Arabic display name
+  description: string; // Arabic description
+  previewImageUrl: string | null; // Template preview image
   layoutType: TemplateLayoutType;
   features: TemplateFeatures;
   styleConfig: TemplateStyleConfig;
@@ -93,13 +93,13 @@ export interface UpdateProfileTemplateRequest {
 // ============================================
 
 export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {
-  [TemplateId.Classic]: {
-    id: TemplateId.Classic,
-    name: "classic",
-    nameArabic: "كلاسيكي",
+  [TemplateId.Default]: {
+    id: TemplateId.Default,
+    name: "default",
+    nameArabic: "افتراضي",
     description: "تصميم تقليدي أنيق مع عناصر منحنية وألوان هادئة",
     previewImageUrl: null,
-    layoutType: "classic",
+    layoutType: "default",
     features: {
       hasHeaderCurve: true,
       hasProfileImageBorder: true,
@@ -122,13 +122,13 @@ export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
   },
-  [TemplateId.Modern]: {
-    id: TemplateId.Modern,
-    name: "modern",
-    nameArabic: "عصري",
+  [TemplateId.Dark]: {
+    id: TemplateId.Dark,
+    name: "dark",
+    nameArabic: "داكن",
     description: "تصميم حديث وبسيط مع خطوط نظيفة وتخطيط متناسق",
     previewImageUrl: null,
-    layoutType: "modern",
+    layoutType: "dark",
     features: {
       hasHeaderCurve: false,
       hasProfileImageBorder: false,
@@ -151,13 +151,13 @@ export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
   },
-  [TemplateId.Elegant]: {
-    id: TemplateId.Elegant,
-    name: "elegant",
-    nameArabic: "راقي",
+  [TemplateId.Heritage]: {
+    id: TemplateId.Heritage,
+    name: "heritage",
+    nameArabic: "تراثي",
     description: "تصميم راقي ومميز مع تفاصيل دقيقة وأناقة عالية",
     previewImageUrl: null,
-    layoutType: "elegant",
+    layoutType: "heritage",
     features: {
       hasHeaderCurve: true,
       hasProfileImageBorder: true,
@@ -180,13 +180,13 @@ export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
   },
-  [TemplateId.Creative]: {
-    id: TemplateId.Creative,
-    name: "creative",
-    nameArabic: "إبداعي",
+  [TemplateId.Arabic]: {
+    id: TemplateId.Arabic,
+    name: "arabic",
+    nameArabic: "عربي",
     description: "تصميم إبداعي ومرن مع عناصر ديناميكية وتخطيط فريد",
     previewImageUrl: null,
-    layoutType: "creative",
+    layoutType: "arabic",
     features: {
       hasHeaderCurve: false,
       hasProfileImageBorder: true,
@@ -213,24 +213,40 @@ export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {
 
 // Helper to get template by ID
 export function getTemplateConfig(templateId: number): Template {
-  return TEMPLATE_CONFIGS[templateId as TemplateId] || TEMPLATE_CONFIGS[TemplateId.Classic];
+  return (
+    TEMPLATE_CONFIGS[templateId as TemplateId] ||
+    TEMPLATE_CONFIGS[TemplateId.Default]
+  );
 }
 
 // Helper to get all templates as array
 export function getAllTemplates(): Template[] {
-  return Object.values(TEMPLATE_CONFIGS).sort((a, b) => a.displayOrder - b.displayOrder);
+  return Object.values(TEMPLATE_CONFIGS).sort(
+    (a, b) => a.displayOrder - b.displayOrder,
+  );
 }
 
 // Helper to get template summaries
 export function getTemplateSummaries(): TemplateSummary[] {
-  return getAllTemplates().map(({ id, name, nameArabic, description, previewImageUrl, layoutType, isActive, displayOrder }) => ({
-    id,
-    name,
-    nameArabic,
-    description,
-    previewImageUrl,
-    layoutType,
-    isActive,
-    displayOrder,
-  }));
+  return getAllTemplates().map(
+    ({
+      id,
+      name,
+      nameArabic,
+      description,
+      previewImageUrl,
+      layoutType,
+      isActive,
+      displayOrder,
+    }) => ({
+      id,
+      name,
+      nameArabic,
+      description,
+      previewImageUrl,
+      layoutType,
+      isActive,
+      displayOrder,
+    }),
+  );
 }

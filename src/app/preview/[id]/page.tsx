@@ -11,9 +11,16 @@ import {
   AchievementsSection,
   ContactButton,
   ThemeSelector,
-  // Classic Template Components
-  ClassicEducationSection,
-  ClassicCareerSection,
+  // Template Components
+  DefaultEducationSection,
+  DefaultCareerSection,
+  DefaultPortfolioHeader,
+  DarkEducationSection,
+  DarkCareerSection,
+  HeritageEducationSection,
+  HeritageCareerSection,
+  ArabicEducationSection,
+  ArabicCareerSection,
 } from "@/features/profiles";
 import { useProfileDetails } from "@/features/profiles/hooks";
 import {
@@ -184,106 +191,138 @@ export default function ProfilePreviewPage() {
       dir="rtl"
       style={{ backgroundColor: theme.background }}
     >
-      {/* Back Button - Fixed at top right */}
-      <button
-        data-back-button
-        onClick={handleGoBack}
-        className="fixed top-4 right-4 z-50 w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
-        style={{
-          backgroundColor: theme.cardBg,
-          border: `1px solid ${theme.border}`,
-        }}
-        aria-label="رجوع"
-      >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke={theme.text}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-
       {/* Portfolio Content */}
       <div
         ref={contentRef}
         className="w-full relative pb-8"
         style={{ backgroundColor: theme.background }}
       >
-        {/* Header Section */}
-        <PortfolioHeader
-          profileImage={null} // TODO: Add profile image when available
-          teacherName={profileDetails.userName || "المعلم"}
-          teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-          academicYear={profileDetails.academicYearName || ""}
-          onDownload={handleDownload}
-          onShare={handleShare}
-          isDownloading={isDownloading}
-          content={{
-            downloadFile: previewPage.downloadFile,
-            shareFile: previewPage.shareFile,
-            fileTitle: previewPage.fileTitle,
-          }}
-          theme={theme}
-        />
-
-        {/* Personal Info Section */}
-        <PersonalInfoSection
-          personalInfo={profileDetails.personalInfo}
-          content={previewPage.personalInfo}
-          memberBadge={previewPage.memberBadge}
-          theme={theme}
-        />
-
-        {/* Education Section - Template-aware */}
-        {profileDetails.templateId === TemplateId.Classic ? (
-          <ClassicEducationSection
-            qualifications={profileDetails.qualifications}
-            content={previewPage.education}
+        {/* Header Section - Template-aware (full width background handled inside component) */}
+        {profileDetails.templateId === TemplateId.Default ? (
+          <DefaultPortfolioHeader
+            teacherName={profileDetails.userName || "المعلم"}
+            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
+            academicYear={profileDetails.academicYearName || ""}
+            onDownload={handleDownload}
+            onShare={handleShare}
+            onBack={handleGoBack}
+            isDownloading={isDownloading}
+            content={{
+              downloadFile: previewPage.downloadFile,
+              shareFile: previewPage.shareFile,
+              fileTitle: previewPage.fileTitle,
+              publishFile: previewPage.publishFile ?? "نشر الملف",
+            }}
             theme={theme}
           />
         ) : (
-          <EducationSection
-            qualifications={profileDetails.qualifications}
-            content={previewPage.education}
+          <PortfolioHeader
+            profileImage={null} // TODO: Add profile image when available
+            teacherName={profileDetails.userName || "المعلم"}
+            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
+            academicYear={profileDetails.academicYearName || ""}
+            onDownload={handleDownload}
+            onShare={handleShare}
+            isDownloading={isDownloading}
+            content={{
+              downloadFile: previewPage.downloadFile,
+              shareFile: previewPage.shareFile,
+              fileTitle: previewPage.fileTitle,
+            }}
             theme={theme}
           />
         )}
 
-        {/* Career Section - Template-aware */}
-        {profileDetails.templateId === TemplateId.Classic ? (
-          <ClassicCareerSection
-            careerJobs={profileDetails.careerJobs}
-            content={previewPage.career}
+        {/* Main content constrained to max width */}
+        <div className="max-w-[1200px] mx-auto">
+          {/* Personal Info Section */}
+          <PersonalInfoSection
+            personalInfo={profileDetails.personalInfo}
+            content={previewPage.personalInfo}
+            memberBadge={previewPage.memberBadge}
             theme={theme}
           />
-        ) : (
-          <CareerSection
-            careerJobs={profileDetails.careerJobs}
-            content={previewPage.career}
+
+          {/* Education Section - Template-aware */}
+          {profileDetails.templateId === TemplateId.Default ? (
+            <DefaultEducationSection
+              qualifications={profileDetails.qualifications}
+              content={previewPage.education}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Dark ? (
+            <DarkEducationSection
+              qualifications={profileDetails.qualifications}
+              content={previewPage.education}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Heritage ? (
+            <HeritageEducationSection
+              qualifications={profileDetails.qualifications}
+              content={previewPage.education}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Arabic ? (
+            <ArabicEducationSection
+              qualifications={profileDetails.qualifications}
+              content={previewPage.education}
+              theme={theme}
+            />
+          ) : (
+            <EducationSection
+              qualifications={profileDetails.qualifications}
+              content={previewPage.education}
+              theme={theme}
+            />
+          )}
+
+          {/* Career Section - Template-aware */}
+          {profileDetails.templateId === TemplateId.Default ? (
+            <DefaultCareerSection
+              careerJobs={profileDetails.careerJobs}
+              content={previewPage.career}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Dark ? (
+            <DarkCareerSection
+              careerJobs={profileDetails.careerJobs}
+              content={previewPage.career}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Heritage ? (
+            <HeritageCareerSection
+              careerJobs={profileDetails.careerJobs}
+              content={previewPage.career}
+              theme={theme}
+            />
+          ) : profileDetails.templateId === TemplateId.Arabic ? (
+            <ArabicCareerSection
+              careerJobs={profileDetails.careerJobs}
+              content={previewPage.career}
+              theme={theme}
+            />
+          ) : (
+            <CareerSection
+              careerJobs={profileDetails.careerJobs}
+              content={previewPage.career}
+              theme={theme}
+            />
+          )}
+
+          {/* Achievements Section */}
+          <AchievementsSection
+            sections={profileDetails.sections}
+            content={previewPage.achievements}
             theme={theme}
           />
-        )}
 
-        {/* Achievements Section */}
-        <AchievementsSection
-          sections={profileDetails.sections}
-          content={previewPage.achievements}
-          theme={theme}
-        />
-
-        {/* Contact Button */}
-        <ContactButton
-          content={previewPage.contact}
-          whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-          theme={theme}
-        />
+          {/* Contact Button */}
+          <ContactButton
+            content={previewPage.contact}
+            whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+            theme={theme}
+          />
+        </div>
       </div>
 
       {/* Theme Selector - Floating Button + Modal */}
