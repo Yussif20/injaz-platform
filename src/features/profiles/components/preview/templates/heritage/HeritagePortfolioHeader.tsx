@@ -113,9 +113,9 @@ export const HeritagePortfolioHeader = ({
   const publishLabel = content.publishFile ?? "نشر الملف";
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden ">
       {/* Background with pattern and overlay */}
-      <div className="absolute inset-0 bg-contain bg-center bg-repeat bg-[url('/images/profiles/heritage/header-bg.svg')]" />
+      <div className="absolute inset-0 bg-contain bg-center bg-repeat bg-[url('/images/profiles/heritage/header-bg.svg')] " />
       {/* Color overlay */}
       <div
         className="absolute inset-0"

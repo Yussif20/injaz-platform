@@ -19,6 +19,7 @@ import {
   DarkEducationSection,
   DarkCareerSection,
   HeritagePortfolioHeader,
+  HeritagePersonalInfoSection,
   HeritageEducationSection,
   HeritageCareerSection,
   ArabicPortfolioHeader,
@@ -297,6 +298,12 @@ export default function ProfilePreviewPage() {
               content={previewPage.personalInfo}
               theme={theme}
             />
+          ) : selectedTemplateId === TemplateId.Heritage ? (
+            <HeritagePersonalInfoSection
+              personalInfo={profileDetails.personalInfo}
+              content={previewPage.personalInfo}
+              theme={theme}
+            />
           ) : selectedTemplateId === TemplateId.Arabic ? (
             <ArabicPersonalInfoSection
               personalInfo={profileDetails.personalInfo}
@@ -379,6 +386,7 @@ export default function ProfilePreviewPage() {
           )}
 
           {/* Achievements Section */}
+
           <AchievementsSection
             sections={profileDetails.sections}
             content={previewPage.achievements}

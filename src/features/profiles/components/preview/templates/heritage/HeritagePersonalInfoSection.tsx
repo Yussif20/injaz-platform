@@ -3,7 +3,7 @@
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
 
-interface ArabicPersonalInfoSectionProps {
+interface HeritagePersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
   content: {
     title: string;
@@ -61,25 +61,35 @@ const FloralIcon = ({
   </svg>
 );
 
-// Card color configurations
-const CARD_COLORS = {
-  dark: {
-    bg: "#543A31",
-    text: "#FFFFFF",
-    icon: "#D8CEC6",
+// Card color configurations with heritage colors
+const CARD_STYLES = {
+  origin: {
+    bg: "#EBE9E4",
+    text: "#4A4A4A",
+    icon: "#602726",
   },
-  light: {
-    bg: "#D8CEC6",
-    text: "#543A31",
-    icon: "#543A31",
+  nationalId: {
+    bg: "#602726",
+    text: "#FFFFFF",
+    icon: "#C9A89A",
+  },
+  email: {
+    bg: "#828A7D",
+    text: "#FFFFFF",
+    icon: "#602726",
+  },
+  birthday: {
+    bg: "#B2BAAF",
+    text: "#4A4A4A",
+    icon: "#602726",
   },
 };
 
-export const ArabicPersonalInfoSection = ({
+export const HeritagePersonalInfoSection = ({
   personalInfo,
   content,
   theme,
-}: ArabicPersonalInfoSectionProps) => {
+}: HeritagePersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
   // Format date to Arabic format (e.g., "5/8/1988")
@@ -92,10 +102,7 @@ export const ArabicPersonalInfoSection = ({
   return (
     <div className="px-4 py-6">
       {/* Section Header */}
-      <div
-        className="flex items-start justify-start gap-2 md:gap-3 mb-4 md:mb-8 border-r-2 pr-3 md:pr-6"
-        style={{ borderColor: theme.primary }}
-      >
+      <div className="flex items-start justify-start gap-2 md:gap-3 mb-4 md:mb-8 border-r-2 border-[#602726] pr-3 md:pr-6">
         <div className="text-right flex flex-col gap-2 md:gap-4">
           <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
             {content.title}
@@ -106,117 +113,118 @@ export const ArabicPersonalInfoSection = ({
         </div>
       </div>
 
-      {/* Info Cards Grid - 2 rows, equal height */}
-      <div className="flex flex-col gap-3 md:gap-5">
-        {/* Row 1: ID (2/3 right) + Birthday (1/3 left) */}
-        <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
-          {/* ID Card - 2/3 width, dark bg */}
+      {/* Info Cards Grid - Custom Layout */}
+      {/* RTL: first column = right (2/3), second column = left (1/3) */}
+      <div className="h-[200px] md:h-[500px] flex gap-3 md:gap-5 lg:gap-6">
+        {/* Right Column (2/3 width): Place (40%) + Email (60%) */}
+        <div className="flex-[2] flex flex-col gap-3 md:gap-5 lg:gap-6">
+          {/* Place/Origin Card - 40% height */}
           <div
-            className="flex-[2] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
-            style={{ backgroundColor: CARD_COLORS.dark.bg }}
+            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.origin.bg }}
           >
             <div className="flex-1 text-right">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.dark.text }}
-              >
-                {content.nationalId}
-              </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.dark.text, opacity: 0.9 }}
-              >
-                {personalInfo.nationalId || "—"}
-              </p>
-            </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.dark.icon}
-              />
-            </div>
-          </div>
-
-          {/* Birthday Card - 1/3 width, light bg */}
-          <div
-            className="flex-1 flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
-            style={{ backgroundColor: CARD_COLORS.light.bg }}
-          >
-            <div className="flex-1 text-right">
-              <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.light.text }}
-              >
-                {content.birthday}
-              </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.light.text, opacity: 0.9 }}
-              >
-                {formatDate(personalInfo.birthDate)}
-              </p>
-            </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.light.icon}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Row 2: Place (1/3 right) + Email (2/3 left) */}
-        <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
-          {/* Place Card - 1/3 width, dark bg */}
-          <div
-            className="flex-1 flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
-            style={{ backgroundColor: CARD_COLORS.dark.bg }}
-          >
-            <div className="flex-1 text-right">
-              <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.dark.text }}
+                style={{ color: CARD_STYLES.origin.text }}
               >
                 {content.origin}
               </p>
               <p
                 className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.dark.text, opacity: 0.9 }}
+                style={{ color: CARD_STYLES.origin.text, opacity: 0.9 }}
               >
                 {personalInfo.address || "—"}
               </p>
             </div>
             <div className="shrink-0">
               <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.dark.icon}
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.origin.icon}
               />
             </div>
           </div>
 
-          {/* Email Card - 2/3 width, light bg */}
+          {/* Email Card - 60% height */}
           <div
-            className="flex-[2] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
-            style={{ backgroundColor: CARD_COLORS.light.bg }}
+            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.email.bg }}
           >
             <div className="flex-1 text-right">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.light.text }}
+                style={{ color: CARD_STYLES.email.text }}
               >
                 {content.email}
               </p>
               <p
                 className="text-sm md:text-lg lg:text-xl font-light break-all"
-                style={{ color: CARD_COLORS.light.text, opacity: 0.9 }}
+                style={{ color: CARD_STYLES.email.text, opacity: 0.9 }}
               >
                 {personalInfo.email || "—"}
               </p>
             </div>
             <div className="shrink-0">
               <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.light.icon}
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.email.icon}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Left Column (1/3 width): ID (60%) + Birthday (40%) */}
+        <div className="flex-1 flex flex-col gap-3 md:gap-5 lg:gap-6">
+          {/* National ID Card - 60% height */}
+          <div
+            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.nationalId.bg }}
+          >
+            <div className="flex-1 text-right">
+              <p
+                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                style={{ color: CARD_STYLES.nationalId.text }}
+              >
+                {content.nationalId}
+              </p>
+              <p
+                className="text-sm md:text-lg lg:text-xl font-light"
+                style={{ color: CARD_STYLES.nationalId.text, opacity: 0.9 }}
+              >
+                {personalInfo.nationalId || "—"}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <FloralIcon
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.nationalId.icon}
+              />
+            </div>
+          </div>
+
+          {/* Birthday Card - 40% height */}
+          <div
+            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.birthday.bg }}
+          >
+            <div className="flex-1 text-right">
+              <p
+                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                style={{ color: CARD_STYLES.birthday.text }}
+              >
+                {content.birthday}
+              </p>
+              <p
+                className="text-sm md:text-lg lg:text-xl font-light"
+                style={{ color: CARD_STYLES.birthday.text, opacity: 0.9 }}
+              >
+                {formatDate(personalInfo.birthDate)}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <FloralIcon
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.birthday.icon}
               />
             </div>
           </div>

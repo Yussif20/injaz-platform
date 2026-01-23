@@ -337,8 +337,9 @@ export const dashboardContent = {
     // Achievements Section
     achievements: {
       title: "مهام وإنجازات المعلم",
-      subtitle: "الوزن النسبي لهذا القسم",
+      subtitle: "تعرف على أبرز إنجازاتي ومهاراتي",
       weightLabel: "الوزن النسبي",
+      attachmentLabel: "مرفق من",
     },
 
     // Contact Section
