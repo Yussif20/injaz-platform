@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { PORTFOLIO_THEMES, type ThemeName } from "../../types/theme.types";
+import { TemplateId } from "../../types/template.types";
 
-interface ThemeSelectorProps {
-  currentTheme: ThemeName;
-  onThemeChange: (theme: ThemeName) => void;
+interface TemplateSelectorProps {
+  currentTemplate: TemplateId;
+  onTemplateChange: (templateId: TemplateId) => void;
   content: {
     title: string;
     themes: {
@@ -18,33 +18,40 @@ interface ThemeSelectorProps {
   };
 }
 
+// Template configuration with colors
+const TEMPLATE_CONFIG: {
+  id: TemplateId;
+  key: "default" | "dark" | "heritage" | "arabic";
+  color: string;
+}[] = [
+  { id: TemplateId.Default, key: "default", color: "#008387" },
+  { id: TemplateId.Dark, key: "dark", color: "#12263a" },
+  { id: TemplateId.Heritage, key: "heritage", color: "#6b2a3d" },
+  { id: TemplateId.Arabic, key: "arabic", color: "#5c4033" },
+];
+
 export const ThemeSelector = ({
-  currentTheme,
-  onThemeChange,
+  currentTemplate,
+  onTemplateChange,
   content,
-}: ThemeSelectorProps) => {
+}: TemplateSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const themes: { name: ThemeName; label: string; color: string }[] = [
-    { name: "default", label: content.themes.default, color: PORTFOLIO_THEMES.default.circleColor },
-    { name: "dark", label: content.themes.dark, color: PORTFOLIO_THEMES.dark.circleColor },
-    { name: "heritage", label: content.themes.heritage, color: PORTFOLIO_THEMES.heritage.circleColor },
-    { name: "arabic", label: content.themes.arabic, color: PORTFOLIO_THEMES.arabic.circleColor },
-  ];
-
-  const handleThemeSelect = (themeName: ThemeName) => {
-    onThemeChange(themeName);
+  const handleTemplateSelect = (templateId: TemplateId) => {
+    onTemplateChange(templateId);
   };
+
+  // Get current template color for the floating button
+  const currentColor =
+    TEMPLATE_CONFIG.find((t) => t.id === currentTemplate)?.color || "#008387";
 
   return (
     <>
-      {/* Floating Theme Button */}
+      {/* Floating Template Button */}
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-24 left-4 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 z-40"
-        style={{
-          backgroundColor: PORTFOLIO_THEMES[currentTheme].colors.primary,
-        }}
+        style={{ backgroundColor: currentColor }}
       >
         <svg
           className="w-6 h-6 text-white"
@@ -75,49 +82,50 @@ export const ThemeSelector = ({
             {/* Handle */}
             <div className="w-12 h-1 bg-grey-300 rounded-full mx-auto mb-6" />
 
-            {/* Theme Options */}
-            <div className="flex justify-center gap-4 mb-6">
-              {themes.map((theme) => (
-                <button
-                  key={theme.name}
-                  onClick={() => handleThemeSelect(theme.name)}
-                  className="flex flex-col items-center gap-2"
-                >
-                  {/* Theme Circle */}
-                  <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform ${
-                      currentTheme === theme.name ? "ring-2 ring-offset-2" : ""
-                    }`}
-                    style={{
-                      backgroundColor: theme.color,
-                      ringColor: theme.color,
-                    }}
+            {/* Title */}
+            <h3 className="text-center text-lg font-semibold text-grey-900 mb-6">
+              {content.title}
+            </h3>
+
+            {/* Template Options */}
+            <div className="flex justify-center gap-3 mb-6">
+              {TEMPLATE_CONFIG.map((template) => {
+                const isSelected = currentTemplate === template.id;
+                const label = content.themes[template.key];
+
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => handleTemplateSelect(template.id)}
+                    className="relative"
                   >
-                    {currentTheme === theme.name && (
-                      <div className="w-3 h-3 rounded-full bg-white" />
-                    )}
-                  </div>
-                  {/* Theme Label */}
-                  <span
-                    className={`text-sm ${
-                      currentTheme === theme.name
-                        ? "font-semibold text-grey-900"
-                        : "text-grey-600"
-                    }`}
-                  >
-                    {theme.label}
-                  </span>
-                </button>
-              ))}
+                    {/* Template Circle with name inside */}
+                    <div
+                      className={`w-18 h-18 md:w-20 md:h-20 rounded-full flex items-center justify-center transition-all ${
+                        isSelected
+                          ? "ring-2 ring-offset-2 scale-105"
+                          : "hover:scale-105"
+                      }`}
+                      style={{
+                        backgroundColor: template.color,
+                        ["--tw-ring-color" as string]: template.color,
+                      }}
+                    >
+                      {/* Template Name - White text inside circle */}
+                      <span className="text-white text-xs md:text-sm font-medium text-center px-1 leading-tight">
+                        {label}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Customize Button */}
+            {/* Apply Button */}
             <button
               onClick={() => setIsOpen(false)}
               className="w-full py-3 rounded-full text-white font-medium transition-colors"
-              style={{
-                backgroundColor: PORTFOLIO_THEMES[currentTheme].colors.primary,
-              }}
+              style={{ backgroundColor: currentColor }}
             >
               {content.customizeButton}
             </button>

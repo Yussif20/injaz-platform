@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,21 +15,28 @@ import {
   DefaultEducationSection,
   DefaultCareerSection,
   DefaultPortfolioHeader,
+  DefaultPersonalInfoSection,
   DarkEducationSection,
   DarkCareerSection,
+  HeritagePortfolioHeader,
   HeritageEducationSection,
   HeritageCareerSection,
   ArabicEducationSection,
   ArabicCareerSection,
 } from "@/features/profiles";
 import { useProfileDetails } from "@/features/profiles/hooks";
-import {
-  PORTFOLIO_THEMES,
-  type ThemeName,
-} from "@/features/profiles/types/theme.types";
+import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
+
+// Map template ID to theme name for colors
+const TEMPLATE_TO_THEME: Record<TemplateId, keyof typeof PORTFOLIO_THEMES> = {
+  [TemplateId.Default]: "default",
+  [TemplateId.Dark]: "dark",
+  [TemplateId.Heritage]: "heritage",
+  [TemplateId.Arabic]: "arabic",
+};
 
 export default function ProfilePreviewPage() {
   const params = useParams();
@@ -39,15 +46,27 @@ export default function ProfilePreviewPage() {
 
   const { previewPage } = dashboardContent;
 
-  // Theme state
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>("default");
-  const theme = PORTFOLIO_THEMES[currentTheme].colors;
-
   // Download loading state
   const [isDownloading, setIsDownloading] = useState(false);
 
   // Fetch profile details
   const { profileDetails, isLoading } = useProfileDetails(Number(profileId));
+
+  // Selected template state - initialized from profile data
+  const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId>(
+    TemplateId.Default
+  );
+
+  // Update selectedTemplateId when profileDetails loads
+  useEffect(() => {
+    if (profileDetails?.templateId) {
+      setSelectedTemplateId(profileDetails.templateId as TemplateId);
+    }
+  }, [profileDetails?.templateId]);
+
+  // Get theme colors based on selected template
+  const themeName = TEMPLATE_TO_THEME[selectedTemplateId] || "default";
+  const theme = PORTFOLIO_THEMES[themeName].colors;
 
   // Go back handler
   const handleGoBack = () => {
@@ -67,10 +86,10 @@ export default function ProfilePreviewPage() {
 
       // Hide floating buttons during capture
       const backButton = document.querySelector(
-        "[data-back-button]",
+        "[data-back-button]"
       ) as HTMLElement;
       const themeButton = document.querySelector(
-        "[data-theme-button]",
+        "[data-theme-button]"
       ) as HTMLElement;
       if (backButton) backButton.style.visibility = "hidden";
       if (themeButton) themeButton.style.visibility = "hidden";
@@ -198,8 +217,25 @@ export default function ProfilePreviewPage() {
         style={{ backgroundColor: theme.background }}
       >
         {/* Header Section - Template-aware (full width background handled inside component) */}
-        {profileDetails.templateId === TemplateId.Default ? (
+        {selectedTemplateId === TemplateId.Default ? (
           <DefaultPortfolioHeader
+            teacherName={profileDetails.userName || "المعلم"}
+            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
+            academicYear={profileDetails.academicYearName || ""}
+            onDownload={handleDownload}
+            onShare={handleShare}
+            onBack={handleGoBack}
+            isDownloading={isDownloading}
+            content={{
+              downloadFile: previewPage.downloadFile,
+              shareFile: previewPage.shareFile,
+              fileTitle: previewPage.fileTitle,
+              publishFile: previewPage.publishFile ?? "نشر الملف",
+            }}
+            theme={theme}
+          />
+        ) : selectedTemplateId === TemplateId.Heritage ? (
+          <HeritagePortfolioHeader
             teacherName={profileDetails.userName || "المعلم"}
             teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
             academicYear={profileDetails.academicYearName || ""}
@@ -235,34 +271,42 @@ export default function ProfilePreviewPage() {
 
         {/* Main content constrained to max width */}
         <div className="max-w-[1200px] mx-auto">
-          {/* Personal Info Section */}
-          <PersonalInfoSection
-            personalInfo={profileDetails.personalInfo}
-            content={previewPage.personalInfo}
-            memberBadge={previewPage.memberBadge}
-            theme={theme}
-          />
+          {/* Personal Info Section - Template-aware */}
+          {selectedTemplateId === TemplateId.Default ? (
+            <DefaultPersonalInfoSection
+              personalInfo={profileDetails.personalInfo}
+              content={previewPage.personalInfo}
+              theme={theme}
+            />
+          ) : (
+            <PersonalInfoSection
+              personalInfo={profileDetails.personalInfo}
+              content={previewPage.personalInfo}
+              memberBadge={previewPage.memberBadge}
+              theme={theme}
+            />
+          )}
 
           {/* Education Section - Template-aware */}
-          {profileDetails.templateId === TemplateId.Default ? (
+          {selectedTemplateId === TemplateId.Default ? (
             <DefaultEducationSection
               qualifications={profileDetails.qualifications}
               content={previewPage.education}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Dark ? (
+          ) : selectedTemplateId === TemplateId.Dark ? (
             <DarkEducationSection
               qualifications={profileDetails.qualifications}
               content={previewPage.education}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Heritage ? (
+          ) : selectedTemplateId === TemplateId.Heritage ? (
             <HeritageEducationSection
               qualifications={profileDetails.qualifications}
               content={previewPage.education}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Arabic ? (
+          ) : selectedTemplateId === TemplateId.Arabic ? (
             <ArabicEducationSection
               qualifications={profileDetails.qualifications}
               content={previewPage.education}
@@ -277,25 +321,25 @@ export default function ProfilePreviewPage() {
           )}
 
           {/* Career Section - Template-aware */}
-          {profileDetails.templateId === TemplateId.Default ? (
+          {selectedTemplateId === TemplateId.Default ? (
             <DefaultCareerSection
               careerJobs={profileDetails.careerJobs}
               content={previewPage.career}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Dark ? (
+          ) : selectedTemplateId === TemplateId.Dark ? (
             <DarkCareerSection
               careerJobs={profileDetails.careerJobs}
               content={previewPage.career}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Heritage ? (
+          ) : selectedTemplateId === TemplateId.Heritage ? (
             <HeritageCareerSection
               careerJobs={profileDetails.careerJobs}
               content={previewPage.career}
               theme={theme}
             />
-          ) : profileDetails.templateId === TemplateId.Arabic ? (
+          ) : selectedTemplateId === TemplateId.Arabic ? (
             <ArabicCareerSection
               careerJobs={profileDetails.careerJobs}
               content={previewPage.career}
@@ -325,11 +369,11 @@ export default function ProfilePreviewPage() {
         </div>
       </div>
 
-      {/* Theme Selector - Floating Button + Modal */}
+      {/* Template Selector - Floating Button + Modal */}
       <div data-theme-button>
         <ThemeSelector
-          currentTheme={currentTheme}
-          onThemeChange={setCurrentTheme}
+          currentTemplate={selectedTemplateId}
+          onTemplateChange={setSelectedTemplateId}
           content={previewPage.themeSelector}
         />
       </div>

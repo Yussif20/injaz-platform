@@ -315,6 +315,7 @@ export const dashboardContent = {
     // Personal Info Section
     personalInfo: {
       title: "بياناتي",
+      subtitle: "تعرف على بياناتي الشخصية",
       birthday: "تاريخ الميلاد",
       email: "البريد الإلكتروني",
       nationalId: "الهوية الوطنية",

@@ -6,3 +6,4 @@
 export { DefaultCareerSection } from "./DefaultCareerSection";
 export { DefaultEducationSection } from "./DefaultEducationSection";
 export { DefaultPortfolioHeader } from "./DefaultPortfolioHeader";
+export { DefaultPersonalInfoSection } from "./DefaultPersonalInfoSection";

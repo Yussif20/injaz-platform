@@ -15,12 +15,14 @@
       "Bash(npx.cmd playwright install:*)",
       "Bash(npx.cmd playwright test:*)",
       "Bash(npm run lint)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(tree:*)",
+      "Bash(ls -la \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\public\\\\icons\"\" 2>/dev/null || echo \"Directory not found \")"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "puppeteer",
     "context7"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
