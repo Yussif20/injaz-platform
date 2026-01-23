@@ -21,6 +21,8 @@ import {
   HeritagePortfolioHeader,
   HeritageEducationSection,
   HeritageCareerSection,
+  ArabicPortfolioHeader,
+  ArabicPersonalInfoSection,
   ArabicEducationSection,
   ArabicCareerSection,
 } from "@/features/profiles";
@@ -54,7 +56,7 @@ export default function ProfilePreviewPage() {
 
   // Selected template state - initialized from profile data
   const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId>(
-    TemplateId.Default
+    TemplateId.Default,
   );
 
   // Update selectedTemplateId when profileDetails loads
@@ -86,10 +88,10 @@ export default function ProfilePreviewPage() {
 
       // Hide floating buttons during capture
       const backButton = document.querySelector(
-        "[data-back-button]"
+        "[data-back-button]",
       ) as HTMLElement;
       const themeButton = document.querySelector(
-        "[data-theme-button]"
+        "[data-theme-button]",
       ) as HTMLElement;
       if (backButton) backButton.style.visibility = "hidden";
       if (themeButton) themeButton.style.visibility = "hidden";
@@ -251,6 +253,23 @@ export default function ProfilePreviewPage() {
             }}
             theme={theme}
           />
+        ) : selectedTemplateId === TemplateId.Arabic ? (
+          <ArabicPortfolioHeader
+            teacherName={profileDetails.userName || "المعلم"}
+            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
+            academicYear={profileDetails.academicYearName || ""}
+            onDownload={handleDownload}
+            onShare={handleShare}
+            onBack={handleGoBack}
+            isDownloading={isDownloading}
+            content={{
+              downloadFile: previewPage.downloadFile,
+              shareFile: previewPage.shareFile,
+              fileTitle: previewPage.fileTitle,
+              publishFile: previewPage.publishFile ?? "نشر الملف",
+            }}
+            theme={theme}
+          />
         ) : (
           <PortfolioHeader
             profileImage={null} // TODO: Add profile image when available
@@ -274,6 +293,12 @@ export default function ProfilePreviewPage() {
           {/* Personal Info Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
             <DefaultPersonalInfoSection
+              personalInfo={profileDetails.personalInfo}
+              content={previewPage.personalInfo}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Arabic ? (
+            <ArabicPersonalInfoSection
               personalInfo={profileDetails.personalInfo}
               content={previewPage.personalInfo}
               theme={theme}
