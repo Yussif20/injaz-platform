@@ -17,12 +17,19 @@ interface ArabicPersonalInfoSectionProps {
 }
 
 // Decorative floral icon component
-const FloralIcon = ({ className }: { className?: string }) => (
+const FloralIcon = ({
+  className,
+  color,
+}: {
+  className?: string;
+  color: string;
+}) => (
   <svg
     viewBox="0 0 80 80"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
+    style={{ color }}
   >
     {/* Center cross petals */}
     <path
@@ -54,27 +61,27 @@ const FloralIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Card color configurations
-const CARD_COLORS = {
+// Card color configurations with updated colors
+const CARD_STYLES = {
+  origin: {
+    bg: "#EBE9E4",
+    text: "#4A4A4A",
+    icon: "#602726",
+  },
   nationalId: {
-    bg: "#6B3A3A",
+    bg: "#602726",
     text: "#FFFFFF",
     icon: "#C9A89A",
-  },
-  origin: {
-    bg: "#E8E4DF",
-    text: "#4A4A4A",
-    icon: "#6B3A3A",
-  },
-  birthday: {
-    bg: "#8A9A8E",
-    text: "#FFFFFF",
-    icon: "#6B3A3A",
   },
   email: {
-    bg: "#4A5F5F",
+    bg: "#828A7D",
     text: "#FFFFFF",
-    icon: "#C9A89A",
+    icon: "#602726",
+  },
+  birthday: {
+    bg: "#B2BAAF",
+    text: "#4A4A4A",
+    icon: "#602726",
   },
 };
 
@@ -91,33 +98,6 @@ export const ArabicPersonalInfoSection = ({
     const date = new Date(dateStr);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
-
-  const infoCards = [
-    {
-      key: "nationalId",
-      label: content.nationalId,
-      value: personalInfo.nationalId || "—",
-      colors: CARD_COLORS.nationalId,
-    },
-    {
-      key: "origin",
-      label: content.origin,
-      value: personalInfo.address || "—",
-      colors: CARD_COLORS.origin,
-    },
-    {
-      key: "birthday",
-      label: content.birthday,
-      value: formatDate(personalInfo.birthDate),
-      colors: CARD_COLORS.birthday,
-    },
-    {
-      key: "email",
-      label: content.email,
-      value: personalInfo.email || "—",
-      colors: CARD_COLORS.email,
-    },
-  ];
 
   return (
     <div className="px-4 py-6">
@@ -136,39 +116,122 @@ export const ArabicPersonalInfoSection = ({
         </div>
       </div>
 
-      {/* Info Cards Grid - 2x2 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-        {infoCards.map((card) => (
+      {/* Info Cards Grid - Custom Layout */}
+      {/* RTL: first column = right (2/3), second column = left (1/3) */}
+      <div className="h-[200px] md:h-[500px] flex gap-3 md:gap-5 lg:gap-6">
+        {/* Right Column (2/3 width): Place (40%) + Email (60%) */}
+        <div className="flex-[2] flex flex-col gap-3 md:gap-5 lg:gap-6">
+          {/* Place/Origin Card - 40% height */}
           <div
-            key={card.key}
-            className="flex items-center justify-between gap-4 p-5 md:p-6 rounded-2xl md:rounded-3xl min-h-[100px] md:min-h-[120px]"
-            style={{ backgroundColor: card.colors.bg }}
+            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.origin.bg }}
           >
-            {/* Text Content */}
             <div className="flex-1 text-right">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: card.colors.text }}
+                style={{ color: CARD_STYLES.origin.text }}
               >
-                {card.label}
+                {content.origin}
               </p>
               <p
                 className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: card.colors.text, opacity: 0.9 }}
+                style={{ color: CARD_STYLES.origin.text, opacity: 0.9 }}
               >
-                {card.value}
+                {personalInfo.address || "—"}
               </p>
             </div>
-
-            {/* Decorative Icon */}
             <div className="shrink-0">
               <FloralIcon
-                className="w-12 h-12 md:w-16 md:h-16"
-                style={{ color: card.colors.icon } as React.CSSProperties}
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.origin.icon}
               />
             </div>
           </div>
-        ))}
+
+          {/* Email Card - 60% height */}
+          <div
+            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.email.bg }}
+          >
+            <div className="flex-1 text-right">
+              <p
+                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                style={{ color: CARD_STYLES.email.text }}
+              >
+                {content.email}
+              </p>
+              <p
+                className="text-sm md:text-lg lg:text-xl font-light break-all"
+                style={{ color: CARD_STYLES.email.text, opacity: 0.9 }}
+              >
+                {personalInfo.email || "—"}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <FloralIcon
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.email.icon}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Left Column (1/3 width): ID (60%) + Birthday (40%) */}
+        <div className="flex-1 flex flex-col gap-3 md:gap-5 lg:gap-6">
+          {/* National ID Card - 60% height */}
+          <div
+            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.nationalId.bg }}
+          >
+            <div className="flex-1 text-right">
+              <p
+                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                style={{ color: CARD_STYLES.nationalId.text }}
+              >
+                {content.nationalId}
+              </p>
+              <p
+                className="text-sm md:text-lg lg:text-xl font-light"
+                style={{ color: CARD_STYLES.nationalId.text, opacity: 0.9 }}
+              >
+                {personalInfo.nationalId || "—"}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <FloralIcon
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.nationalId.icon}
+              />
+            </div>
+          </div>
+
+          {/* Birthday Card - 40% height */}
+          <div
+            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_STYLES.birthday.bg }}
+          >
+            <div className="flex-1 text-right">
+              <p
+                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                style={{ color: CARD_STYLES.birthday.text }}
+              >
+                {content.birthday}
+              </p>
+              <p
+                className="text-sm md:text-lg lg:text-xl font-light"
+                style={{ color: CARD_STYLES.birthday.text, opacity: 0.9 }}
+              >
+                {formatDate(personalInfo.birthDate)}
+              </p>
+            </div>
+            <div className="shrink-0">
+              <FloralIcon
+                className="w-10 h-10 md:w-16 md:h-16"
+                color={CARD_STYLES.birthday.icon}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
