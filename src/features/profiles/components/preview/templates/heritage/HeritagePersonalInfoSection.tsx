@@ -2,6 +2,7 @@
 
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
+import Image from "next/image";
 
 interface HeritagePersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
@@ -88,7 +89,6 @@ const CARD_STYLES = {
 export const HeritagePersonalInfoSection = ({
   personalInfo,
   content,
-  theme,
 }: HeritagePersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
@@ -115,60 +115,64 @@ export const HeritagePersonalInfoSection = ({
 
       {/* Info Cards Grid - Custom Layout */}
       {/* RTL: first column = right (2/3), second column = left (1/3) */}
-      <div className="h-[200px] md:h-[500px] flex gap-3 md:gap-5 lg:gap-6">
+      <div className="h-55 md:h-125 flex gap-3 md:gap-5 lg:gap-6">
         {/* Right Column (2/3 width): Place (40%) + Email (60%) */}
-        <div className="flex-[2] flex flex-col gap-3 md:gap-5 lg:gap-6">
+        <div className="flex-2 flex flex-col gap-3 md:gap-5 lg:gap-6">
           {/* Place/Origin Card - 40% height */}
           <div
-            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-40 flex flex-col lg:flex-row gap-2 md:gap-5 lg:gap-9 items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_STYLES.origin.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 relative w-10 md:w-25 lg:w-31 h-6 md:h-14 lg:h-18">
+              <Image
+                src="/images/profiles/heritage/pattern-place.svg"
+                alt="diamond pattern"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex-1 text-center lg:text-right">
               <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                className="text-sm md:text-2xl lg:text-[28px] font-normal mb-1 md:mb-2"
                 style={{ color: CARD_STYLES.origin.text }}
               >
                 {content.origin}
               </p>
               <p
-                className="text-sm md:text-lg lg:text-xl font-light"
+                className="text-xs md:text-xl lg:text-2xl font-light"
                 style={{ color: CARD_STYLES.origin.text, opacity: 0.9 }}
               >
                 {personalInfo.address || "—"}
               </p>
             </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-16 md:h-16"
-                color={CARD_STYLES.origin.icon}
-              />
-            </div>
           </div>
 
           {/* Email Card - 60% height */}
           <div
-            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-60 flex flex-col lg:flex-row gap-2 md:gap-5 lg:gap-9 items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_STYLES.email.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 relative w-10 md:w-25 lg:w-31 h-6 md:h-14 lg:h-18">
+              <Image
+                src="/images/profiles/heritage/pattern-email.svg"
+                alt="diamond pattern"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex-1 text-center lg:text-right">
               <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                className="text-sm md:text-2xl lg:text-[28px] font-normal mb-1 md:mb-2"
                 style={{ color: CARD_STYLES.email.text }}
               >
                 {content.email}
               </p>
               <p
-                className="text-sm md:text-lg lg:text-xl font-light break-all"
+                className="text-xs md:text-xl lg:text-2xl font-light break-all"
                 style={{ color: CARD_STYLES.email.text, opacity: 0.9 }}
               >
                 {personalInfo.email || "—"}
               </p>
-            </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-16 md:h-16"
-                color={CARD_STYLES.email.icon}
-              />
             </div>
           </div>
         </div>
@@ -177,55 +181,59 @@ export const HeritagePersonalInfoSection = ({
         <div className="flex-1 flex flex-col gap-3 md:gap-5 lg:gap-6">
           {/* National ID Card - 60% height */}
           <div
-            className="flex-[60] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-60 flex flex-col lg:flex-row gap-2 md:gap-5 lg:gap-9 items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_STYLES.nationalId.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 relative w-10 md:w-25 lg:w-31 h-6 md:h-14 lg:h-18">
+              <Image
+                src="/images/profiles/heritage/pattern-light.svg"
+                alt="diamond pattern"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex-1 text-center lg:text-right">
               <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                className="text-sm md:text-2xl lg:text-[28px] font-normal mb-1 md:mb-2"
                 style={{ color: CARD_STYLES.nationalId.text }}
               >
                 {content.nationalId}
               </p>
               <p
-                className="text-sm md:text-lg lg:text-xl font-light"
+                className="text-xs md:text-xl lg:text-2xl font-light"
                 style={{ color: CARD_STYLES.nationalId.text, opacity: 0.9 }}
               >
                 {personalInfo.nationalId || "—"}
               </p>
             </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-16 md:h-16"
-                color={CARD_STYLES.nationalId.icon}
-              />
-            </div>
           </div>
 
           {/* Birthday Card - 40% height */}
           <div
-            className="flex-[40] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-40 flex flex-col lg:flex-row gap-2 md:gap-5 lg:gap-9 items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_STYLES.birthday.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 relative w-10 md:w-25 lg:w-31 h-6 md:h-14 lg:h-18">
+              <Image
+                src="/images/profiles/heritage/pattern-dark.svg"
+                alt="diamond pattern"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex-1 text-center lg:text-right">
               <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                className="text-sm md:text-2xl lg:text-[28px] font-normal mb-1 md:mb-2"
                 style={{ color: CARD_STYLES.birthday.text }}
               >
                 {content.birthday}
               </p>
               <p
-                className="text-sm md:text-lg lg:text-xl font-light"
+                className="text-xs md:text-xl lg:text-2xl font-light"
                 style={{ color: CARD_STYLES.birthday.text, opacity: 0.9 }}
               >
                 {formatDate(personalInfo.birthDate)}
               </p>
-            </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-16 md:h-16"
-                color={CARD_STYLES.birthday.icon}
-              />
             </div>
           </div>
         </div>

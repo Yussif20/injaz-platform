@@ -16,7 +16,6 @@ interface HeritageEducationSectionProps {
 export const HeritageEducationSection = ({
   qualifications,
   content,
-  theme,
 }: HeritageEducationSectionProps) => {
   if (!qualifications || qualifications.length === 0) return null;
 

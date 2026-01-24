@@ -26,79 +26,6 @@ interface HeritagePortfolioHeaderProps {
   theme: ThemeColors;
 }
 
-// PDF icon for download button
-const PdfIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M14 2V8H20"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M9 13H10.5C10.8978 13 11.2794 13.158 11.5607 13.4393C11.842 13.7206 12 14.1022 12 14.5C12 14.8978 11.842 15.2794 11.5607 15.5607C11.2794 15.842 10.8978 16 10.5 16H9V13Z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M9 16V18"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// Share/Upload icon
-const ShareIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4 12V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V12"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M16 6L12 2L8 6"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M12 2V15"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export const HeritagePortfolioHeader = ({
   teacherName,
   teacherRank,
@@ -108,14 +35,13 @@ export const HeritagePortfolioHeader = ({
   onBack,
   isDownloading = false,
   content,
-  theme,
 }: HeritagePortfolioHeaderProps) => {
   const publishLabel = content.publishFile ?? "نشر الملف";
 
   return (
     <div className="relative overflow-hidden ">
       {/* Background with pattern and overlay */}
-      <div className="absolute inset-0 bg-contain bg-center bg-repeat bg-[url('/images/profiles/heritage/header-bg.svg')] " />
+      <div className="absolute inset-0 bg-cover bg-center bg-repeat bg-[url('/images/profiles/heritage/header-bg.svg')] " />
       {/* Color overlay */}
       <div
         className="absolute inset-0"
@@ -175,7 +101,12 @@ export const HeritagePortfolioHeader = ({
                     color: "#52161E",
                   }}
                 >
-                  <ShareIcon />
+                  <Image
+                    src="/images/profiles/heritage/share.svg"
+                    alt="Share"
+                    width={24}
+                    height={24}
+                  />
                   {content.shareFile}
                 </button>
 
@@ -190,7 +121,12 @@ export const HeritagePortfolioHeader = ({
                     opacity: isDownloading ? 0.7 : 1,
                   }}
                 >
-                  <PdfIcon />
+                  <Image
+                    src="/images/profiles/default/file.svg"
+                    alt="Download"
+                    width={24}
+                    height={24}
+                  />
                   {isDownloading ? "جاري التحميل..." : content.downloadFile}
                 </button>
               </div>

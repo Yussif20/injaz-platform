@@ -21,6 +21,8 @@ Additional Tailwind syntax reminders:
 - Prefer shorthand arbitrary values where available (e.g., use `bg-[center]` instead of `bg-[position:center]`, and `bg-repeat-space` instead of `bg-[repeat:space]`).
 - For background sizing, use breakpoint-specific utilities like `lg:bg-size-[auto_65px]` instead of `bg-[length:auto_65px]`.
 - Prefer breakpoint utilities over arbitrary pixel heights when possible (e.g., `md:h-14.5` instead of `md:h-[58px]`).
+- Use shorthand flex utilities: `flex-1`, `flex-2`, `flex-60` instead of `flex-[1]`, `flex-[2]`, `flex-[60]`.
+- Use shorthand height utilities: `h-50`, `md:h-125` instead of `h-[200px]`, `md:h-[500px]` (numeric values represent multiples of 4px in Tailwind).
 
 **Exception**: Only use `style={}` for:
 

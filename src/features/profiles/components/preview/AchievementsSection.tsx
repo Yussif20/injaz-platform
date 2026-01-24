@@ -3,7 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { ThemeColors } from "../../types/theme.types";
-import type { ProfileSection, ProfileSubsection, SubsectionImage } from "../../types/profile.types";
+import type {
+  ProfileSection,
+  ProfileSubsection,
+  SubsectionImage,
+} from "../../types/profile.types";
 
 interface AchievementsSectionProps {
   sections: ProfileSection[] | null;
@@ -49,7 +53,7 @@ const SubsectionGallery = ({
       )}
 
       {/* Featured Image - full width with rounded corners */}
-      <div className="relative aspect-[4/3] w-full rounded-2xl md:rounded-3xl overflow-hidden">
+      <div className="relative h-55 md:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden">
         <Image
           src={selectedImage?.publicUrl || "/images/profiles/achievment.png"}
           alt={selectedImage?.description || "صورة الشاهد"}
@@ -157,12 +161,48 @@ const MOCK_SECTIONS: ProfileSection[] = [
         weightPercent: 5,
         displayOrder: 1,
         images: [
-          { id: 1, imagePath: null, publicUrl: null, description: "إعداد ومتابعة الدروس والإختبارات", displayOrder: 1 },
-          { id: 2, imagePath: null, publicUrl: null, description: "متابعة الطلاب", displayOrder: 2 },
-          { id: 3, imagePath: null, publicUrl: null, description: "تقييم الأداء", displayOrder: 3 },
-          { id: 4, imagePath: null, publicUrl: null, description: "إعداد التقارير", displayOrder: 4 },
-          { id: 5, imagePath: null, publicUrl: null, description: "المشاركة في الأنشطة", displayOrder: 5 },
-          { id: 6, imagePath: null, publicUrl: null, description: "التطوير المهني", displayOrder: 6 },
+          {
+            id: 1,
+            imagePath: null,
+            publicUrl: null,
+            description: "إعداد ومتابعة الدروس والإختبارات",
+            displayOrder: 1,
+          },
+          {
+            id: 2,
+            imagePath: null,
+            publicUrl: null,
+            description: "متابعة الطلاب",
+            displayOrder: 2,
+          },
+          {
+            id: 3,
+            imagePath: null,
+            publicUrl: null,
+            description: "تقييم الأداء",
+            displayOrder: 3,
+          },
+          {
+            id: 4,
+            imagePath: null,
+            publicUrl: null,
+            description: "إعداد التقارير",
+            displayOrder: 4,
+          },
+          {
+            id: 5,
+            imagePath: null,
+            publicUrl: null,
+            description: "المشاركة في الأنشطة",
+            displayOrder: 5,
+          },
+          {
+            id: 6,
+            imagePath: null,
+            publicUrl: null,
+            description: "التطوير المهني",
+            displayOrder: 6,
+          },
         ],
       },
       {
@@ -171,8 +211,20 @@ const MOCK_SECTIONS: ProfileSection[] = [
         weightPercent: 5,
         displayOrder: 2,
         images: [
-          { id: 7, imagePath: null, publicUrl: null, description: "إعداد ومتابعة الدروس والإختبارات", displayOrder: 1 },
-          { id: 8, imagePath: null, publicUrl: null, description: "تقييم الطلاب", displayOrder: 2 },
+          {
+            id: 7,
+            imagePath: null,
+            publicUrl: null,
+            description: "إعداد ومتابعة الدروس والإختبارات",
+            displayOrder: 1,
+          },
+          {
+            id: 8,
+            imagePath: null,
+            publicUrl: null,
+            description: "تقييم الطلاب",
+            displayOrder: 2,
+          },
         ],
       },
     ],
@@ -189,12 +241,48 @@ const MOCK_SECTIONS: ProfileSection[] = [
         weightPercent: 10,
         displayOrder: 1,
         images: [
-          { id: 9, imagePath: null, publicUrl: null, description: "فعاليات يوم الطالب", displayOrder: 1 },
-          { id: 10, imagePath: null, publicUrl: null, description: "المسابقات الثقافية", displayOrder: 2 },
-          { id: 11, imagePath: null, publicUrl: null, description: "العروض الطلابية", displayOrder: 3 },
-          { id: 12, imagePath: null, publicUrl: null, description: "التكريمات", displayOrder: 4 },
-          { id: 13, imagePath: null, publicUrl: null, description: "الأنشطة الرياضية", displayOrder: 5 },
-          { id: 14, imagePath: null, publicUrl: null, description: "المعارض", displayOrder: 6 },
+          {
+            id: 9,
+            imagePath: null,
+            publicUrl: null,
+            description: "فعاليات يوم الطالب",
+            displayOrder: 1,
+          },
+          {
+            id: 10,
+            imagePath: null,
+            publicUrl: null,
+            description: "المسابقات الثقافية",
+            displayOrder: 2,
+          },
+          {
+            id: 11,
+            imagePath: null,
+            publicUrl: null,
+            description: "العروض الطلابية",
+            displayOrder: 3,
+          },
+          {
+            id: 12,
+            imagePath: null,
+            publicUrl: null,
+            description: "التكريمات",
+            displayOrder: 4,
+          },
+          {
+            id: 13,
+            imagePath: null,
+            publicUrl: null,
+            description: "الأنشطة الرياضية",
+            displayOrder: 5,
+          },
+          {
+            id: 14,
+            imagePath: null,
+            publicUrl: null,
+            description: "المعارض",
+            displayOrder: 6,
+          },
         ],
       },
     ],
@@ -208,14 +296,18 @@ export const AchievementsSection = ({
 }: AchievementsSectionProps) => {
   // Use mock data for testing if no real sections available
   // TODO: Remove mock data usage in production
-  const useMockData = !sections || sections.length === 0 ||
-    !sections.some((section) => section.subsections?.some((sub) => sub.images && sub.images.length > 0));
+  const useMockData =
+    !sections ||
+    sections.length === 0 ||
+    !sections.some((section) =>
+      section.subsections?.some((sub) => sub.images && sub.images.length > 0),
+    );
 
   const sectionsToUse = useMockData ? MOCK_SECTIONS : sections;
 
   // Filter sections that have at least one subsection with images
   const sectionsWithContent = sectionsToUse!.filter((section) =>
-    section.subsections?.some((sub) => sub.images && sub.images.length > 0)
+    section.subsections?.some((sub) => sub.images && sub.images.length > 0),
   );
 
   if (sectionsWithContent.length === 0) return null;
