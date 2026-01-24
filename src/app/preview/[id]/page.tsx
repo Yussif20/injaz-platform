@@ -18,6 +18,8 @@ import {
   DefaultPersonalInfoSection,
   DarkEducationSection,
   DarkCareerSection,
+  DarkPortfolioHeader,
+  DarkPersonalInfoSection,
   HeritagePortfolioHeader,
   HeritagePersonalInfoSection,
   HeritageEducationSection,
@@ -271,6 +273,23 @@ export default function ProfilePreviewPage() {
             }}
             theme={theme}
           />
+        ) : selectedTemplateId === TemplateId.Dark ? (
+          <DarkPortfolioHeader
+            teacherName={profileDetails.userName || "المعلم"}
+            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
+            academicYear={profileDetails.academicYearName || ""}
+            onDownload={handleDownload}
+            onShare={handleShare}
+            onBack={handleGoBack}
+            isDownloading={isDownloading}
+            content={{
+              downloadFile: previewPage.downloadFile,
+              shareFile: previewPage.shareFile,
+              fileTitle: previewPage.fileTitle,
+              publishFile: previewPage.publishFile ?? "نشر الملف",
+            }}
+            theme={theme}
+          />
         ) : (
           <PortfolioHeader
             profileImage={null} // TODO: Add profile image when available
@@ -306,6 +325,12 @@ export default function ProfilePreviewPage() {
             />
           ) : selectedTemplateId === TemplateId.Arabic ? (
             <ArabicPersonalInfoSection
+              personalInfo={profileDetails.personalInfo}
+              content={previewPage.personalInfo}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Dark ? (
+            <DarkPersonalInfoSection
               personalInfo={profileDetails.personalInfo}
               content={previewPage.personalInfo}
               theme={theme}
