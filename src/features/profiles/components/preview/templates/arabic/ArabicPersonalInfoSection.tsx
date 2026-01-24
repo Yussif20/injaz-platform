@@ -61,96 +61,105 @@ export const ArabicPersonalInfoSection = ({
         </div>
       </div>
 
-      {/* Info Cards Grid - 2 rows, equal height */}
+      {/* Info Cards Grid - 3 rows on sm/md, 2 rows on lg */}
       <div className="flex flex-col gap-3 md:gap-5">
-        {/* Row 1: ID (2/3 right) + Birthday (1/3 left) */}
+        {/* Row 1: ID Card - full width on sm/md, 2/3 on lg */}
         <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
-          {/* ID Card - 2/3 width, dark bg */}
           <div
-            className="flex-2 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            className="w-full lg:flex-2 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.dark.bg }}
           >
             <div className="pr-4 flex-3/5 text-right">
-              <p
-                className=" text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.dark.text }}
-              >
+              <p className="text-white text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.nationalId}
               </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.dark.text, opacity: 0.9 }}
-              >
+              <p className="text-white text-xs md:text-xl lg:text-2xl">
                 {personalInfo.nationalId || "—"}
               </p>
             </div>
             <div className="shrink-0 flex-2/5 bg-[url('/images/profiles/arabic/personal-info-pattern-large-light.svg')] bg-cover bg-center w-full h-full"></div>
           </div>
 
-          {/* Birthday Card - 1/3 width, light bg */}
+          {/* Birthday Card - hidden on sm/md, 1/3 on lg */}
           <div
-            className="flex-1 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            className="hidden lg:flex flex-1 items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.light.bg }}
           >
             <div className="shrink-0 flex-1/3 bg-[url('/images/profiles/arabic/personal-info-pattern-small.svg')] bg-cover bg-center w-full h-full"></div>
-            <div className="flex-2/3 text-right pr-4">
-              <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.light.text }}
-              >
+            <div className="text-[#543A31] flex-2/3 text-right pr-4">
+              <p className=" text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.birthday}
               </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.light.text, opacity: 0.9 }}
-              >
+              <p className=" text-xs md:text-xl lg:text-2xl">
                 {formatDate(personalInfo.birthDate)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Row 2: Place (1/3 right) + Email (2/3 left) */}
+        {/* Row 2: Place (1/2 on sm/md) + Birthday (1/2 on sm/md, hidden on lg) | Place (1/3 on lg) + Email (2/3 on lg, hidden on sm/md) */}
         <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
-          {/* Place Card - 1/3 width, dark bg */}
+          {/* Place Card - 1/2 width on sm/md, 1/3 on lg */}
           <div
-            className="flex-1 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-1 lg:flex-1 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.dark.bg }}
           >
             <div className="flex-2/3 text-right pr-4">
-              <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.dark.text }}
-              >
+              <p className="text-white text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.origin}
               </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light"
-                style={{ color: CARD_COLORS.dark.text, opacity: 0.9 }}
-              >
+              <p className="text-white text-xs md:text-xl lg:text-2xl">
                 {personalInfo.address || "—"}
               </p>
             </div>
             <div className="shrink-0 flex-1/3 bg-[url('/images/profiles/arabic/personal-info-pattern-small-light.svg')] bg-cover bg-center w-full h-full"></div>
           </div>
 
-          {/* Email Card - 2/3 width, light bg */}
+          {/* Birthday Card - 1/2 width on sm/md, hidden on lg */}
           <div
-            className="flex-2 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-1 lg:hidden flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_COLORS.light.bg }}
+          >
+            <div className="shrink-0 flex-1/3 bg-[url('/images/profiles/arabic/personal-info-pattern-small.svg')] bg-cover bg-center w-full h-full"></div>
+            <div className="text-[#543A31] flex-2/3 text-right pr-4">
+              <p className=" text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
+                {content.birthday}
+              </p>
+              <p className=" text-xs md:text-xl lg:text-2xl">
+                {formatDate(personalInfo.birthDate)}
+              </p>
+            </div>
+          </div>
+
+          {/* Email Card - hidden on sm/md, 2/3 on lg */}
+          <div
+            className="hidden lg:flex flex-2 items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.light.bg }}
           >
             <div className="shrink-0 flex-2/5 bg-[url('/images/profiles/arabic/personal-info-pattern-large.svg')] bg-cover bg-center w-full h-full"></div>
-            <div className="flex-3/5 text-right pr-4">
-              <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
-                style={{ color: CARD_COLORS.light.text }}
-              >
+            <div className="flex-3/5 text-right pr-4 text-[#543A31]">
+              <p className="text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.email}
               </p>
-              <p
-                className="text-sm md:text-lg lg:text-xl font-light break-all"
-                style={{ color: CARD_COLORS.light.text, opacity: 0.9 }}
-              >
+              <p className="text-xs md:text-xl lg:text-2xl">
+                {personalInfo.email || "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Email Card - full width on sm/md, hidden on lg */}
+        <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:hidden">
+          <div
+            className="w-full flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
+            style={{ backgroundColor: CARD_COLORS.light.bg }}
+          >
+            <div className="shrink-0 flex-2/5 bg-[url('/images/profiles/arabic/personal-info-pattern-large.svg')] bg-cover bg-center w-full h-full"></div>
+            <div className="flex-3/5 text-right pr-4 text-[#543A31]">
+              <p className="text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
+                {content.email}
+              </p>
+              <p className="text-xs md:text-xl lg:text-2xl">
                 {personalInfo.email || "—"}
               </p>
             </div>
