@@ -59,10 +59,10 @@ export const HeritagePortfolioHeader = ({
           />
 
           {/* Main Content */}
-          <div className="flex flex-col md:flex-row md:items-center md:gap-12 lg:gap-20">
+          <div className="flex flex-col md:flex-row-reverse md:items-center md:gap-12 lg:gap-20">
             {/* Profile Image - Left on desktop, centered on mobile */}
-            <div className="flex justify-center md:justify-start mb-6 md:mb-0">
-              <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden shadow-xl">
+            <div className="flex justify-center md:justify-end mb-6 md:mb-0">
+              <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden">
                 <Image
                   src="/images/profiles/avatar.png"
                   alt={teacherName}

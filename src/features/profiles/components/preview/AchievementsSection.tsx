@@ -5,7 +5,6 @@ import Image from "next/image";
 import type { ThemeColors } from "../../types/theme.types";
 import type {
   ProfileSection,
-  ProfileSubsection,
   SubsectionImage,
 } from "../../types/profile.types";
 
@@ -53,7 +52,7 @@ const SubsectionGallery = ({
       )}
 
       {/* Featured Image - full width with rounded corners */}
-      <div className="relative h-55 md:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden">
+      <div className="relative h-33.5 md:h-80 lg:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden">
         <Image
           src={selectedImage?.publicUrl || "/images/profiles/achievment.png"}
           alt={selectedImage?.description || "صورة الشاهد"}
@@ -69,27 +68,7 @@ const SubsectionGallery = ({
 
       {/* Navigation Arrows - below title, aligned to left (appears on left in RTL) */}
       {images.length > 1 && (
-        <div className="flex items-center justify-start gap-3 mt-3">
-          <button
-            onClick={handleNext}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors"
-            style={{ backgroundColor: theme.primary }}
-            aria-label="التالي"
-          >
-            <svg
-              className="w-5 h-5 md:w-6 md:h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
+        <div className="flex items-center justify-start gap-2 mt-3">
           <button
             onClick={handlePrev}
             className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors"
@@ -107,6 +86,26 @@ const SubsectionGallery = ({
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={handleNext}
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors"
+            style={{ backgroundColor: theme.primary }}
+            aria-label="التالي"
+          >
+            <svg
+              className="w-5 h-5 md:w-6 md:h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
               />
             </svg>
           </button>
@@ -315,22 +314,7 @@ export const AchievementsSection = ({
   return (
     <div className="px-4 py-6">
       {/* Section Header */}
-      <div className="flex items-start justify-start gap-2 md:gap-3 mb-6 md:mb-8">
-        {/* Star Icon */}
-        <div className="w-8 h-8 md:w-10 md:h-10 relative shrink-0">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            className="w-full h-full"
-            style={{ color: theme.primary }}
-          >
-            <path
-              d="M12 2L14.09 8.26L20.7 8.82L15.55 13.14L17.18 19.77L12 16.27L6.82 19.77L8.45 13.14L3.3 8.82L9.91 8.26L12 2Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-
+      <div className="flex items-start border-r md:border-r-2 border-[#602726] pr-2 md:pr-3 justify-start gap-2 md:gap-3 mb-6 md:mb-8">
         {/* Title and Subtitle */}
         <div className="text-right flex flex-col gap-1 md:gap-2">
           <h2
@@ -346,17 +330,15 @@ export const AchievementsSection = ({
       </div>
 
       {/* Sections */}
-      <div className="space-y-8 md:space-y-10">
+      <div className="bg-[#EBE9E4] rounded-[36px] px-14 py-13 space-y-8 md:space-y-10">
         {sectionsWithContent.map((section) => (
           <div key={section.id}>
             {/* Section Weight Badge */}
-            <div className="flex justify-end mb-2">
-              <span
-                className="text-xs md:text-sm px-3 py-1 rounded-full text-white"
-                style={{ backgroundColor: theme.primary }}
-              >
-                {content.weightLabel} {section.weightPercent}%
-              </span>
+            <div
+              className="flex justify-start mb-2"
+              style={{ color: theme.primary }}
+            >
+              {content.weightLabel} {section.weightPercent}%
             </div>
 
             {/* Section Title */}
@@ -368,7 +350,7 @@ export const AchievementsSection = ({
             </h3>
 
             {/* Subsections */}
-            <div className="space-y-8 md:space-y-12">
+            <div className="bg-white rounded-[36px] px-14 py-13 space-y-8 md:space-y-12">
               {section.subsections
                 ?.filter((sub) => sub.images && sub.images.length > 0)
                 .map((subsection) => (

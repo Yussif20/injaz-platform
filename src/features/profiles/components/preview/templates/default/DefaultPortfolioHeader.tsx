@@ -31,7 +31,7 @@ interface DefaultPortfolioHeaderProps {
 export const DefaultPortfolioHeader = ({
   teacherName,
   teacherRank,
-  academicYear,
+  // academicYear,
   onDownload,
   onShare,
   onBack,
@@ -120,8 +120,6 @@ export const DefaultPortfolioHeader = ({
                   src="/images/profiles/avatar.png"
                   alt={teacherName}
                   fill
-                  sizes="(max-width: 768px) 190px, 350px"
-                  className="object-cover"
                 />
               </div>
             </div>

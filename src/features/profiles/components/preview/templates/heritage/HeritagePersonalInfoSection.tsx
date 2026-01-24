@@ -17,51 +17,6 @@ interface HeritagePersonalInfoSectionProps {
   theme: ThemeColors;
 }
 
-// Decorative floral icon component
-const FloralIcon = ({
-  className,
-  color,
-}: {
-  className?: string;
-  color: string;
-}) => (
-  <svg
-    viewBox="0 0 80 80"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    style={{ color }}
-  >
-    {/* Center cross petals */}
-    <path
-      d="M40 20L45 35H55L47 43L50 58L40 50L30 58L33 43L25 35H35L40 20Z"
-      fill="currentColor"
-      opacity="0.8"
-    />
-    {/* Top diamond */}
-    <path d="M40 5L45 15L40 25L35 15L40 5Z" fill="currentColor" opacity="0.6" />
-    {/* Bottom diamond */}
-    <path
-      d="M40 55L45 65L40 75L35 65L40 55Z"
-      fill="currentColor"
-      opacity="0.6"
-    />
-    {/* Left diamond */}
-    <path d="M5 40L15 35L25 40L15 45L5 40Z" fill="currentColor" opacity="0.6" />
-    {/* Right diamond */}
-    <path
-      d="M55 40L65 35L75 40L65 45L55 40Z"
-      fill="currentColor"
-      opacity="0.6"
-    />
-    {/* Corner dots */}
-    <circle cx="20" cy="20" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="60" cy="20" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="20" cy="60" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="60" cy="60" r="3" fill="currentColor" opacity="0.4" />
-  </svg>
-);
-
 // Card color configurations with heritage colors
 const CARD_STYLES = {
   origin: {

@@ -144,14 +144,12 @@ export const ArabicPortfolioHeader = ({
           {/* Avatar */}
           {/* Avatar */}
           <div className="flex justify-center md:justify-start">
-            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 rounded-full overflow-hidden p-3 border-2 border-[#543A31]">
-              <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#543A31]">
+            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden ">
+              <div className="relative w-full h-full overflow-hidden ">
                 <Image
                   src="/images/profiles/avatar.png"
                   alt={teacherName}
                   fill
-                  sizes="(max-width: 768px) 190px, 350px"
-                  className="object-cover"
                 />
               </div>
             </div>

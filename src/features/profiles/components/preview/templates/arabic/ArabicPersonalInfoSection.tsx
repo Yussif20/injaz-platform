@@ -16,51 +16,6 @@ interface ArabicPersonalInfoSectionProps {
   theme: ThemeColors;
 }
 
-// Decorative floral icon component
-const FloralIcon = ({
-  className,
-  color,
-}: {
-  className?: string;
-  color: string;
-}) => (
-  <svg
-    viewBox="0 0 80 80"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    style={{ color }}
-  >
-    {/* Center cross petals */}
-    <path
-      d="M40 20L45 35H55L47 43L50 58L40 50L30 58L33 43L25 35H35L40 20Z"
-      fill="currentColor"
-      opacity="0.8"
-    />
-    {/* Top diamond */}
-    <path d="M40 5L45 15L40 25L35 15L40 5Z" fill="currentColor" opacity="0.6" />
-    {/* Bottom diamond */}
-    <path
-      d="M40 55L45 65L40 75L35 65L40 55Z"
-      fill="currentColor"
-      opacity="0.6"
-    />
-    {/* Left diamond */}
-    <path d="M5 40L15 35L25 40L15 45L5 40Z" fill="currentColor" opacity="0.6" />
-    {/* Right diamond */}
-    <path
-      d="M55 40L65 35L75 40L65 45L55 40Z"
-      fill="currentColor"
-      opacity="0.6"
-    />
-    {/* Corner dots */}
-    <circle cx="20" cy="20" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="60" cy="20" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="20" cy="60" r="3" fill="currentColor" opacity="0.4" />
-    <circle cx="60" cy="60" r="3" fill="currentColor" opacity="0.4" />
-  </svg>
-);
-
 // Card color configurations
 const CARD_COLORS = {
   dark: {
@@ -112,12 +67,12 @@ export const ArabicPersonalInfoSection = ({
         <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
           {/* ID Card - 2/3 width, dark bg */}
           <div
-            className="flex-[2] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-2 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.dark.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="pr-4 flex-3/5 text-right">
               <p
-                className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
+                className=" text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
                 style={{ color: CARD_COLORS.dark.text }}
               >
                 {content.nationalId}
@@ -129,20 +84,16 @@ export const ArabicPersonalInfoSection = ({
                 {personalInfo.nationalId || "—"}
               </p>
             </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.dark.icon}
-              />
-            </div>
+            <div className="shrink-0 flex-2/5 bg-[url('/images/profiles/arabic/personal-info-pattern-large-light.svg')] bg-cover bg-center w-full h-full"></div>
           </div>
 
           {/* Birthday Card - 1/3 width, light bg */}
           <div
-            className="flex-1 flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-1 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.light.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 flex-1/3 bg-[url('/images/profiles/arabic/personal-info-pattern-small.svg')] bg-cover bg-center w-full h-full"></div>
+            <div className="flex-2/3 text-right pr-4">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
                 style={{ color: CARD_COLORS.light.text }}
@@ -156,12 +107,6 @@ export const ArabicPersonalInfoSection = ({
                 {formatDate(personalInfo.birthDate)}
               </p>
             </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.light.icon}
-              />
-            </div>
           </div>
         </div>
 
@@ -169,10 +114,10 @@ export const ArabicPersonalInfoSection = ({
         <div className="flex gap-3 md:gap-5 h-24 md:h-32 lg:h-36">
           {/* Place Card - 1/3 width, dark bg */}
           <div
-            className="flex-1 flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-1 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.dark.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="flex-2/3 text-right pr-4">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
                 style={{ color: CARD_COLORS.dark.text }}
@@ -186,20 +131,16 @@ export const ArabicPersonalInfoSection = ({
                 {personalInfo.address || "—"}
               </p>
             </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.dark.icon}
-              />
-            </div>
+            <div className="shrink-0 flex-1/3 bg-[url('/images/profiles/arabic/personal-info-pattern-small-light.svg')] bg-cover bg-center w-full h-full"></div>
           </div>
 
           {/* Email Card - 2/3 width, light bg */}
           <div
-            className="flex-[2] flex items-center justify-between p-4 md:p-6 rounded-2xl md:rounded-3xl overflow-hidden"
+            className="flex-2 flex items-center justify-between rounded-2xl md:rounded-3xl overflow-hidden"
             style={{ backgroundColor: CARD_COLORS.light.bg }}
           >
-            <div className="flex-1 text-right">
+            <div className="shrink-0 flex-2/5 bg-[url('/images/profiles/arabic/personal-info-pattern-large.svg')] bg-cover bg-center w-full h-full"></div>
+            <div className="flex-3/5 text-right pr-4">
               <p
                 className="text-base md:text-xl lg:text-2xl font-normal mb-1 md:mb-2"
                 style={{ color: CARD_COLORS.light.text }}
@@ -212,12 +153,6 @@ export const ArabicPersonalInfoSection = ({
               >
                 {personalInfo.email || "—"}
               </p>
-            </div>
-            <div className="shrink-0">
-              <FloralIcon
-                className="w-10 h-10 md:w-14 md:h-14 lg:w-16 lg:h-16"
-                color={CARD_COLORS.light.icon}
-              />
             </div>
           </div>
         </div>
