@@ -8,6 +8,7 @@ import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { Button, ConfirmModal } from "@/shared/components/ui";
 import { useLogout } from "@/features/auth";
+import { useAuth } from "@/features/auth";
 
 interface DashboardNavbarProps {
   onMenuToggle?: () => void;
@@ -21,6 +22,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { logout, isLoading: isLoggingOut } = useLogout();
+  const { user } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const { navbar, breadcrumb, modals } = dashboardContent;
@@ -33,12 +35,14 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
         <>
           <Link
             href={ROUTES.DASHBOARD}
-            className="text-grey-500 hover:text-primary-500 transition-colors"
+            className="text-[#666666] hover:text-primary-500 transition-colors text-sm md:text-lg font-light md:font-normal"
           >
             {breadcrumb.home}
           </Link>
           <span className="text-grey-400 mx-2">&lt;</span>
-          <span className="text-secondary-800">{breadcrumb.createFile}</span>
+          <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+            {breadcrumb.createFile}
+          </span>
         </>
       );
     }
@@ -67,17 +71,23 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
           <>
             <Link
               href={ROUTES.DASHBOARD_ACCOUNT}
-              className="text-grey-500 hover:text-primary-500 transition-colors"
+              className="text-[#666666] hover:text-primary-500 transition-colors text-sm md:text-lg font-light md:font-normal"
             >
               {breadcrumb.account}
             </Link>
             <span className="text-grey-400 mx-2">&lt;</span>
-            <span className="text-secondary-800">{currentPage}</span>
+            <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+              {currentPage}
+            </span>
           </>
         );
       }
 
-      return <span className="text-secondary-800">{breadcrumb.account}</span>;
+      return (
+        <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+          {breadcrumb.account}
+        </span>
+      );
     }
 
     return null;
@@ -110,25 +120,48 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
             />
           </Link>
 
-          {/* Breadcrumb - desktop only */}
-          <nav className="hidden lg:flex items-center text-sm">
-            <Link href={ROUTES.DASHBOARD} className="ml-2">
-              <svg
-                className="w-5 h-5 text-grey-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
+          {/* Breadcrumb / Welcome */}
+          {pathname === ROUTES.DASHBOARD ? (
+            <div className="flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
+              <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
+                <Image
+                  src={user?.imageUrl || "/icons/ui/user.svg"}
+                  alt="صورة الملف الشخصي"
+                  width={54}
+                  height={54}
+                  className="object-cover w-full h-full"
                 />
-              </svg>
-            </Link>
-            {getBreadcrumb()}
-          </nav>
+              </div>
+              <div className="leading-snug text-right">
+                <p className="text-[16px] md:text-[18px] font-normal text-[#333333]">
+                  مرحبًا بك، {user?.fullName || ""}
+                  <span className="mr-1">👋</span>
+                </p>
+                <p className="text-[14px] md:text-[16px] font-light text-[#4D4D4D]">
+                  ابدء رحلتك معنا بتجميع إنجازاتك لكل سنة
+                </p>
+              </div>
+            </div>
+          ) : (
+            <nav className="hidden lg:flex items-center text-sm">
+              <Link href={ROUTES.DASHBOARD} className="ml-2">
+                <svg
+                  className="w-5 h-5 text-grey-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Link>
+              {getBreadcrumb()}
+            </nav>
+          )}
         </div>
 
         {/* Left side - Logout and menu (RTL: appears on left) */}

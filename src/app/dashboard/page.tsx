@@ -13,7 +13,11 @@ import {
   FileData,
   FileStatus,
 } from "@/features/dashboard";
-import { useMyProfiles, useUnpublishProfile, useDeleteProfile } from "@/features/profiles";
+import {
+  useMyProfiles,
+  useUnpublishProfile,
+  useDeleteProfile,
+} from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import type { Profile } from "@/features/profiles/types";
@@ -60,7 +64,11 @@ function mapProfileToFileData(profile: Profile): FileData {
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const { profiles, isLoading: profilesLoading, refetch: refetchProfiles } = useMyProfiles();
+  const {
+    profiles,
+    isLoading: profilesLoading,
+    refetch: refetchProfiles,
+  } = useMyProfiles();
   const { unpublish } = useUnpublishProfile();
   const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
 
@@ -76,7 +84,7 @@ export default function DashboardPage() {
   // Password modal states
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">(
-    "set"
+    "set",
   );
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
@@ -194,26 +202,6 @@ export default function DashboardPage() {
 
   return (
     <div className="text-right" dir="rtl">
-      {/* Welcome Header */}
-      <div className="flex items-center justify-start gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-grey-100 overflow-hidden shrink-0 flex items-center justify-center">
-          <Image
-            src="/icons/ui/user.svg"
-            alt="صورة الملف الشخصي"
-            width={32}
-            height={32}
-            className="opacity-50"
-          />
-        </div>
-        <div className="text-right">
-          <h1 className="text-xl font-semibold text-secondary-800">
-            {welcomeHeader.greeting} {user?.fullName || "محمد"}
-            <span className="mr-2">&#128075;</span>
-          </h1>
-          <p className="text-grey-500 text-sm">{welcomeHeader.subtext}</p>
-        </div>
-      </div>
-
       {/* Main content area */}
       <div className="flex gap-6">
         {/* Files section - main content */}
@@ -230,7 +218,9 @@ export default function DashboardPage() {
                 <FileCard
                   key={file.id}
                   file={file}
-                  onAddEvidence={(id) => router.push(ROUTES.DASHBOARD_PROFILE_SECTIONS(id))}
+                  onAddEvidence={(id) =>
+                    router.push(ROUTES.DASHBOARD_PROFILE_SECTIONS(id))
+                  }
                   onPreview={(id) => router.push(ROUTES.PROFILE_PREVIEW(id))}
                   onEditBasicData={handleEditBasicDataClick}
                   onEditMyData={(id) => console.log("Edit my data:", id)}

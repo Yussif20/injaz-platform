@@ -81,7 +81,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* Sidebar */}
       <aside
         className={`
-          fixed lg:static top-0 right-0 h-full z-50
+          fixed top-0 lg:top-20 right-0 h-screen lg:h-[calc(100vh-5rem)] z-50
           w-64 bg-white border-l border-grey-200
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
