@@ -109,7 +109,10 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
         {/* Right side - Logo and breadcrumb (RTL: appears on right) */}
         <div className="flex items-center gap-4">
           {/* Logo */}
-          <Link href={ROUTES.DASHBOARD} className="shrink-0">
+          <Link
+            href={ROUTES.DASHBOARD}
+            className="hidden sm:inline-flex shrink-0"
+          >
             <Image
               src="/logo/logo-cyan.svg"
               alt={navbar.logoAlt}
@@ -166,12 +169,12 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
         {/* Left side - Logout and menu (RTL: appears on left) */}
         <div className="flex items-center gap-4">
-          {/* Logout button */}
+          {/* Logout button (desktop only) */}
           <Button
             variant="warning"
             size="sm"
             onClick={() => setShowLogoutModal(true)}
-            className="w-auto h-10 px-4 flex items-center gap-2"
+            className="hidden lg:inline-flex w-auto h-10 px-4 items-center gap-2"
           >
             <Image
               src="/icons/ui/logout.svg"

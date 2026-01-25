@@ -106,10 +106,13 @@ function CreateFileContent() {
   }
 
   return (
-    <div className="flex gap-8" dir="rtl">
+    <div className="flex flex-col lg:flex-row justify-between gap-8" dir="rtl">
       {/* Main Form Area */}
-      <div className="flex-1">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="flex-1 order-2 lg:order-1">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 flex flex-col items-stretch"
+        >
           {/* Page Title */}
           <h1 className="text-2xl font-medium text-secondary-800">
             {isEditMode ? createFile.editPageTitle : createFile.pageTitle}
@@ -123,7 +126,7 @@ function CreateFileContent() {
           )}
 
           {/* Image Upload Section */}
-          <div className="space-y-2 max-w-[600px]">
+          <div className="space-y-2 max-w-150">
             <label className="text-base font-normal text-secondary-800">
               {createFile.imageLabel}
               <span className="text-grey-400 text-sm mr-1">
@@ -292,7 +295,7 @@ function CreateFileContent() {
           </div>
 
           {/* Rank Selector */}
-          <div className="space-y-2 max-w-[600px]">
+          <div className="space-y-2 max-w-150">
             <label className="text-base font-normal text-secondary-800">
               {createFile.jobRankLabel}
               <span className="text-warning-500">*</span>
@@ -380,14 +383,14 @@ function CreateFileContent() {
           </div>
 
           {/* Submit Button */}
-          <div className="max-w-[600px]">
+          <div className="max-w-150">
             <Button
               type="submit"
               variant="primary"
               disabled={!isFormValid || creating}
               isLoading={creating}
-              className={`!w-full !p-2 !rounded-[24px] flex items-center justify-center gap-2 ${
-                !isFormValid ? "!bg-grey-200 !text-grey-400" : ""
+              className={`w-full p-2 rounded-3xl flex items-center justify-center gap-2 ${
+                !isFormValid ? "bg-grey-200! text-grey-400!" : ""
               }`}
             >
               <svg
@@ -408,6 +411,34 @@ function CreateFileContent() {
             </Button>
           </div>
         </form>
+      </div>
+
+      {/* Illustration - Left side on desktop, above form on mobile */}
+      <div className="w-full lg:w-100 flex items-center justify-end order-2">
+        {/* Small screens */}
+        <Image
+          src="/images/dashboard/create-file/create-file-sm.svg"
+          alt="إنشاء ملف"
+          width={400}
+          height={464}
+          className="block md:hidden w-full h-auto max-h-116"
+        />
+        {/* Medium screens */}
+        <Image
+          src="/images/dashboard/create-file/create-file-md.svg"
+          alt="إنشاء ملف"
+          width={400}
+          height={562}
+          className="hidden md:block lg:hidden w-full h-auto max-h-140"
+        />
+        {/* Large screens */}
+        <Image
+          src="/images/dashboard/create-file/create-file.svg"
+          alt="إنشاء ملف"
+          width={400}
+          height={685}
+          className="hidden lg:block w-full h-auto max-h-170"
+        />
       </div>
 
       {/* Promotional Sidebar - Desktop Only */}
