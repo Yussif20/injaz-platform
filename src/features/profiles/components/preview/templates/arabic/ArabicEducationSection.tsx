@@ -44,41 +44,43 @@ export const ArabicEducationSection = ({
         </div>
       </div>
 
-      {/* Education Cards */}
-      <div className="space-y-2 md:space-y-7 bg-white rounded-[38px] border-2">
-        {qualifications.map((qual) => (
-          <div key={qual.id} className="rounded-[36px] overflow-hidden">
-            <div className="flex items-stretch">
-              {/* Content */}
-              <div className="flex-1 flex items-stretch justify-start py-4 px-4 gap-1 md:gap-6">
-                <div className="w-1 md:w-2 shrink-0 relative scale-x-[-1]">
-                  <Image
-                    src="/images/profiles/arabic/diamond-pattern.svg"
-                    alt="diamond pattern"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
+      {/* Education Cards with end strip */}
+      <div className="flex items-stretch gap-0 bg-white rounded-[38px] border-2 overflow-hidden">
+        <div className="flex-1 space-y-2 md:space-y-7">
+          {qualifications.map((qual) => (
+            <div key={qual.id} className="rounded-[36px] overflow-hidden">
+              <div className="flex items-stretch">
+                {/* Content */}
+                <div className="flex-1 flex items-stretch justify-start py-4 px-4 gap-1 md:gap-6">
+                  <div className="w-1 md:w-2 shrink-0 relative scale-x-[-1]">
+                    <Image
+                      src="/images/profiles/arabic/diamond-pattern.svg"
+                      alt="diamond pattern"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
 
-                {/* Text Content */}
-                <div className="text-right flex flex-col gap-1 md:gap-4.5">
-                  <h3 className="text-text-dark text-sm md:text-2xl lg:text-[28px] font-normal">
-                    {qual.degreeType} {qual.title}
-                  </h3>
-                  <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
-                    {qual.grade || "—"}
-                  </p>
-                  <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
-                    {formatYear(qual.graduationDate)}
-                  </p>
+                  {/* Text Content */}
+                  <div className="text-right flex flex-col gap-1 md:gap-4.5">
+                    <h3 className="text-text-dark text-sm md:text-2xl lg:text-[28px] font-normal">
+                      {qual.degreeType} {qual.title}
+                    </h3>
+                    <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
+                      {qual.grade || "—"}
+                    </p>
+                    <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
+                      {formatYear(qual.graduationDate)}
+                    </p>
+                  </div>
                 </div>
               </div>
-
-              {/* Pattern strip aligned to end */}
-              <div className=" w-24 md:w-32 lg:w-36 shrink-0 bg-[url('/images/profiles/arabic/card-pattern.svg')] bg-repeat bg-right"></div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Pattern strip aligned to end of container */}
+        <div className="w-24 md:w-32 lg:w-36 shrink-0 bg-[url('/images/profiles/arabic/card-pattern.svg')] bg-no-repeat bg-right bg-cover"></div>
       </div>
     </div>
   );

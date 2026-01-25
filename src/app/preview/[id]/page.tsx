@@ -4,30 +4,32 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  PortfolioHeader,
-  PersonalInfoSection,
-  EducationSection,
-  CareerSection,
-  AchievementsSection,
-  ContactButton,
   ThemeSelector,
   // Template Components
   DefaultEducationSection,
   DefaultCareerSection,
   DefaultPortfolioHeader,
   DefaultPersonalInfoSection,
+  DefaultAchievementsSection,
+  DefaultContactSection,
   DarkEducationSection,
   DarkCareerSection,
   DarkPortfolioHeader,
   DarkPersonalInfoSection,
+  DarkAchievementsSection,
+  DarkContactSection,
   HeritagePortfolioHeader,
   HeritagePersonalInfoSection,
   HeritageEducationSection,
   HeritageCareerSection,
+  HeritageAchievementsSection,
+  HeritageContactSection,
   ArabicPortfolioHeader,
   ArabicPersonalInfoSection,
   ArabicEducationSection,
   ArabicCareerSection,
+  ArabicAchievementsSection,
+  ArabicContactSection,
 } from "@/features/profiles";
 import { useProfileDetails } from "@/features/profiles/hooks";
 import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
@@ -215,13 +217,40 @@ export default function ProfilePreviewPage() {
       dir="rtl"
       style={{ backgroundColor: theme.background }}
     >
+      {/* Dynamic Scrollbar Styles */}
+      <style jsx>{`
+        /* Firefox scrollbar */
+        div {
+          scrollbar-color: ${theme.primary} transparent;
+          scrollbar-width: thin;
+        }
+
+        /* Webkit scrollbar (Chrome, Safari, Edge) */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background-color: ${theme.primary};
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: ${theme.primary}dd;
+        }
+      `}</style>
+
       {/* Portfolio Content */}
       <div
         ref={contentRef}
         className="w-full relative pb-8"
         style={{ backgroundColor: theme.background }}
       >
-        {/* Header Section - Template-aware (full width background handled inside component) */}
+        {/* Header Section - Template-aware */}
         {selectedTemplateId === TemplateId.Default ? (
           <DefaultPortfolioHeader
             teacherName={profileDetails.userName || "المعلم"}
@@ -273,7 +302,7 @@ export default function ProfilePreviewPage() {
             }}
             theme={theme}
           />
-        ) : selectedTemplateId === TemplateId.Dark ? (
+        ) : (
           <DarkPortfolioHeader
             teacherName={profileDetails.userName || "المعلم"}
             teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
@@ -290,26 +319,10 @@ export default function ProfilePreviewPage() {
             }}
             theme={theme}
           />
-        ) : (
-          <PortfolioHeader
-            profileImage={null} // TODO: Add profile image when available
-            teacherName={profileDetails.userName || "المعلم"}
-            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-            academicYear={profileDetails.academicYearName || ""}
-            onDownload={handleDownload}
-            onShare={handleShare}
-            isDownloading={isDownloading}
-            content={{
-              downloadFile: previewPage.downloadFile,
-              shareFile: previewPage.shareFile,
-              fileTitle: previewPage.fileTitle,
-            }}
-            theme={theme}
-          />
         )}
 
         {/* Main content constrained to max width */}
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-300 mx-auto">
           {/* Personal Info Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
             <DefaultPersonalInfoSection
@@ -329,17 +342,10 @@ export default function ProfilePreviewPage() {
               content={previewPage.personalInfo}
               theme={theme}
             />
-          ) : selectedTemplateId === TemplateId.Dark ? (
+          ) : (
             <DarkPersonalInfoSection
               personalInfo={profileDetails.personalInfo}
               content={previewPage.personalInfo}
-              theme={theme}
-            />
-          ) : (
-            <PersonalInfoSection
-              personalInfo={profileDetails.personalInfo}
-              content={previewPage.personalInfo}
-              memberBadge={previewPage.memberBadge}
               theme={theme}
             />
           )}
@@ -363,14 +369,8 @@ export default function ProfilePreviewPage() {
               content={previewPage.education}
               theme={theme}
             />
-          ) : selectedTemplateId === TemplateId.Arabic ? (
-            <ArabicEducationSection
-              qualifications={profileDetails.qualifications}
-              content={previewPage.education}
-              theme={theme}
-            />
           ) : (
-            <EducationSection
+            <ArabicEducationSection
               qualifications={profileDetails.qualifications}
               content={previewPage.education}
               theme={theme}
@@ -396,34 +396,67 @@ export default function ProfilePreviewPage() {
               content={previewPage.career}
               theme={theme}
             />
-          ) : selectedTemplateId === TemplateId.Arabic ? (
-            <ArabicCareerSection
-              careerJobs={profileDetails.careerJobs}
-              content={previewPage.career}
-              theme={theme}
-            />
           ) : (
-            <CareerSection
+            <ArabicCareerSection
               careerJobs={profileDetails.careerJobs}
               content={previewPage.career}
               theme={theme}
             />
           )}
 
-          {/* Achievements Section */}
+          {/* Achievements Section - Template-aware */}
+          {selectedTemplateId === TemplateId.Default ? (
+            <DefaultAchievementsSection
+              sections={profileDetails.sections}
+              content={previewPage.achievements}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Dark ? (
+            <DarkAchievementsSection
+              sections={profileDetails.sections}
+              content={previewPage.achievements}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Heritage ? (
+            <HeritageAchievementsSection
+              sections={profileDetails.sections}
+              content={previewPage.achievements}
+              theme={theme}
+            />
+          ) : (
+            <ArabicAchievementsSection
+              sections={profileDetails.sections}
+              content={previewPage.achievements}
+              theme={theme}
+            />
+          )}
 
-          <AchievementsSection
-            sections={profileDetails.sections}
-            content={previewPage.achievements}
-            theme={theme}
-          />
-
-          {/* Contact Button */}
-          <ContactButton
-            content={previewPage.contact}
-            whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-            theme={theme}
-          />
+          {/* Contact Section - Template-aware */}
+          {selectedTemplateId === TemplateId.Default ? (
+            <DefaultContactSection
+              content={previewPage.contact}
+              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Dark ? (
+            <DarkContactSection
+              content={previewPage.contact}
+              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+              theme={theme}
+            />
+          ) : selectedTemplateId === TemplateId.Heritage ? (
+            <HeritageContactSection
+              content={previewPage.contact}
+              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+              theme={theme}
+            />
+          ) : (
+            <ArabicContactSection
+              content={previewPage.contact}
+              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+              theme={theme}
+            />
+          )}
         </div>
       </div>
 

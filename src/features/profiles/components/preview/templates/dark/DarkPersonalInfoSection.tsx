@@ -80,10 +80,19 @@ export const DarkPersonalInfoSection = ({
         {cards.map((card) => (
           <div
             key={card.id}
-            className="flex h-23 md:h-40.5 items-center gap-3 md:gap-4 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl bg-[url('/images/profiles/dark/card-bg.svg')] bg-cover bg-center overflow-hidden"
+            className="relative flex h-23 md:h-40.5 items-center gap-3 md:gap-4 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl bg-[url('/images/profiles/dark/card-bg.svg')] bg-cover bg-center overflow-hidden"
           >
+            {/* Radial gradient overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(50% 50% at 50% 50%, rgba(10, 16, 31, 0) 0%, #161A24 83.33%)",
+              }}
+            ></div>
+
             {/* Text Content - Right Side */}
-            <div className="flex-1 text-right">
+            <div className="flex-1 text-right relative z-10">
               <p className="text-[#F8F8F8] text-sm lg:text-2xl font-medium">
                 {card.label}
               </p>
@@ -93,7 +102,7 @@ export const DarkPersonalInfoSection = ({
             </div>
 
             {/* Card Image - Left Side */}
-            <div className="w-18 h-16 md:w-34.5 md:h-28.5 lg:w-32 lg:h-32 shrink-0 relative">
+            <div className="w-18 h-16 md:w-34.5 md:h-28.5 lg:w-32 lg:h-32 shrink-0 relative z-10">
               <Image
                 src={`/images/profiles/dark/${card.icon}`}
                 alt={card.label}

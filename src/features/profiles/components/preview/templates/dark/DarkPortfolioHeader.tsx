@@ -42,11 +42,11 @@ const DarkHeaderBar = ({
       aria-label="Back"
     >
       <Image
-        src="/icons/ui/arrow-left.svg"
+        src="/icons/ui/arrow-right.svg"
         alt="Back"
         width={24}
         height={24}
-        className="md:w-6 md:h-6"
+        className="md:w-6 md:h-6 invert"
       />
     </button>
 
@@ -122,10 +122,7 @@ export const DarkPortfolioHeader = ({
             <p className="text-white text-sm md:text-2xl lg:text-[28px] font-normal">
               {content.fileTitle} - 2025
             </p>
-            <h1
-              className="text-lg md:text-[28px] lg:text-4xl font-normal"
-              style={{ color: theme.primary }}
-            >
+            <h1 className="text-lg md:text-[28px] lg:text-4xl font-normal bg-clip-text text-transparent bg-[linear-gradient(90deg,#1940A6_-22.92%,#478AE2_59.95%,#FFFFFF_119.01%)]">
               {teacherName}
             </h1>
             <p className="text-white text-sm md:text-2xl lg:text-[28px] font-normal">
@@ -137,13 +134,13 @@ export const DarkPortfolioHeader = ({
               <button
                 onClick={onDownload}
                 disabled={isDownloading}
-                className="flex bg-white text-[#161A24] items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
+                className="flex bg-[#263B74] text-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
                 style={{
                   opacity: isDownloading ? 0.8 : 1,
                 }}
               >
                 <Image
-                  src="/images/profiles/default/file.svg"
+                  src="/images/profiles/dark/file.svg"
                   alt="Download"
                   width={24}
                   height={24}
@@ -156,7 +153,7 @@ export const DarkPortfolioHeader = ({
                 className="bg-transparent text-white flex outline outline-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
               >
                 <Image
-                  src="/images/profiles/heritage/share.svg"
+                  src="/images/profiles/dark/share.svg"
                   alt="Share"
                   width={24}
                   height={24}

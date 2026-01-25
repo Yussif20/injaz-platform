@@ -45,5 +45,6 @@ frontend-markdown.md
 
 /docs
 CLAUDE.md
+agents.md
 /.claude
 claude-chat-history.md

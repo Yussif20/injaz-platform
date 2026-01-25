@@ -7,3 +7,5 @@ export { DarkPortfolioHeader } from "./DarkPortfolioHeader";
 export { DarkPersonalInfoSection } from "./DarkPersonalInfoSection";
 export { DarkCareerSection } from "./DarkCareerSection";
 export { DarkEducationSection } from "./DarkEducationSection";
+export { DarkAchievementsSection } from "./DarkAchievementsSection";
+export { DarkContactSection } from "./DarkContactSection";

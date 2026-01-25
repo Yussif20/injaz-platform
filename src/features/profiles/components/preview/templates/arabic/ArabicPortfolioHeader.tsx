@@ -42,11 +42,11 @@ const ArabicHeaderBar = ({
       aria-label="Back"
     >
       <Image
-        src="/icons/ui/arrow-left.svg"
+        src="/icons/ui/arrow-right.svg"
         alt="Back"
         width={24}
         height={24}
-        className="md:w-6 md:h-6"
+        className="md:w-6 md:h-6 invert"
       />
     </button>
 

@@ -3,6 +3,10 @@
  * Each template has its own folder with template-specific components
  */
 
+// Shared utilities
+export { SubsectionGallery } from "./SubsectionGallery";
+export { AchievementsContent } from "./AchievementsContent";
+
 // Default Template
 export * from "./default";
 

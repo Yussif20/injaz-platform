@@ -7,3 +7,5 @@ export { ArabicPortfolioHeader } from "./ArabicPortfolioHeader";
 export { ArabicPersonalInfoSection } from "./ArabicPersonalInfoSection";
 export { ArabicCareerSection } from "./ArabicCareerSection";
 export { ArabicEducationSection } from "./ArabicEducationSection";
+export { ArabicAchievementsSection } from "./ArabicAchievementsSection";
+export { ArabicContactSection } from "./ArabicContactSection";

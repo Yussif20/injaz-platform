@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { TemplateId } from "../../types/template.types";
 
 interface TemplateSelectorProps {
@@ -48,25 +49,31 @@ export const ThemeSelector = ({
   return (
     <>
       {/* Floating Template Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 left-4 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 z-40"
-        style={{ backgroundColor: currentColor }}
-      >
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="fixed bottom-24 left-4 flex flex-col items-center gap-2 z-40 bg-white rounded-3xl p-4 shadow-lg">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-14 h-14 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+          style={{}}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-          />
-        </svg>
-      </button>
+          <div className="relative w-8 h-8">
+            <Image
+              src="/images/profiles/controller.svg"
+              alt="Templates"
+              fill
+              className="object-contain"
+            />
+          </div>
+        </button>
+
+        {/* Templates Label Button */}
+        <p
+          // onClick={() => setIsOpen(true)}
+          className="px-3 py-1 rounded-full text-white text-[12px] md:text-base font-light"
+          style={{ backgroundColor: currentColor }}
+        >
+          القوالب
+        </p>
+      </div>
 
       {/* Modal Overlay */}
       {isOpen && (
@@ -81,11 +88,6 @@ export const ThemeSelector = ({
           >
             {/* Handle */}
             <div className="w-12 h-1 bg-grey-300 rounded-full mx-auto mb-6" />
-
-            {/* Title */}
-            <h3 className="text-center text-lg font-semibold text-grey-900 mb-6">
-              {content.title}
-            </h3>
 
             {/* Template Options */}
             <div className="flex justify-center gap-3 mb-6">
