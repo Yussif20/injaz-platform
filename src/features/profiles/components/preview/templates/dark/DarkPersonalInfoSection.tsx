@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
 
@@ -35,21 +36,25 @@ export const DarkPersonalInfoSection = ({
       id: "nationalId",
       label: content.nationalId,
       value: personalInfo.nationalId || "—",
+      icon: "id-card.svg",
     },
     {
       id: "birthday",
       label: content.birthday,
       value: formatDate(personalInfo.birthDate),
+      icon: "birthday-card.svg",
     },
     {
       id: "origin",
       label: content.origin,
       value: personalInfo.address || "—",
+      icon: "place-card.svg",
     },
     {
       id: "email",
       label: content.email,
       value: personalInfo.email || "—",
+      icon: "email-card.svg",
     },
   ];
 
@@ -61,10 +66,10 @@ export const DarkPersonalInfoSection = ({
         style={{ borderColor: theme.primary }}
       >
         <div className="text-center flex flex-col gap-2 md:gap-4">
-          <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-white">
+          <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-[#F8F8F8]">
             {content.title}
           </h2>
-          <p className="text-sm md:text-lg lg:text-xl font-light text-gray-400">
+          <p className="text-sm md:text-lg lg:text-xl font-light text-[#BABABA]">
             {content.subtitle}
           </p>
         </div>
@@ -75,14 +80,27 @@ export const DarkPersonalInfoSection = ({
         {cards.map((card) => (
           <div
             key={card.id}
-            className="flex h-23 md:h-40.5 flex-col gap-2 md:gap-3 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl bg-[url('/images/profiles/dark/card-bg.svg')] bg-cover bg-center"
+            className="flex h-23 md:h-40.5 items-center gap-3 md:gap-4 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl bg-[url('/images/profiles/dark/card-bg.svg')] bg-cover bg-center overflow-hidden"
           >
-            <p className="text-white text-sm md:text-xl lg:text-2xl font-normal">
-              {card.label}
-            </p>
-            <p className="text-gray-300 text-xs md:text-lg lg:text-xl font-light break-all">
-              {card.value}
-            </p>
+            {/* Text Content - Right Side */}
+            <div className="flex-1 text-right">
+              <p className="text-[#F8F8F8] text-sm lg:text-2xl font-medium">
+                {card.label}
+              </p>
+              <p className="text-[#F8F8F8] text-xs md:text-xl break-all font-light">
+                {card.value}
+              </p>
+            </div>
+
+            {/* Card Image - Left Side */}
+            <div className="w-18 h-16 md:w-34.5 md:h-28.5 lg:w-32 lg:h-32 shrink-0 relative">
+              <Image
+                src={`/images/profiles/dark/${card.icon}`}
+                alt={card.label}
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
         ))}
       </div>
