@@ -111,7 +111,11 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
           {/* Logo */}
           <Link
             href={ROUTES.DASHBOARD}
-            className="hidden sm:inline-flex shrink-0"
+            className={`${
+              pathname === ROUTES.DASHBOARD
+                ? "hidden sm:inline-flex"
+                : "inline-flex"
+            } shrink-0`}
           >
             <Image
               src="/logo/logo-cyan.svg"

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dashboardContent } from "@/content";
@@ -19,6 +19,13 @@ interface NavItem {
   href: string;
   icon: React.ReactNode;
   matchPrefix?: string;
+  submenu?: NavItem[];
+}
+
+interface AccountNavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
 }
 
 export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
@@ -28,7 +35,90 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { logout, isLoading: isLoggingOut } = useLogout();
-  const { sidebar } = dashboardContent;
+  const { sidebar, accountSidebar } = dashboardContent;
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+
+  const accountNavItems: AccountNavItem[] = [
+    {
+      label: accountSidebar.accountInfo,
+      href: ROUTES.DASHBOARD_ACCOUNT_INFO,
+      icon: (
+        <Image
+          src="/icons/ui/profile.svg"
+          alt="account info"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+    {
+      label: accountSidebar.profileData,
+      href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA,
+      icon: (
+        <Image
+          src="/icons/ui/file-edit.svg"
+          alt="profile data"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+    {
+      label: accountSidebar.subscription,
+      href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION,
+      icon: (
+        <Image
+          src="/icons/ui/subscription.svg"
+          alt="subscription"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+    {
+      label: accountSidebar.support,
+      href: ROUTES.DASHBOARD_ACCOUNT_SUPPORT,
+      icon: (
+        <Image
+          src="/icons/ui/support.svg"
+          alt="support"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+    {
+      label: accountSidebar.terms,
+      href: ROUTES.DASHBOARD_ACCOUNT_TERMS,
+      icon: (
+        <Image src="/icons/ui/policy.svg" alt="terms" width={20} height={20} />
+      ),
+    },
+    {
+      label: accountSidebar.howToUse,
+      href: ROUTES.DASHBOARD_ACCOUNT_HOW_TO_USE,
+      icon: (
+        <Image
+          src="/icons/ui/youtube.svg"
+          alt="how to use"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+    {
+      label: accountSidebar.filePassword,
+      href: ROUTES.DASHBOARD_ACCOUNT_FILE_PASSWORD,
+      icon: (
+        <Image
+          src="/icons/ui/lock.svg"
+          alt="file password"
+          width={20}
+          height={20}
+        />
+      ),
+    },
+  ];
 
   const navItems: NavItem[] = [
     {
@@ -62,6 +152,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           height={20}
         />
       ),
+      submenu: accountNavItems,
     },
   ];
 
@@ -70,6 +161,16 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       return pathname.startsWith(item.matchPrefix);
     }
     return pathname === item.href;
+  };
+
+  const isAccountLinkActive = (href: string) => {
+    if (href === ROUTES.DASHBOARD_ACCOUNT_INFO) {
+      return (
+        pathname === href ||
+        pathname === ROUTES.DASHBOARD_ACCOUNT_CHANGE_PASSWORD
+      );
+    }
+    return pathname === href;
   };
 
   return (
@@ -121,13 +222,22 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             <ul className="space-y-2">
               {navItems.map((item) => {
                 const active = isActive(item);
+                const isExpanded = expandedMenu === item.href;
+
                 return (
                   <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
+                    <button
+                      onClick={() => {
+                        if (item.submenu) {
+                          // Toggle submenu on mobile/tablet
+                          setExpandedMenu(isExpanded ? null : item.href);
+                        } else {
+                          router.push(item.href);
+                          onClose?.();
+                        }
+                      }}
                       className={`
-                        flex items-center gap-3 px-4 py-3 rounded-xl
+                        w-full flex items-center gap-3 px-4 py-3 rounded-xl
                         transition-colors duration-200
                         ${
                           active
@@ -144,9 +254,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                         {item.icon}
                       </span>
                       <span className="font-normal">{item.label}</span>
-                      {active && (
+                      {/* Dropdown arrow for submenu on mobile/tablet */}
+                      {item.submenu && (
                         <svg
-                          className="w-4 h-4 mr-auto"
+                          className={`w-4 h-4 ml-auto lg:hidden transition-transform ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -155,11 +268,50 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M15 19l-7-7 7-7"
+                            d="M19 9l-7 7-7-7"
                           />
                         </svg>
                       )}
-                    </Link>
+                    </button>
+
+                    {/* Submenu - shown on mobile/tablet when expanded */}
+                    {item.submenu && isExpanded && (
+                      <ul className="lg:hidden mt-1 space-y-1 bg-grey-50 rounded-lg p-2 ml-4">
+                        {item.submenu.map((subitem) => {
+                          const subActive = isAccountLinkActive(subitem.href);
+                          return (
+                            <li key={subitem.href}>
+                              <Link
+                                href={subitem.href}
+                                onClick={onClose}
+                                className={`
+                                  flex items-center gap-3 px-4 py-2 rounded-lg
+                                  transition-colors duration-200 text-sm
+                                  ${
+                                    subActive
+                                      ? "text-primary-500 bg-shade-50"
+                                      : "text-grey-600 hover:text-secondary-800"
+                                  }
+                                `}
+                              >
+                                <span
+                                  className={
+                                    subActive
+                                      ? "text-primary-500"
+                                      : "text-grey-400"
+                                  }
+                                >
+                                  {subitem.icon}
+                                </span>
+                                <span className="font-normal">
+                                  {subitem.label}
+                                </span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}
