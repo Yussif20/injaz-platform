@@ -83,20 +83,27 @@ export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
         onTabChange={handleTabChange}
         className="mb-6"
         rightContent={
-          <button
-            type="button"
-            onClick={toggleEditMode}
-            className={`flex items-center gap-2 transition-colors ${
-              isEditing
-                ? "text-warning-500 hover:text-warning-700"
-                : "text-primary-500 hover:text-primary-700"
-            }`}
-          >
-            <Image src="/icons/ui/edit.svg" alt="edit" width={24} height={24} />
-            <span className="text-lg font-light">
-              {isEditing ? profileData.cancel : profileData.edit}
-            </span>
-          </button>
+          activeTab === "myData" ? (
+            <button
+              type="button"
+              onClick={toggleEditMode}
+              className={`flex items-center gap-2 transition-colors ${
+                isEditing
+                  ? "text-warning-500 hover:text-warning-700"
+                  : "text-primary-500 hover:text-primary-700"
+              }`}
+            >
+              <Image
+                src="/icons/ui/edit.svg"
+                alt="edit"
+                width={24}
+                height={24}
+              />
+              <span className="text-lg font-light">
+                {isEditing ? profileData.cancel : profileData.edit}
+              </span>
+            </button>
+          ) : null
         }
       />
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,7 +14,10 @@ import {
   useUpdateQualification,
   useDeleteQualification,
 } from "../hooks";
-import type { Qualification, CreateQualificationRequest } from "../types/me.types";
+import type {
+  Qualification,
+  CreateQualificationRequest,
+} from "../types/me.types";
 
 // Validation schema for qualification form
 const qualificationSchema = z.object({
@@ -45,15 +49,18 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   onSave,
 }) => {
   const { profileData } = dashboardContent;
-  const [editingQualification, setEditingQualification] = useState<Qualification | null>(null);
+  const [editingQualification, setEditingQualification] =
+    useState<Qualification | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Hooks
   const { qualifications, isLoading, refetch } = useQualifications();
   const { addQualificationAsync, isLoading: isAdding } = useAddQualification();
-  const { updateQualificationAsync, isLoading: isUpdating } = useUpdateQualification();
-  const { deleteQualificationAsync, isLoading: isDeleting } = useDeleteQualification();
+  const { updateQualificationAsync, isLoading: isUpdating } =
+    useUpdateQualification();
+  const { deleteQualificationAsync, isLoading: isDeleting } =
+    useDeleteQualification();
 
   const {
     register,
@@ -182,9 +189,12 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   }
 
   // Form for adding/editing
-  if (isEditing && (isAddingNew || editingQualification)) {
+  if (isAddingNew || editingQualification) {
     return (
-      <form onSubmit={handleSubmit(handleSaveQualification)} className="space-y-6">
+      <form
+        onSubmit={handleSubmit(handleSaveQualification)}
+        className="space-y-6"
+      >
         <div>
           <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
             {editingQualification ? "تعديل المؤهل" : "إضافة مؤهل جديد"}
@@ -248,84 +258,11 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   }
 
   // Edit mode list view
-  if (isEditing) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.educationTitle}
-          </h3>
-
-          {error && (
-            <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {qualifications.map((qualification) => (
-              <div
-                key={qualification.id}
-                className="bg-shade-100 rounded-xl p-4 space-y-3"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteQualification(qualification.id)}
-                      disabled={isDeleting}
-                      className="text-warning-500 hover:text-warning-700 text-sm disabled:opacity-50"
-                    >
-                      {profileData.removeCertification}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingQualification(qualification)}
-                      className="text-primary-500 hover:text-primary-700 text-sm"
-                    >
-                      تعديل
-                    </button>
-                  </div>
-                  <span className="text-grey-500 text-sm">
-                    {getDegreeLabel(qualification.degreeType)}
-                  </span>
-                </div>
-                <div className="text-right text-grey-700">
-                  <p>
-                    <strong>التخصص:</strong> {qualification.title || "-"}
-                  </p>
-                  <p>
-                    <strong>التقدير:</strong> {qualification.grade || "-"}
-                  </p>
-                  <p>
-                    <strong>تاريخ التخرج:</strong> {formatDate(qualification.graduationDate)}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setIsAddingNew(true)}
-              className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors"
-            >
-              + {profileData.addCertification}
-            </button>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="primary"
-          onClick={() => onSave?.()}
-          className="w-full rounded-xl h-12"
-        >
-          {profileData.saveChanges}
-        </Button>
-      </div>
-    );
+  if (false) {
+    return null;
   }
 
-  // View Mode
+  // View Mode with 3-dots menus and add button
   return (
     <div className="space-y-6">
       <div>
@@ -333,58 +270,102 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
           {profileData.educationTitle}
         </h3>
 
-        {qualifications.length === 0 ? (
-          <div className="bg-shade-100 rounded-xl py-8 px-6 text-center text-grey-500">
-            لا توجد مؤهلات مسجلة
+        {error && (
+          <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
+            {error}
           </div>
-        ) : (
-          qualifications.map((qualification) => (
+        )}
+
+        <div className="space-y-4">
+          {qualifications.map((qualification) => (
             <div
               key={qualification.id}
-              className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
+              className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={profileData.educationFields.degree}
-                  value={getDegreeLabel(qualification.degreeType)}
-                />
+              <div className="flex-1">
+                <p className="font-medium text-secondary-800 mb-1">
+                  {getDegreeLabel(qualification.degreeType)}
+                </p>
+                <p className="text-grey-600 text-sm mb-1">
+                  <strong>التخصص:</strong> {qualification.title || "-"}
+                </p>
+                <p className="text-grey-600 text-sm mb-1">
+                  <strong>التقدير:</strong> {qualification.grade || "-"}
+                </p>
+                <p className="text-grey-600 text-sm">
+                  <strong>تاريخ التخرج:</strong>{" "}
+                  {formatDate(qualification.graduationDate)}
+                </p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={profileData.educationFields.specialization}
-                  value={qualification.title || "-"}
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label="التقدير"
-                  value={qualification.grade || "-"}
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={profileData.educationFields.graduationYear}
-                  value={formatDate(qualification.graduationDate)}
-                />
+              {/* 3-dots menu */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="p-2 hover:bg-white rounded-lg transition-colors"
+                  aria-label="خيارات"
+                >
+                  <svg
+                    className="w-5 h-5 text-grey-500"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="5" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="19" r="2" />
+                  </svg>
+                </button>
+                {/* Dropdown menu */}
+                <div className="absolute hidden group-hover:block right-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-40">
+                  <button
+                    type="button"
+                    onClick={() => setEditingQualification(qualification)}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-primary-500"
+                  >
+                    <Image
+                      src="/icons/ui/edit.svg"
+                      alt="edit"
+                      width={16}
+                      height={16}
+                    />
+                    <span className="text-sm">تعديل</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteQualification(qualification.id)}
+                    disabled={isDeleting}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-warning-500 disabled:opacity-50"
+                  >
+                    <Image
+                      src="/icons/ui/delete.svg"
+                      alt="delete"
+                      width={16}
+                      height={16}
+                    />
+                    <span className="text-sm">حذف</span>
+                  </button>
+                </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
 
-      {/* Save Button (disabled in view mode) */}
-      <Button
-        type="button"
-        variant="outline"
-        disabled
-        className="w-full rounded-xl h-12 !bg-[#EBEBEB] !text-[#666] text-lg font-light !border-none"
-      >
-        {profileData.saveChanges}
-      </Button>
+          {/* Add new button */}
+          <button
+            type="button"
+            onClick={() => setIsAddingNew(true)}
+            className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 5v14m7-7H5"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+              />
+            </svg>
+            {profileData.addCertification || "إضافة درجة علمية آخرى"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

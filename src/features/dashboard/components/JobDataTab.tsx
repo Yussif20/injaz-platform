@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -183,7 +184,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({
   }
 
   // Form for adding/editing
-  if (isEditing && (isAddingNew || editingJob)) {
+  if (isAddingNew || editingJob) {
     return (
       <form onSubmit={handleSubmit(handleSaveJob)} className="space-y-6">
         <div>
@@ -291,88 +292,11 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({
   }
 
   // Edit mode list view
-  if (isEditing) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.jobTitle}
-          </h3>
-
-          {error && (
-            <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {careerJobs.map((job) => (
-              <div
-                key={job.id}
-                className="bg-shade-100 rounded-xl p-4 space-y-3"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteJob(job.id)}
-                      disabled={isDeleting}
-                      className="text-warning-500 hover:text-warning-700 text-sm disabled:opacity-50"
-                    >
-                      {profileData.removePosition}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingJob(job)}
-                      className="text-primary-500 hover:text-primary-700 text-sm"
-                    >
-                      تعديل
-                    </button>
-                  </div>
-                  <span className="text-grey-500 text-sm">
-                    {job.title || "وظيفة"}
-                  </span>
-                </div>
-                <div className="text-right text-grey-700">
-                  <p>
-                    <strong>المدرسة:</strong> {job.school || "-"}
-                  </p>
-                  <p>
-                    <strong>الدرجة:</strong> {job.rank || "-"}
-                  </p>
-                  <p>
-                    <strong>المرحلة:</strong> {job.educationalStage || "-"}
-                  </p>
-                  <p>
-                    <strong>الفترة:</strong> {job.startYear} -{" "}
-                    {job.endYear || "حتى الآن"}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setIsAddingNew(true)}
-              className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors"
-            >
-              + {profileData.addPosition}
-            </button>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="primary"
-          onClick={() => onSave?.()}
-          className="w-full rounded-xl h-12"
-        >
-          {profileData.saveChanges}
-        </Button>
-      </div>
-    );
+  if (false) {
+    return null;
   }
 
-  // View Mode
+  // View Mode with 3-dots menus and add button
   return (
     <div className="space-y-6">
       <div>
@@ -380,73 +304,105 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({
           {profileData.jobTitle}
         </h3>
 
-        {careerJobs.length === 0 ? (
-          <div className="bg-shade-100 rounded-xl py-8 px-6 text-center text-grey-500">
-            لا توجد وظائف مسجلة
+        {error && (
+          <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
+            {error}
           </div>
-        ) : (
-          careerJobs.map((job) => (
+        )}
+
+        <div className="space-y-4">
+          {careerJobs.map((job) => (
             <div
               key={job.id}
-              className="bg-shade-100 rounded-xl py-5 px-6 space-y-6 mb-4"
+              className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={profileData.jobFields.schoolName}
-                  value={job.school || "-"}
-                />
+              <div className="flex-1">
+                <p className="font-medium text-secondary-800 mb-1">
+                  {job.title || "وظيفة"}
+                </p>
+                <p className="text-grey-600 text-sm mb-1">
+                  <strong>المدرسة:</strong> {job.school || "-"}
+                </p>
+                <p className="text-grey-600 text-sm mb-1">
+                  <strong>الدرجة:</strong> {job.rank || "-"}
+                </p>
+                <p className="text-grey-600 text-sm mb-1">
+                  <strong>المرحلة:</strong> {job.educationalStage || "-"}
+                </p>
+                <p className="text-grey-600 text-sm">
+                  <strong>الفترة:</strong> {job.startYear} -{" "}
+                  {job.endYear || "حتى الآن"}
+                </p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={profileData.jobFields.position}
-                  value={job.title || "-"}
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard label="الدرجة الوظيفية" value={job.rank || "-"} />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label="المرحلة التعليمية"
-                  value={job.educationalStage || "-"}
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-                <DataCard
-                  label={`${profileData.jobFields.startDate} - ${profileData.jobFields.endDate}`}
-                  value={
-                    job.endYear === null
-                      ? `${job.startYear} - حتى الآن`
-                      : `${job.startYear} - ${job.endYear}`
-                  }
-                />
-              </div>
-              {job.endYear === null && (
-                <div className="text-right">
-                  <span className="inline-block bg-success-500 text-white text-xs px-3 py-1 rounded-full">
-                    {profileData.jobFields.currentJob}
-                  </span>
+              {/* 3-dots menu */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="p-2 hover:bg-white rounded-lg transition-colors"
+                  aria-label="خيارات"
+                >
+                  <svg
+                    className="w-5 h-5 text-grey-500"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="5" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="19" r="2" />
+                  </svg>
+                </button>
+                {/* Dropdown menu */}
+                <div className="absolute hidden group-hover:block right-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-40">
+                  <button
+                    type="button"
+                    onClick={() => setEditingJob(job)}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-primary-500"
+                  >
+                    <Image
+                      src="/icons/ui/edit.svg"
+                      alt="edit"
+                      width={16}
+                      height={16}
+                    />
+                    <span className="text-sm">تعديل</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteJob(job.id)}
+                    disabled={isDeleting}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-warning-500 disabled:opacity-50"
+                  >
+                    <Image
+                      src="/icons/ui/delete.svg"
+                      alt="delete"
+                      width={16}
+                      height={16}
+                    />
+                    <span className="text-sm">حذف</span>
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
 
-      {/* Save Button (disabled in view mode) */}
-      <Button
-        type="button"
-        variant="outline"
-        disabled
-        className="w-full rounded-xl h-12 !bg-[#EBEBEB] !text-[#666] text-lg font-light !border-none"
-      >
-        {profileData.saveChanges}
-      </Button>
+          {/* Add new button */}
+          <button
+            type="button"
+            onClick={() => setIsAddingNew(true)}
+            className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 5v14m7-7H5"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+              />
+            </svg>
+            {profileData.addPosition || "إضافة بيانات وظيفية آخرى"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
