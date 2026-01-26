@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { Tabs, Tab } from "@/shared/components/ui";
 import { ProfileDataTab } from "./ProfileDataTab";
@@ -8,11 +9,36 @@ import { EducationDataTab } from "./EducationDataTab";
 import { JobDataTab } from "./JobDataTab";
 import type { ProfileDataTabId } from "../types";
 import Image from "next/image";
+import { ROUTES } from "@/config";
 
-export const ProfileDataTabs: React.FC = () => {
+// Map tab IDs to routes
+const tabRoutes: Record<ProfileDataTabId, string> = {
+  myData: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL,
+  education: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION,
+  job: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER,
+};
+
+// Map routes to tab IDs
+const routeToTab: Record<string, ProfileDataTabId> = {
+  [ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL]: "myData",
+  [ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION]: "education",
+  [ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER]: "job",
+};
+
+interface ProfileDataTabsProps {
+  initialTab?: ProfileDataTabId;
+}
+
+export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
+  initialTab = "myData",
+}) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { profileData } = dashboardContent;
-  const [activeTab, setActiveTab] = useState<ProfileDataTabId>("myData");
   const [isEditing, setIsEditing] = useState(false);
+
+  // Determine active tab from URL or fallback to initialTab
+  const activeTab: ProfileDataTabId = routeToTab[pathname] || initialTab;
 
   const tabs: Tab[] = [
     { id: "myData", label: profileData.tabs.myData },
@@ -21,7 +47,10 @@ export const ProfileDataTabs: React.FC = () => {
   ];
 
   const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId as ProfileDataTabId);
+    const route = tabRoutes[tabId as ProfileDataTabId];
+    if (route) {
+      router.push(route);
+    }
   };
 
   const toggleEditMode = () => {

@@ -17,7 +17,8 @@ export const ROUTES = {
   // Dashboard routes
   DASHBOARD: "/dashboard",
   DASHBOARD_PROFILE_NEW: "/dashboard/profile/new",
-  DASHBOARD_PROFILE_SECTIONS: (id: string | number) => `/dashboard/profile/${id}/sections`,
+  DASHBOARD_PROFILE_SECTIONS: (id: string | number) =>
+    `/dashboard/profile/${id}/sections`,
 
   // Preview route (full-screen, outside dashboard layout)
   PROFILE_PREVIEW: (id: string | number) => `/preview/${id}`,
@@ -26,7 +27,12 @@ export const ROUTES = {
   DASHBOARD_ACCOUNT: "/dashboard/account",
   DASHBOARD_ACCOUNT_INFO: "/dashboard/account/info",
   DASHBOARD_ACCOUNT_PROFILE_DATA: "/dashboard/account/profile-data",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL: "/dashboard/account/profile-data/personal",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION: "/dashboard/account/profile-data/education",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER: "/dashboard/account/profile-data/career",
   DASHBOARD_ACCOUNT_SUBSCRIPTION: "/dashboard/account/subscription",
+  DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE: "/dashboard/account/subscription/manage",
+  DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY: "/dashboard/account/subscription/history",
   DASHBOARD_ACCOUNT_SUPPORT: "/dashboard/account/support",
   DASHBOARD_ACCOUNT_TERMS: "/dashboard/account/terms",
   DASHBOARD_ACCOUNT_HOW_TO_USE: "/dashboard/account/how-to-use",

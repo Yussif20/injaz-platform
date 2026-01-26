@@ -22,10 +22,17 @@ interface NavItem {
   submenu?: NavItem[];
 }
 
+interface SubNavItem {
+  label: string;
+  href: string;
+}
+
 interface AccountNavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  submenu?: SubNavItem[];
+  matchPrefix?: string;
 }
 
 export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
@@ -54,6 +61,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       label: accountSidebar.profileData,
       href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA,
+      matchPrefix: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA,
       icon: (
         <Image
           src="/icons/ui/file-edit.svg"
@@ -62,10 +70,25 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           height={20}
         />
       ),
+      submenu: [
+        {
+          label: accountSidebar.profileDataPersonal,
+          href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL,
+        },
+        {
+          label: accountSidebar.profileDataEducation,
+          href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION,
+        },
+        {
+          label: accountSidebar.profileDataCareer,
+          href: ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER,
+        },
+      ],
     },
     {
       label: accountSidebar.subscription,
       href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION,
+      matchPrefix: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION,
       icon: (
         <Image
           src="/icons/ui/subscription.svg"
@@ -74,6 +97,16 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           height={20}
         />
       ),
+      submenu: [
+        {
+          label: accountSidebar.subscriptionManage,
+          href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE,
+        },
+        {
+          label: accountSidebar.subscriptionHistory,
+          href: ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY,
+        },
+      ],
     },
     {
       label: accountSidebar.support,
@@ -163,13 +196,20 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     return pathname === item.href;
   };
 
-  const isAccountLinkActive = (href: string) => {
-    if (href === ROUTES.DASHBOARD_ACCOUNT_INFO) {
+  const isAccountLinkActive = (item: AccountNavItem) => {
+    if (item.matchPrefix) {
+      return pathname.startsWith(item.matchPrefix);
+    }
+    if (item.href === ROUTES.DASHBOARD_ACCOUNT_INFO) {
       return (
-        pathname === href ||
+        pathname === item.href ||
         pathname === ROUTES.DASHBOARD_ACCOUNT_CHANGE_PASSWORD
       );
     }
+    return pathname === item.href;
+  };
+
+  const isSubLinkActive = (href: string) => {
     return pathname === href;
   };
 
@@ -229,8 +269,14 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     <button
                       onClick={() => {
                         if (item.submenu) {
-                          // Toggle submenu on mobile/tablet
-                          setExpandedMenu(isExpanded ? null : item.href);
+                          // On large screens, navigate to the account page
+                          // On mobile/tablet, toggle the submenu
+                          if (window.innerWidth >= 1024) {
+                            router.push(item.href);
+                            onClose?.();
+                          } else {
+                            setExpandedMenu(isExpanded ? null : item.href);
+                          }
                         } else {
                           router.push(item.href);
                           onClose?.();
@@ -278,11 +324,16 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     {item.submenu && isExpanded && (
                       <ul className="lg:hidden mt-1 space-y-1 bg-grey-50 rounded-lg p-2 ml-4">
                         {item.submenu.map((subitem) => {
-                          const subActive = isAccountLinkActive(subitem.href);
+                          const subActive = isAccountLinkActive(subitem);
+                          const hasNestedSubmenu = subitem.submenu && subitem.submenu.length > 0;
+
+                          // For items with nested submenu (like subscription), navigate to first nested item
+                          const targetHref = hasNestedSubmenu ? subitem.submenu![0].href : subitem.href;
+
                           return (
                             <li key={subitem.href}>
                               <Link
-                                href={subitem.href}
+                                href={targetHref}
                                 onClick={onClose}
                                 className={`
                                   flex items-center gap-3 px-4 py-2 rounded-lg

@@ -80,6 +80,8 @@ export const dashboardContent = {
     accountInfo: "بيانات الحساب",
     profileData: "بيانات ملفي",
     subscription: "اشتراكي",
+    subscriptionManage: "إدارة الاشتراكات",
+    subscriptionHistory: "تاريخ الاشتراكات",
     support: "الدعم الفني",
     terms: "الشروط والأحكام",
     howToUse: "كيفية الإستخدام",
@@ -92,7 +94,12 @@ export const dashboardContent = {
   accountSidebar: {
     accountInfo: "بيانات الحساب",
     profileData: "بيانات ملفي",
+    profileDataPersonal: "بياناتي",
+    profileDataEducation: "البيانات العلمية",
+    profileDataCareer: "البيانات الوظيفية",
     subscription: "اشتراكي",
+    subscriptionManage: "إدارة الاشتراكات",
+    subscriptionHistory: "تاريخ الاشتراكات",
     support: "الدعم الفني",
     terms: "الشروط والأحكام",
     howToUse: "كيفية الإستخدام",
@@ -366,6 +373,96 @@ export const dashboardContent = {
     loading: "جاري التحميل...",
     notFound: "لم يتم العثور على الملف",
     backHome: "العودة للرئيسية",
+  },
+
+  // Subscription pages
+  subscription: {
+    // Page titles
+    manageTitle: "إدارة الاشتراكات",
+    historyTitle: "تاريخ الاشتراكات",
+
+    // Promo banner
+    promoBadge: "عروض نهاية العام",
+    planTitle: "خطة الاشتراك",
+    priceOriginal: "70",
+    priceDiscounted: "50",
+    priceCurrency: "ريال",
+    priceUnit: "السنة الدراسية",
+    priceSuffix: "بدل",
+
+    // Plan features
+    features: [
+      "ملف إنجاز لكل سنة دراسية",
+      "إمكانية إنشاء كلمة مرور خاصة للملف",
+      "إضافة بنود خاصة لكل رتبة وظيفية",
+      "إمكانية نشر الملف وتحميله بصيغة PDF",
+      "اختيار شكل للملف من بين 4 قوالب تصميم مميزة",
+    ],
+
+    // Countdown
+    countdownTitle: "متبقي على الإنتهاء",
+    days: "أيام",
+    hours: "ساعة",
+    minutes: "دقيقة",
+    seconds: "ثواني",
+
+    // Subscribe button
+    subscribeNow: "اشترك الآن",
+
+    // Empty states
+    noSubscriptions: "لا يوجد اشتراكات بعد",
+    noHistory: "لا يوجد سجل اشتراكات",
+
+    // History table
+    historyTableHeaders: {
+      plan: "الخطة",
+      startDate: "تاريخ البداية",
+      endDate: "تاريخ النهاية",
+      status: "الحالة",
+      amount: "المبلغ",
+    },
+
+    // Status labels
+    statusActive: "نشط",
+    statusExpired: "منتهي",
+    statusCancelled: "ملغي",
+
+    // Subscription form
+    form: {
+      title: "تأكيد الإشتراك",
+      subscriptionValue: "قيمة الاشتراك:",
+      expiryDate: "موعد الانتهاء:",
+      priceText: "50 ريال بدل 70 / للسنة الدراسية",
+
+      // Payment methods
+      paymentMethodTitle: "اختر طريقة الدفع المناسبة",
+      visa: "فيزا",
+      mada: "مدى",
+      applePay: "أبل باي",
+
+      // Card details
+      cardDetailsTitle: "بيانات البطاقة",
+      cardNameLabel: "الاسم على البطاقة",
+      cardNamePlaceholder: "مثال: محمد أحمد العتيبي",
+      cardNumberLabel: "رقم البطاقة",
+      cardNumberPlaceholder: "مثال: 123 456 789 587",
+      cvvLabel: "رمز التحقق",
+      cvvPlaceholder: "مثال: 123",
+      expiryLabel: "تاريخ الإنتهاء",
+      expiryPlaceholder: "شهر/سنة",
+
+      // Buttons
+      confirmPayment: "تأكيد الدفع",
+      cancel: "إلغاء",
+
+      // Confirmation modal
+      confirmModalTitle: "تأكيد الاشتراك",
+      remainingText: "متبقي على انتهاء السنة الدراسية:",
+      subscriptionEndsOn: "الاشتراك ينتهي في:",
+      monthAnd: "شهر و",
+      days: "أيام",
+      confirm: "تأكيد",
+    },
   },
 
   // Profile data page (بيانات ملفي)

@@ -1,7 +1,6 @@
-"use client";
-
-import { ProfileDataTabs } from "@/features/dashboard/components/ProfileDataTabs";
+import { redirect } from "next/navigation";
+import { ROUTES } from "@/config";
 
 export default function ProfileDataPage() {
-  return <ProfileDataTabs />;
+  redirect(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL);
 }

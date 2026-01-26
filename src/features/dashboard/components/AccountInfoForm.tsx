@@ -161,7 +161,7 @@ export const AccountInfoForm: React.FC = () => {
                 }
               },
               onError: (error) => reject(error),
-            }
+            },
           );
         });
       }
@@ -180,7 +180,7 @@ export const AccountInfoForm: React.FC = () => {
                 }
               },
               onError: (error) => reject(error),
-            }
+            },
           );
         });
       }
@@ -192,7 +192,7 @@ export const AccountInfoForm: React.FC = () => {
     } catch (error) {
       console.error("Failed to save profile:", error);
       setErrorMessage(
-        error instanceof Error ? error.message : errorMessages.updateFailed
+        error instanceof Error ? error.message : errorMessages.updateFailed,
       );
     }
   };
@@ -202,7 +202,7 @@ export const AccountInfoForm: React.FC = () => {
       onSuccess: (response) => {
         if (!response.status) {
           setErrorMessage(
-            response.message || errorMessages.deleteAccountFailed
+            response.message || errorMessages.deleteAccountFailed,
           );
         }
         setShowDeleteModal(false);
@@ -329,6 +329,7 @@ export const AccountInfoForm: React.FC = () => {
               value={displayData.fullName}
               disabled
               readOnly
+              className="text-text-dark"
             />
 
             {/* Gender (editable) */}
@@ -336,6 +337,7 @@ export const AccountInfoForm: React.FC = () => {
               label={accountInfo.genderLabel}
               options={genderOptions}
               error={errors.gender?.message}
+              className="text-text-dark"
               {...register("gender")}
             />
 
@@ -345,6 +347,7 @@ export const AccountInfoForm: React.FC = () => {
               type="email"
               placeholder={accountInfo.emailPlaceholder}
               error={errors.email?.message}
+              className="text-text-dark"
               {...register("email")}
             />
 
@@ -355,7 +358,7 @@ export const AccountInfoForm: React.FC = () => {
               disabled
               readOnly
               dir="ltr"
-              className="text-left"
+              className="text-text-dark text-left"
             />
           </div>
           {/* Change Password Link */}

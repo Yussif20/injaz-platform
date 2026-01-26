@@ -40,7 +40,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
             {breadcrumb.home}
           </Link>
           <span className="text-grey-400 mx-2">&lt;</span>
-          <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+          <span className="text-text-dark text-sm md:text-lg font-light md:font-normal">
             {breadcrumb.createFile}
           </span>
         </>
@@ -76,7 +76,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
               {breadcrumb.account}
             </Link>
             <span className="text-grey-400 mx-2">&lt;</span>
-            <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+            <span className="text-text-dark text-sm md:text-lg font-light md:font-normal">
               {currentPage}
             </span>
           </>
@@ -84,7 +84,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
       }
 
       return (
-        <span className="text-[#333333] text-sm md:text-lg font-light md:font-normal">
+        <span className="text-text-dark text-sm md:text-lg font-light md:font-normal">
           {breadcrumb.account}
         </span>
       );
@@ -130,7 +130,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
           {/* Breadcrumb / Welcome */}
           {pathname === ROUTES.DASHBOARD ? (
             <div className="flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
-              <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
+              <div className="w-6 h-6 md:w-13.5 md:h-13.5 rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
                 <Image
                   src={user?.imageUrl || "/icons/ui/user.svg"}
                   alt="صورة الملف الشخصي"
@@ -140,7 +140,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
                 />
               </div>
               <div className="leading-snug text-right">
-                <p className="text-[16px] md:text-[18px] font-normal text-[#333333]">
+                <p className="text-[16px] md:text-[18px] font-normal text-text-dark">
                   مرحبًا بك، {user?.fullName || ""}
                   <span className="mr-1">👋</span>
                 </p>
