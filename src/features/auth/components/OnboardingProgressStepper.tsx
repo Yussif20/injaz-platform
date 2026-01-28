@@ -35,12 +35,13 @@ export function OnboardingProgressStepper({
     <div
       className={
         isHorizontal
-          ? "flex flex-row items-center justify-between gap-4 w-full"
+          ? "mx-auto flex flex-row items-center justify-center w-full"
           : "flex flex-col items-start h-full"
       }
     >
       {stepOrder.map((step, index) => {
         const status = getStepStatus(index);
+        const isFirst = index === 0;
         const isLast = index === stepOrder.length - 1;
         const label =
           step === "basicInfo"
@@ -53,16 +54,29 @@ export function OnboardingProgressStepper({
             ? "text-primary-500"
             : "text-grey-400";
         const lineClass =
-          status === "completed" || status === "current"
+          status === "completed" ? "bg-primary-500" : "bg-grey-300";
+
+        // Line color before this dot (based on previous step's status)
+        const lineBeforeClass =
+          index > 0 && getStepStatus(index - 1) === "completed"
             ? "bg-primary-500"
             : "bg-grey-300";
 
         if (isHorizontal) {
           return (
             <div key={step} className="flex flex-col items-center gap-2 flex-1">
+              <span
+                className={`text-sm font-medium whitespace-nowrap ${labelClass}`}
+              >
+                {label}
+              </span>
               <div className="flex items-center w-full">
+                {/* Line before dot - connects from previous step */}
+                <div className="flex-1">
+                  {!isFirst && <div className={`h-0.5 w-full ${lineBeforeClass}`} />}
+                </div>
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center border-2 shrink-0 ${
                     status === "completed"
                       ? "bg-primary-500 border-primary-500"
                       : status === "current"
@@ -90,13 +104,11 @@ export function OnboardingProgressStepper({
                     <div className="w-2 h-2 rounded-full bg-grey-300" />
                   )}
                 </div>
-                {!isLast && <div className={`h-0.5 flex-1 ${lineClass}`} />}
+                {/* Line after dot - connects to next step */}
+                <div className="flex-1">
+                  {!isLast && <div className={`h-0.5 w-full ${lineClass}`} />}
+                </div>
               </div>
-              <span
-                className={`text-sm font-medium whitespace-nowrap ${labelClass}`}
-              >
-                {label}
-              </span>
             </div>
           );
         }
@@ -141,7 +153,11 @@ export function OnboardingProgressStepper({
 
               {/* Connecting line - centered under circle */}
               {!isLast && (
-                <div className={`w-0.5 flex-1 min-h-4 ${lineClass}`} />
+                <div
+                  className={`w-0.5 flex-1 min-h-4 ${
+                    status === "completed" ? "bg-primary-500" : "bg-grey-300"
+                  }`}
+                />
               )}
             </div>
 

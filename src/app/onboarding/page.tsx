@@ -18,7 +18,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 lg:px-12 py-6">
+      <header className="flex items-center justify-between px-2 lg:px-12 py-6">
         {/* Back Button (Right in RTL) */}
         <button
           type="button"
@@ -64,7 +64,7 @@ export default function OnboardingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-6 lg:px-12 pb-8">
+      <main className="flex-1 px-2 lg:px-12 pb-8">
         <OnboardingFlow ref={onboardingRef} />
       </main>
     </div>
