@@ -5,9 +5,9 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { dashboardContent } from "@/content";
-import { Button, Input, Select } from "@/shared/components/ui";
-import { DataCard } from "./DataCard";
+import { dashboardContent, authContent } from "@/content";
+import { Input, Select } from "@/shared/components/ui";
+import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
 import {
   useQualifications,
   useAddQualification,
@@ -24,7 +24,7 @@ const qualificationSchema = z.object({
   degreeType: z.string().min(1, "نوع الشهادة مطلوب"),
   title: z.string().min(1, "التخصص مطلوب"),
   grade: z.string().optional(),
-  graduationDate: z.string().min(1, "تاريخ التخرج مطلوب"),
+  graduationDate: z.string().min(1, "سنة التخرج مطلوبة"),
 });
 
 type QualificationFormData = z.infer<typeof qualificationSchema>;
@@ -36,26 +36,38 @@ interface EducationDataTabProps {
 
 // Degree types in Arabic
 const DEGREE_TYPES = [
-  { value: "diploma", label: "دبلوم" },
-  { value: "bachelor", label: "بكالوريوس" },
-  { value: "master", label: "ماجستير" },
-  { value: "doctorate", label: "دكتوراه" },
-  { value: "higher_diploma", label: "دبلوم عالي" },
-  { value: "professional", label: "شهادة مهنية" },
+  { value: "دبلوم", label: "دبلوم" },
+  { value: "بكالوريوس", label: "بكالوريوس" },
+  { value: "ماجستير", label: "ماجستير" },
+  { value: "دكتوراه", label: "دكتوراه" },
+  { value: "دبلوم عالي", label: "دبلوم عالي" },
+  { value: "شهادة مهنية", label: "شهادة مهنية" },
 ];
 
+// Generate years for dropdown
+const generateYears = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = currentYear; year >= 1960; year--) {
+    years.push({ value: year.toString(), label: year.toString() });
+  }
+  return years;
+};
+
+const YEARS = generateYears();
+
 export const EducationDataTab: React.FC<EducationDataTabProps> = ({
-  isEditing,
   onSave,
 }) => {
   const { profileData } = dashboardContent;
+  const { onboarding } = authContent;
   const [editingQualification, setEditingQualification] =
     useState<Qualification | null>(null);
-  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Hooks
-  const { qualifications, isLoading, refetch } = useQualifications();
+  const { qualifications, isLoading } = useQualifications();
   const { addQualificationAsync, isLoading: isAdding } = useAddQualification();
   const { updateQualificationAsync, isLoading: isUpdating } =
     useUpdateQualification();
@@ -66,9 +78,10 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<QualificationFormData>({
     resolver: zodResolver(qualificationSchema),
+    mode: "onChange",
     defaultValues: {
       degreeType: "",
       title: "",
@@ -87,10 +100,12 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         title: editingQualification.title || "",
         grade: editingQualification.grade || "",
         graduationDate: editingQualification.graduationDate
-          ? editingQualification.graduationDate.split("T")[0]
+          ? new Date(editingQualification.graduationDate)
+              .getFullYear()
+              .toString()
           : "",
       });
-    } else if (isAddingNew) {
+    } else {
       reset({
         degreeType: "",
         title: "",
@@ -98,7 +113,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         graduationDate: "",
       });
     }
-  }, [editingQualification, isAddingNew, reset]);
+  }, [editingQualification, reset]);
 
   const handleSaveQualification = async (data: QualificationFormData) => {
     setError(null);
@@ -107,27 +122,24 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         degreeType: data.degreeType,
         title: data.title,
         grade: data.grade || undefined,
-        graduationDate: data.graduationDate,
+        graduationDate: `${data.graduationDate}-01-01`,
       };
 
       if (editingQualification) {
-        // Update existing qualification
         const response = await updateQualificationAsync({
           id: editingQualification.id,
           data: requestData,
         });
         if (response.status) {
-          setEditingQualification(null);
+          closeModal();
           onSave?.();
         } else {
           setError(response.message || "فشل في تحديث المؤهل");
         }
       } else {
-        // Add new qualification
         const response = await addQualificationAsync(requestData);
         if (response.status) {
-          setIsAddingNew(false);
-          reset();
+          closeModal();
           onSave?.();
         } else {
           setError(response.message || "فشل في إضافة المؤهل");
@@ -152,31 +164,43 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     }
   };
 
-  const handleCancelEdit = () => {
+  const openAddModal = () => {
     setEditingQualification(null);
-    setIsAddingNew(false);
+    reset({
+      degreeType: "",
+      title: "",
+      grade: "",
+      graduationDate: "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (qualification: Qualification) => {
+    setEditingQualification(qualification);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingQualification(null);
     setError(null);
     reset();
+  };
+
+  const formatYear = (dateString: string | null) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.getFullYear().toString();
+    } catch {
+      return dateString;
+    }
   };
 
   const getDegreeLabel = (value: string | null) => {
     if (!value) return "-";
     const degree = DEGREE_TYPES.find((d) => d.value === value);
     return degree?.label || value;
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("ar-SA", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString;
-    }
   };
 
   // Loading state
@@ -188,184 +212,136 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     );
   }
 
-  // Form for adding/editing
-  if (isAddingNew || editingQualification) {
-    return (
-      <form
-        onSubmit={handleSubmit(handleSaveQualification)}
-        className="space-y-6"
-      >
-        <div>
-          <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {editingQualification ? "تعديل المؤهل" : "إضافة مؤهل جديد"}
-          </h3>
-
-          {error && (
-            <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
-              {error}
-            </div>
-          )}
-
-          <div className="bg-shade-100 rounded-xl p-4 space-y-3">
-            <Select
-              label={`${profileData.educationFields.degree}*`}
-              options={DEGREE_TYPES}
-              error={errors.degreeType?.message}
-              {...register("degreeType")}
-            />
-            <Input
-              label={`${profileData.educationFields.specialization}*`}
-              error={errors.title?.message}
-              {...register("title")}
-            />
-            <Input
-              label="التقدير"
-              error={errors.grade?.message}
-              {...register("grade")}
-            />
-            <Input
-              label={`${profileData.educationFields.graduationYear}*`}
-              type="date"
-              dir="ltr"
-              className="text-left"
-              error={errors.graduationDate?.message}
-              {...register("graduationDate")}
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancelEdit}
-            className="flex-1 rounded-xl h-12"
-          >
-            إلغاء
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={isSaving}
-            isLoading={isSaving}
-            className="flex-1 rounded-xl h-12"
-          >
-            {editingQualification ? "تحديث" : "إضافة"}
-          </Button>
-        </div>
-      </form>
-    );
-  }
-
-  // Edit mode list view
-  if (false) {
-    return null;
-  }
-
-  // View Mode with 3-dots menus and add button
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-          {profileData.educationTitle}
-        </h3>
+    <div className="flex flex-col gap-4">
+      {error && (
+        <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
+          {error}
+        </div>
+      )}
 
-        {error && (
-          <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg mb-4 text-right">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-4">
-          {qualifications.map((qualification) => (
-            <div
-              key={qualification.id}
-              className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
-            >
-              <div className="flex-1">
-                <p className="font-medium text-secondary-800 mb-1">
-                  {getDegreeLabel(qualification.degreeType)}
-                </p>
-                <p className="text-grey-600 text-sm mb-1">
-                  <strong>التخصص:</strong> {qualification.title || "-"}
-                </p>
-                <p className="text-grey-600 text-sm mb-1">
-                  <strong>التقدير:</strong> {qualification.grade || "-"}
-                </p>
-                <p className="text-grey-600 text-sm">
-                  <strong>تاريخ التخرج:</strong>{" "}
-                  {formatDate(qualification.graduationDate)}
-                </p>
-              </div>
-              {/* 3-dots menu */}
-              <div className="relative group">
+      {/* Qualification Cards */}
+      <div className="space-y-4">
+        {qualifications.map((qualification) => (
+          <div
+            key={qualification.id}
+            className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
+          >
+            <div className="flex-1 text-right border-r-2 border-[#008387] pr-3">
+              <p className="font-normal text-[#333] text-sm md:text-lg">
+                {getDegreeLabel(qualification.degreeType)} {qualification.title || ""}
+              </p>
+              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
+                {qualification.grade || "-"}
+              </p>
+              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
+                {formatYear(qualification.graduationDate)}
+              </p>
+            </div>
+            <div className="relative group">
+              <button
+                type="button"
+                className="p-1"
+                aria-label="خيارات"
+              >
+                <svg
+                  className="w-5 h-5 text-grey-500"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="5" r="2" />
+                  <circle cx="12" cy="12" r="2" />
+                  <circle cx="12" cy="19" r="2" />
+                </svg>
+              </button>
+              {/* Dropdown menu */}
+              <div className="absolute hidden group-hover:block left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
                 <button
                   type="button"
-                  className="p-2 hover:bg-white rounded-lg transition-colors"
-                  aria-label="خيارات"
+                  onClick={() => openEditModal(qualification)}
+                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700"
                 >
-                  <svg
-                    className="w-5 h-5 text-grey-500"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle cx="12" cy="5" r="2" />
-                    <circle cx="12" cy="12" r="2" />
-                    <circle cx="12" cy="19" r="2" />
-                  </svg>
+                  تعديل
                 </button>
-                {/* Dropdown menu */}
-                <div className="absolute hidden group-hover:block right-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-40">
-                  <button
-                    type="button"
-                    onClick={() => setEditingQualification(qualification)}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-primary-500"
-                  >
-                    <Image
-                      src="/icons/ui/edit.svg"
-                      alt="edit"
-                      width={16}
-                      height={16}
-                    />
-                    <span className="text-sm">تعديل</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteQualification(qualification.id)}
-                    disabled={isDeleting}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors flex items-center gap-2 text-warning-500 disabled:opacity-50"
-                  >
-                    <Image
-                      src="/icons/ui/delete.svg"
-                      alt="delete"
-                      width={16}
-                      height={16}
-                    />
-                    <span className="text-sm">حذف</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteQualification(qualification.id)}
+                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500"
+                >
+                  حذف
+                </button>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
 
-          {/* Add new button */}
-          <button
-            type="button"
-            onClick={() => setIsAddingNew(true)}
-            className="w-full py-3 border-2 border-dashed border-primary-300 rounded-xl text-primary-500 hover:bg-shade-100 transition-colors flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 5v14m7-7H5"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-              />
-            </svg>
-            {profileData.addCertification || "إضافة درجة علمية آخرى"}
-          </button>
-        </div>
+        {/* Add Button */}
+        <button
+          type="button"
+          onClick={openAddModal}
+          className="flex items-center gap-2 text-primary-500 justify-start w-full mt-4"
+        >
+          <Image
+            src="/images/auth/plus.svg"
+            alt="Add"
+            className="h-5 w-5 md:h-6 md:w-6"
+            width={20}
+            height={20}
+          />
+          <span className="font-light text-base md:text-lg">
+            {qualifications.length === 0
+              ? onboarding.qualifications.firstAddButton
+              : onboarding.qualifications.addButton}
+          </span>
+        </button>
       </div>
+
+      {/* Qualification Modal */}
+      <OnboardingDataModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={
+          editingQualification
+            ? onboarding.qualifications.modalEditTitle
+            : onboarding.qualifications.modalTitle
+        }
+        submitLabel={
+          editingQualification
+            ? onboarding.qualifications.editButton
+            : onboarding.qualifications.saveButton
+        }
+        onSubmit={handleSubmit(handleSaveQualification)}
+        isLoading={isSaving}
+        isEditing={!!editingQualification}
+        isFormValid={isValid}
+      >
+        <Select
+          label={onboarding.qualifications.degreeLabel}
+          placeholder="اختر الدرجة العلمية"
+          options={DEGREE_TYPES}
+          error={errors.degreeType?.message}
+          {...register("degreeType")}
+        />
+        <Input
+          label={onboarding.qualifications.institutionLabel}
+          placeholder="مثال: جامعة الملك فهد"
+          error={errors.grade?.message}
+          {...register("grade")}
+        />
+        <Input
+          label={onboarding.qualifications.titleLabel}
+          placeholder="مثال: تربية لغة عربية"
+          error={errors.title?.message}
+          {...register("title")}
+        />
+        <Select
+          label={onboarding.qualifications.graduationDateLabel}
+          placeholder="اختر السنة"
+          options={YEARS}
+          error={errors.graduationDate?.message}
+          {...register("graduationDate")}
+        />
+      </OnboardingDataModal>
     </div>
   );
 };

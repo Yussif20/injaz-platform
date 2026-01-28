@@ -37,13 +37,23 @@ export function QualificationCard({
   }, [showMenu]);
 
   return (
-    <div className="bg-shade-100 rounded-xl p-4 border-r-4 border-primary-500 relative">
-      <div className="flex items-start justify-between">
+    <div className="bg-shade-100 rounded-xl p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 text-right border-r-2 border-[#008387] pr-3">
+          <p className="font-normal text-[#333] text-sm md:text-lg">{degree}</p>
+          <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
+            {institution}
+          </p>
+          <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
+            {year}
+          </p>
+        </div>
+
         <div className="relative" ref={menuRef}>
           <button
             type="button"
             onClick={() => setShowMenu(!showMenu)}
-            className="text-grey-500 hover:text-grey-700 p-1"
+            className="text-grey-500 p-1"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -75,12 +85,6 @@ export function QualificationCard({
               </button>
             </div>
           )}
-        </div>
-
-        <div className="flex-1 text-right">
-          <h4 className="font-medium text-text-dark">{degree}</h4>
-          <p className="text-grey-600 text-sm mt-1">{institution}</p>
-          <p className="text-grey-500 text-sm mt-1">{year}</p>
         </div>
       </div>
     </div>
