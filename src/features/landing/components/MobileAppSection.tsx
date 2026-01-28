@@ -51,7 +51,7 @@ export function MobileAppSection() {
             </p>
 
             {/* App Store Buttons */}
-            <div className="mx-auto lg:mx-0 flex gap-4  items-center">
+            <div className="mx-auto lg:mx-0 flex gap-4 mt-8 items-center">
               <a
                 href="https://apps.apple.com"
                 target="_blank"

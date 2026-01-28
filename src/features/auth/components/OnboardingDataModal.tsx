@@ -60,7 +60,7 @@ export function OnboardingDataModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
         ref={modalRef}
-        className="bg-white rounded-[20px] md:rounded-[24px] lg:rounded-[24px] w-full max-w-md mx-4 shadow-xl"
+        className="bg-white rounded-[20px] md:rounded-3xl w-full max-w-md mx-4 shadow-xl"
       >
         {/* Header */}
         <div className="flex items-center justify-center p-6 border-b border-grey-200 relative">
@@ -100,8 +100,8 @@ export function OnboardingDataModal({
               type="submit"
               isLoading={isLoading}
               disabled={isLoading || !isFormValid}
-              className={`w-full !rounded-[20px] h-12 font-light text-base ${
-                !isFormValid ? "!bg-[#EBEBEB] !text-[#666]" : ""
+              className={`w-full rounded-[20px]! h-12 font-light text-base ${
+                !isFormValid ? "bg-[#EBEBEB]! text-[#666]!" : ""
               }`}
             >
               {submitLabel}

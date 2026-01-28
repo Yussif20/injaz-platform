@@ -45,18 +45,14 @@ export function QualificationCard({
             onClick={() => setShowMenu(!showMenu)}
             className="text-grey-500 hover:text-grey-700 p-1"
           >
-            <svg
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
             </svg>
           </button>
 
           {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-grey-200 py-1 min-w-[100px] z-10">
+            <div className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-grey-200 py-1 min-w-25 z-10">
               <button
                 type="button"
                 onClick={() => {

@@ -111,6 +111,39 @@ export const Footer = () => {
                 />
               </a>
             </div>
+
+            {/* Download App Section */}
+            <div className="flex flex-col gap-5">
+              <h3 className="text-base font-normal">{footer.downloadApp}</h3>
+              <div className="flex gap-4 items-center">
+                <a
+                  href="https://apps.apple.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80 bg-white rounded-lg"
+                >
+                  <Image
+                    src="/images/landing/mobile-app/app-store-button.svg"
+                    alt="Download on App Store"
+                    width={140}
+                    height={42}
+                  />
+                </a>
+                <a
+                  href="https://play.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80 rounded-lg"
+                >
+                  <Image
+                    src="/images/landing/mobile-app/play-store-button.svg"
+                    alt="Get it on Google Play"
+                    width={140}
+                    height={28}
+                  />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

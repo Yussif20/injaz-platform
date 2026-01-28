@@ -28,6 +28,7 @@ export const commonContent = {
       tiktok: "https://tiktok.com",
       instagram: "https://instagram.com",
     },
+    downloadApp: "حمل التطبيق",
   },
 
   comingSoon: {
