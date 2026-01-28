@@ -7,6 +7,7 @@ export { RegisterForm } from "./RegisterForm";
 export { ForgotPasswordForm } from "./ForgotPasswordForm";
 export { ForgotPasswordFlow } from "./ForgotPasswordFlow";
 export { OnboardingFlow } from "./OnboardingFlow";
+export type { OnboardingFlowHandle } from "./OnboardingFlow";
 export { OnboardingProgressStepper } from "./OnboardingProgressStepper";
 export { OnboardingDataModal } from "./OnboardingDataModal";
 export { OnboardingImageCollage } from "./OnboardingImageCollage";

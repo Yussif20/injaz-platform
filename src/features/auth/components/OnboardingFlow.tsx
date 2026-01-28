@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -31,7 +31,11 @@ const basicInfoSchema = z.object({
     .regex(/^\d{10,14}$/, "رقم الهوية يجب أن يكون بين 10-14 رقم"),
   address: z.string().min(1, "المنشأ مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
-  email: z.string().email("البريد الإلكتروني غير صالح").optional().or(z.literal("")),
+  email: z
+    .string()
+    .email("البريد الإلكتروني غير صالح")
+    .optional()
+    .or(z.literal("")),
   whatsapp: z.string().optional(),
 });
 
@@ -112,7 +116,12 @@ const generateYears = () => {
 
 const YEARS = generateYears();
 
-export function OnboardingFlow() {
+export interface OnboardingFlowHandle {
+  handleBack: () => void;
+}
+
+export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
+  function OnboardingFlow(_, ref) {
   const router = useRouter();
   const { onboarding, buttons } = authContent;
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("basicInfo");
@@ -120,14 +129,18 @@ export function OnboardingFlow() {
   const [careerJobs, setCareerJobs] = useState<CareerJobData[]>([]);
 
   // Modal state
-  const [isQualificationModalOpen, setIsQualificationModalOpen] = useState(false);
+  const [isQualificationModalOpen, setIsQualificationModalOpen] =
+    useState(false);
   const [isCareerModalOpen, setIsCareerModalOpen] = useState(false);
-  const [editingQualification, setEditingQualification] = useState<QualificationData | null>(null);
-  const [editingCareerJob, setEditingCareerJob] = useState<CareerJobData | null>(null);
+  const [editingQualification, setEditingQualification] =
+    useState<QualificationData | null>(null);
+  const [editingCareerJob, setEditingCareerJob] =
+    useState<CareerJobData | null>(null);
 
   // Basic info form
   const basicInfoForm = useForm<BasicInfoFormData>({
     resolver: zodResolver(basicInfoSchema),
+    mode: "onChange",
     defaultValues: {
       nationalId: "",
       address: "",
@@ -179,8 +192,8 @@ export function OnboardingFlow() {
     if (editingQualification) {
       setQualifications((prev) =>
         prev.map((q) =>
-          q.id === editingQualification.id ? { ...q, ...data } : q
-        )
+          q.id === editingQualification.id ? { ...q, ...data } : q,
+        ),
       );
     } else {
       setQualifications((prev) => [...prev, { id: generateId(), ...data }]);
@@ -197,13 +210,17 @@ export function OnboardingFlow() {
       rank: data.rank,
       stage: data.stage,
       startYear: parseInt(data.startYear),
-      endYear: data.isCurrent ? null : data.endYear ? parseInt(data.endYear) : null,
+      endYear: data.isCurrent
+        ? null
+        : data.endYear
+          ? parseInt(data.endYear)
+          : null,
       isCurrent: data.isCurrent,
     };
 
     if (editingCareerJob) {
       setCareerJobs((prev) =>
-        prev.map((j) => (j.id === editingCareerJob.id ? jobData : j))
+        prev.map((j) => (j.id === editingCareerJob.id ? jobData : j)),
       );
     } else {
       setCareerJobs((prev) => [...prev, jobData]);
@@ -288,210 +305,258 @@ export function OnboardingFlow() {
     }
   };
 
-  // Get section title based on current step
-  const getSectionTitle = () => {
-    switch (currentStep) {
-      case "basicInfo":
-        return onboarding.basicInfo.title;
-      case "qualifications":
-        return onboarding.qualifications.title;
-      case "careerJobs":
-        return onboarding.careerJobs.title;
+  // Handle back navigation
+  const handleBack = () => {
+    if (currentStep === "basicInfo") {
+      // Go back to signup page
+      router.push(ROUTES.SIGN_UP);
+    } else if (currentStep === "qualifications") {
+      // Go back to basic info (data is preserved in state)
+      setCurrentStep("basicInfo");
+    } else if (currentStep === "careerJobs") {
+      // Go back to qualifications (data is preserved in state)
+      setCurrentStep("qualifications");
     }
   };
 
-  return (
-    <div className="flex h-full min-h-[calc(100vh-120px)]">
-      {/* Left Side - Image Collage (1/3 width, hidden on mobile) */}
-      <div className="hidden lg:block w-1/3 p-4">
-        <OnboardingImageCollage />
-      </div>
+  // Expose handleBack to parent via ref
+  useImperativeHandle(ref, () => ({
+    handleBack,
+  }));
 
+  return (
+    <div className="flex flex-col lg:flex-row h-full min-h-[calc(100vh-120px)]">
       {/* Right Side - Content + Stepper (2/3 width) */}
-      <div className="flex-1 lg:w-2/3 flex">
+      <div className="flex-1 lg:w-3/5 flex flex-col min-h-[calc(100vh-120px)]">
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col px-4 lg:px-8">
-          {/* Section Title */}
-          <h2 className="text-2xl font-medium text-text-dark text-right mb-6">
-            {getSectionTitle()}
-          </h2>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Step 1: Basic Info Form */}
-            {currentStep === "basicInfo" && (
-              <form
-                onSubmit={basicInfoForm.handleSubmit(handleBasicInfoSubmit)}
-                className="space-y-6"
-              >
-                {/* General Info Section */}
-                <div>
-                  <h3 className="text-lg font-medium text-primary-500 mb-4 text-right">
-                    {onboarding.basicInfo.generalInfo}
-                  </h3>
-                  <div className="space-y-4">
-                    <Input
-                      label={onboarding.basicInfo.nationalIdLabel}
-                      placeholder={onboarding.basicInfo.nationalIdPlaceholder}
-                      error={basicInfoForm.formState.errors.nationalId?.message}
-                      {...basicInfoForm.register("nationalId")}
-                    />
-                    <Input
-                      label={onboarding.basicInfo.addressLabel}
-                      placeholder={onboarding.basicInfo.addressPlaceholder}
-                      error={basicInfoForm.formState.errors.address?.message}
-                      {...basicInfoForm.register("address")}
-                    />
-                    <Input
-                      label={onboarding.basicInfo.birthDateLabel}
-                      placeholder={onboarding.basicInfo.birthDatePlaceholder}
-                      type="date"
-                      dir="ltr"
-                      className="text-left"
-                      error={basicInfoForm.formState.errors.birthDate?.message}
-                      {...basicInfoForm.register("birthDate")}
-                    />
-                  </div>
-                </div>
-
-                {/* Contact Info Section */}
-                <div>
-                  <h3 className="text-lg font-medium text-primary-500 mb-4 text-right">
-                    {onboarding.basicInfo.contactInfo}
-                  </h3>
-                  <div className="space-y-4">
-                    <Input
-                      label={onboarding.basicInfo.emailLabel}
-                      placeholder={onboarding.basicInfo.emailPlaceholder}
-                      type="email"
-                      error={basicInfoForm.formState.errors.email?.message}
-                      {...basicInfoForm.register("email")}
-                    />
-                    <Input
-                      label={onboarding.basicInfo.whatsappLabel}
-                      placeholder={onboarding.basicInfo.whatsappPlaceholder}
-                      {...basicInfoForm.register("whatsapp")}
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-4">
-                  <Button type="submit" className="w-full !rounded-full h-14">
-                    {buttons.next}
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {/* Step 2: Qualifications */}
-            {currentStep === "qualifications" && (
-              <div className="space-y-4">
-                {qualifications.map((qual) => (
-                  <QualificationCard
-                    key={qual.id}
-                    degree={qual.degree + " " + qual.specialization}
-                    institution={qual.institution}
-                    year={qual.graduationYear}
-                    onEdit={() => openEditQualificationModal(qual)}
-                    onDelete={() => deleteQualification(qual.id)}
-                  />
-                ))}
-
-                <button
-                  type="button"
-                  onClick={openAddQualificationModal}
-                  className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
-                >
-                  <span className="font-medium">{onboarding.qualifications.addButton}</span>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                </button>
-              </div>
-            )}
-
-            {/* Step 3: Career Jobs */}
-            {currentStep === "careerJobs" && (
-              <div className="space-y-4">
-                {careerJobs.map((job) => (
-                  <QualificationCard
-                    key={job.id}
-                    degree={job.position}
-                    institution={job.school}
-                    year={
-                      job.isCurrent
-                        ? `${job.startYear} - حتى الآن`
-                        : `${job.startYear} - ${job.endYear}`
-                    }
-                    onEdit={() => openEditCareerModal(job)}
-                    onDelete={() => deleteCareerJob(job.id)}
-                  />
-                ))}
-
-                <button
-                  type="button"
-                  onClick={openAddCareerModal}
-                  className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
-                >
-                  <span className="font-medium">{onboarding.careerJobs.addButton}</span>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                </button>
-              </div>
-            )}
+          {/* Mobile/Tablet Stepper - Full Width */}
+          <div className="lg:hidden w-full mb-6">
+            <OnboardingProgressStepper
+              currentStep={currentStep}
+              steps={onboarding.steps}
+              direction="horizontal"
+            />
           </div>
 
-          {/* Navigation Buttons (only for steps 2 and 3) */}
-          {currentStep !== "basicInfo" && (
-            <div className="flex gap-4 pt-6 mt-auto">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleSkip}
-                className="flex-1 !rounded-full h-14"
-              >
-                {buttons.skip}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleNext}
-                className="flex-1 !rounded-full h-14"
-              >
-                {buttons.next}
-              </Button>
-            </div>
-          )}
-        </div>
+          {/* Content with Stepper Row */}
+          <div className="flex-1 overflow-y-auto flex flex-col justify-center">
+            <div className="flex flex-row items-center">
+              {/* Progress Stepper (Right side on desktop) - Fixed height */}
+              <div className="hidden lg:flex w-48 shrink-0 justify-center h-[420px]">
+                <OnboardingProgressStepper
+                  currentStep={currentStep}
+                  steps={onboarding.steps}
+                />
+              </div>
 
-        {/* Progress Stepper (Right side) */}
-        <div className="hidden lg:flex w-48 shrink-0 justify-center pt-8">
-          <OnboardingProgressStepper
-            currentStep={currentStep}
-            steps={onboarding.steps}
-          />
+              {/* Step Content */}
+              <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-7">
+                {/* Step 1: Basic Info Form */}
+                {currentStep === "basicInfo" && (
+                  <form
+                    onSubmit={basicInfoForm.handleSubmit(handleBasicInfoSubmit)}
+                    className="flex flex-col gap-4 md:gap-6 lg:gap-7"
+                  >
+                    {/* Main Section Title */}
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      {onboarding.basicInfo.title}
+                    </h2>
+
+                    {/* General Info Section */}
+                    <div>
+                      <h3 className="text-base md:text-xl lg:text-2xl font-normal text-primary-500 mb-3 text-right">
+                        {onboarding.basicInfo.generalInfo}
+                      </h3>
+                      <div className="space-y-3">
+                        <Input
+                          label={onboarding.basicInfo.nationalIdLabel}
+                          placeholder={onboarding.basicInfo.nationalIdPlaceholder}
+                          error={basicInfoForm.formState.errors.nationalId?.message}
+                          {...basicInfoForm.register("nationalId")}
+                        />
+                        <Input
+                          label={onboarding.basicInfo.addressLabel}
+                          placeholder={onboarding.basicInfo.addressPlaceholder}
+                          error={basicInfoForm.formState.errors.address?.message}
+                          {...basicInfoForm.register("address")}
+                        />
+                        <Input
+                          label={onboarding.basicInfo.birthDateLabel}
+                          placeholder={onboarding.basicInfo.birthDatePlaceholder}
+                          type="date"
+                          dir="ltr"
+                          className="text-left"
+                          error={basicInfoForm.formState.errors.birthDate?.message}
+                          {...basicInfoForm.register("birthDate")}
+                        />
+                        <Input
+                          label={onboarding.basicInfo.emailLabel}
+                          placeholder={onboarding.basicInfo.emailPlaceholder}
+                          type="email"
+                          error={basicInfoForm.formState.errors.email?.message}
+                          {...basicInfoForm.register("email")}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contact Info Section */}
+                    <div>
+                      <h3 className="text-base md:text-xl lg:text-2xl font-normal text-primary-500 mb-3 text-right">
+                        {onboarding.basicInfo.contactInfo}
+                      </h3>
+                      <div className="space-y-3">
+                        <Input
+                          label={onboarding.basicInfo.whatsappLabel}
+                          placeholder={onboarding.basicInfo.whatsappPlaceholder}
+                          {...basicInfoForm.register("whatsapp")}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="mt-2">
+                      <Button
+                        type="submit"
+                        disabled={!basicInfoForm.formState.isValid}
+                        className="w-full rounded-full! h-14"
+                      >
+                        {buttons.next}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Step 2: Qualifications */}
+                {currentStep === "qualifications" && (
+                  <div className="flex flex-col gap-4">
+                    {/* Section Title */}
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      {onboarding.qualifications.title}
+                    </h2>
+
+                    <div className="space-y-4">
+                      {qualifications.map((qual) => (
+                        <QualificationCard
+                          key={qual.id}
+                          degree={qual.degree + " " + qual.specialization}
+                          institution={qual.institution}
+                          year={qual.graduationYear}
+                          onEdit={() => openEditQualificationModal(qual)}
+                          onDelete={() => deleteQualification(qual.id)}
+                        />
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={openAddQualificationModal}
+                        className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
+                      >
+                        <span className="font-medium">
+                          {onboarding.qualifications.addButton}
+                        </span>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Career Jobs */}
+                {currentStep === "careerJobs" && (
+                  <div className="flex flex-col gap-4">
+                    {/* Section Title */}
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      {onboarding.careerJobs.title}
+                    </h2>
+
+                    <div className="space-y-4">
+                      {careerJobs.map((job) => (
+                        <QualificationCard
+                          key={job.id}
+                          degree={job.position}
+                          institution={job.school}
+                          year={
+                            job.isCurrent
+                              ? `${job.startYear} - حتى الآن`
+                              : `${job.startYear} - ${job.endYear}`
+                          }
+                          onEdit={() => openEditCareerModal(job)}
+                          onDelete={() => deleteCareerJob(job.id)}
+                        />
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={openAddCareerModal}
+                        className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
+                      >
+                        <span className="font-medium">
+                          {onboarding.careerJobs.addButton}
+                        </span>
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation Buttons (only for steps 2 and 3) */}
+                {currentStep !== "basicInfo" && (
+                  <div className="flex gap-4 pt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSkip}
+                      className="flex-1 rounded-full h-14"
+                    >
+                      {buttons.skip}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      className="flex-1 rounded-full h-14"
+                    >
+                      {buttons.next}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Image Collage */}
+          <div className="lg:hidden mt-6">
+            <OnboardingImageCollage />
+          </div>
         </div>
+      </div>
+
+      {/* Left Side - Image Collage (1/3 width, hidden on mobile) */}
+      <div className="hidden lg:block w-2/5 p-4">
+        <OnboardingImageCollage />
       </div>
 
       {/* Qualification Modal */}
@@ -593,4 +658,4 @@ export function OnboardingFlow() {
       </OnboardingDataModal>
     </div>
   );
-}
+});

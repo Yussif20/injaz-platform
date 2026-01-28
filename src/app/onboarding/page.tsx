@@ -1,20 +1,28 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { authContent } from "@/content";
 import { OnboardingFlow } from "@/features/auth";
+import type { OnboardingFlowHandle } from "@/features/auth";
 
 export default function OnboardingPage() {
   const { onboarding, signIn } = authContent;
+  const onboardingRef = useRef<OnboardingFlowHandle>(null);
+
+  const handleBackClick = () => {
+    onboardingRef.current?.handleBack();
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 lg:px-12 py-6">
         {/* Back Button (Right in RTL) */}
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={handleBackClick}
           className="text-grey-500 hover:text-grey-700 transition-colors"
         >
           <svg
@@ -30,7 +38,7 @@ export default function OnboardingPage() {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </Link>
+        </button>
 
         {/* Title (Center) */}
         <div className="text-center flex-1">
@@ -57,7 +65,7 @@ export default function OnboardingPage() {
 
       {/* Main Content */}
       <main className="flex-1 px-6 lg:px-12 pb-8">
-        <OnboardingFlow />
+        <OnboardingFlow ref={onboardingRef} />
       </main>
     </div>
   );

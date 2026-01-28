@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={`
           flex justify-center items-center gap-2
           font-normal rounded-4xl transition-colors duration-200
-          disabled:opacity-50 disabled:cursor-not-allowed
+          disabled:bg-[#EBEBEB] disabled:text-[#666666] disabled:cursor-not-allowed disabled:border-transparent
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           ${className || ""}

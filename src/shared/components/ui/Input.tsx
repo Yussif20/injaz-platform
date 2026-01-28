@@ -11,7 +11,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-2">
         {label && (
-          <label className="text-base font-normal text-[#333]">
+          <label className="text-sm md:text-base font-normal text-[#333]">
             {label}
             {note && <span className="text-grey-400 text-xs mr-1">{note}</span>}
           </label>
@@ -21,7 +21,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           className={`
             w-full bg-white text-[#333] placeholder:text-[#B3B3B3]
-            text-sm text-right leading-normal
+            text-xs md:text-sm font-light md:font-normal text-right leading-normal
             px-3 py-2
             border rounded-2xl
             transition-colors duration-200
@@ -39,7 +39,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error && <p className="text-warning-500 text-xs">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

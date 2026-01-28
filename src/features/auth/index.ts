@@ -13,6 +13,8 @@ export {
   StepIndicator,
 } from "./components";
 
+export type { OnboardingFlowHandle } from "./components";
+
 // Hooks
 export {
   useAuth,
