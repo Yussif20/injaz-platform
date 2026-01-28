@@ -22,6 +22,7 @@ import {
 import { OnboardingDataModal } from "./OnboardingDataModal";
 import { QualificationCard } from "./QualificationCard";
 import { OnboardingImageCollage } from "./OnboardingImageCollage";
+import Image from "next/image";
 
 // Basic info form schema
 const basicInfoSchema = z.object({
@@ -363,7 +364,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                       className="flex flex-col gap-4 md:gap-6 lg:gap-7"
                     >
                       {/* Main Section Title */}
-                      <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      <h2 className="text-xl hidden lg:block md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
                         {onboarding.basicInfo.title}
                       </h2>
 
@@ -451,7 +452,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                   {currentStep === "qualifications" && (
                     <div className="flex flex-col gap-4">
                       {/* Section Title */}
-                      <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      <h2 className="hidden lg:block text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
                         {onboarding.qualifications.title}
                       </h2>
 
@@ -470,24 +471,20 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         <button
                           type="button"
                           onClick={openAddQualificationModal}
-                          className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
+                          className="flex items-center gap-2 text-primary-500  justify-start w-full mt-4"
                         >
-                          <span className="font-medium">
-                            {onboarding.qualifications.addButton}
+                          <Image
+                            src="/images/auth/plus.svg"
+                            alt="Add"
+                            className="h-5 w-5 md:h-6 md:w-6"
+                            width={20}
+                            height={20}
+                          />
+                          <span className="font-light text-base md:text-lg">
+                            {qualifications.length === 0
+                              ? onboarding.qualifications.firstAddButton
+                              : onboarding.qualifications.addButton}
                           </span>
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
                         </button>
                       </div>
                     </div>
@@ -497,7 +494,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                   {currentStep === "careerJobs" && (
                     <div className="flex flex-col gap-4">
                       {/* Section Title */}
-                      <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
+                      <h2 className="hidden lg:block text-xl md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
                         {onboarding.careerJobs.title}
                       </h2>
 
@@ -520,24 +517,20 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         <button
                           type="button"
                           onClick={openAddCareerModal}
-                          className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors justify-end w-full mt-4"
+                          className="flex items-center gap-2 text-primary-500  justify-start w-full mt-4"
                         >
-                          <span className="font-medium">
-                            {onboarding.careerJobs.addButton}
+                          <Image
+                            src="/images/auth/plus.svg"
+                            alt="Add"
+                            className="h-5 w-5 md:h-6 md:w-6"
+                            width={20}
+                            height={20}
+                          />
+                          <span className="font-light text-base md:text-lg">
+                            {careerJobs.length === 0
+                              ? onboarding.careerJobs.firstAddButton
+                              : onboarding.careerJobs.addButton}
                           </span>
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
                         </button>
                       </div>
                     </div>

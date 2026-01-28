@@ -168,6 +168,7 @@ export const authContent = {
     qualifications: {
       title: "البيانات العلمية",
       emptyMessage: "لا توجد مؤهلات مسجلة",
+      firstAddButton: "إضافة درجة علمية",
       addButton: "إضافة درجة علمية أخرى",
       degreeLabel: "الدرجة العلمية*",
       institutionLabel: "المؤسسة/الجامعة*",
@@ -180,7 +181,8 @@ export const authContent = {
     careerJobs: {
       title: "البيانات الوظيفية",
       emptyMessage: "لا توجد وظائف مسجلة",
-      addButton: "إضافة وظيفة",
+      firstAddButton: "إضافة بيانات وظيفية",
+      addButton: "إضافة بيانات وظيفية أخرى",
       schoolLabel: "اسم المدرسة*",
       positionLabel: "المسمى الوظيفي*",
       rankLabel: "الدرجة الوظيفية*",
