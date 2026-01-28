@@ -5,8 +5,10 @@ interface SelectOption {
   label: string;
 }
 
-interface SelectProps
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
+interface SelectProps extends Omit<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  "children"
+> {
   label?: string;
   error?: string;
   options: SelectOption[];
@@ -16,12 +18,14 @@ interface SelectProps
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   (
     { label, error, options, placeholder, className, disabled, ...props },
-    ref
+    ref,
   ) => {
     return (
       <div className="flex flex-col gap-2">
         {label && (
-          <label className="text-base font-normal text-[#333]">{label}</label>
+          <label className="text-sm md:text-base font-normal text-[#333]">
+            {label}
+          </label>
         )}
         <div className="relative">
           <select
@@ -29,8 +33,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disabled={disabled}
             className={`
               w-full bg-white
-              ${!props.value ? "text-[#B3B3B3]" : "text-[#333]"}
-              text-sm text-right
+              text-[#333333]
+              text-xs sm:text-xs md:text-sm font-light sm:font-light md:font-normal text-right
               px-3 py-2 pr-10
               border rounded-2xl
               transition-colors duration-200
@@ -77,7 +81,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {error && <p className="text-warning-500 text-xs">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Select.displayName = "Select";

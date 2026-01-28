@@ -11,6 +11,8 @@ interface OnboardingDataModalProps {
   onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
   isLoading?: boolean;
+  isEditing?: boolean;
+  isFormValid?: boolean;
 }
 
 export function OnboardingDataModal({
@@ -21,6 +23,8 @@ export function OnboardingDataModal({
   onSubmit,
   submitLabel,
   isLoading = false,
+  isEditing = false,
+  isFormValid = true,
 }: OnboardingDataModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -56,14 +60,14 @@ export function OnboardingDataModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-xl"
+        className="bg-white rounded-[20px] md:rounded-[24px] lg:rounded-[24px] w-full max-w-md mx-4 shadow-xl"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-grey-200">
+        <div className="flex items-center justify-center p-6 border-b border-grey-200 relative">
           <button
             type="button"
             onClick={onClose}
-            className="text-grey-500 hover:text-grey-700 transition-colors"
+            className="text-grey-500 hover:text-grey-700 transition-colors absolute right-6"
           >
             <svg
               className="w-6 h-6"
@@ -79,12 +83,14 @@ export function OnboardingDataModal({
               />
             </svg>
           </button>
-          <h2 className="text-lg font-medium text-text-dark">{title}</h2>
+          <h2 className="text-base sm:text-base md:text-xl lg:text-xl font-normal text-[#333]">
+            {title}
+          </h2>
         </div>
 
         {/* Form Content */}
         <form onSubmit={onSubmit}>
-          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="p-6 space-y-5 sm:space-y-5 md:space-y-7 max-h-[60vh] overflow-y-auto">
             {children}
           </div>
 
@@ -93,8 +99,10 @@ export function OnboardingDataModal({
             <Button
               type="submit"
               isLoading={isLoading}
-              disabled={isLoading}
-              className="w-full !rounded-xl h-12"
+              disabled={isLoading || !isFormValid}
+              className={`w-full !rounded-[20px] h-12 font-light text-base ${
+                !isFormValid ? "!bg-[#EBEBEB] !text-[#666]" : ""
+              }`}
             >
               {submitLabel}
             </Button>

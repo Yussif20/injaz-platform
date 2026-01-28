@@ -538,22 +538,23 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
 
                   {/* Navigation Buttons (only for steps 2 and 3) */}
                   {currentStep !== "basicInfo" && (
-                    <div className="flex gap-4 pt-6">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleSkip}
-                        className="flex-1 rounded-full h-14"
-                      >
-                        {buttons.skip}
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={handleNext}
-                        className="flex-1 rounded-full h-14"
-                      >
-                        {buttons.next}
-                      </Button>
+                    <div className="mt-2">
+                      <div className="flex gap-3 sm:gap-3 md:gap-4">
+                        <button
+                          type="button"
+                          onClick={handleSkip}
+                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 border-2 bg-white border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100 font-light text-base lg:text-lg transition-colors duration-200"
+                        >
+                          {buttons.skip}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleNext}
+                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 font-light text-base lg:text-lg transition-colors duration-200"
+                        >
+                          {buttons.next}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -576,9 +577,19 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
         <OnboardingDataModal
           isOpen={isQualificationModalOpen}
           onClose={closeQualificationModal}
-          title={onboarding.qualifications.modalTitle}
-          submitLabel={onboarding.qualifications.saveButton}
+          title={
+            editingQualification
+              ? onboarding.qualifications.modalEditTitle
+              : onboarding.qualifications.modalTitle
+          }
+          submitLabel={
+            editingQualification
+              ? onboarding.qualifications.editButton
+              : onboarding.qualifications.saveButton
+          }
           onSubmit={qualificationForm.handleSubmit(handleQualificationSubmit)}
+          isEditing={!!editingQualification}
+          isFormValid={qualificationForm.formState.isValid}
         >
           <Select
             label={onboarding.qualifications.degreeLabel}
@@ -612,9 +623,19 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
         <OnboardingDataModal
           isOpen={isCareerModalOpen}
           onClose={closeCareerModal}
-          title={onboarding.careerJobs.title}
-          submitLabel={onboarding.qualifications.saveButton}
+          title={
+            editingCareerJob
+              ? onboarding.careerJobs.modalEditTitle
+              : onboarding.careerJobs.modalTitle
+          }
+          submitLabel={
+            editingCareerJob
+              ? onboarding.careerJobs.editButton
+              : onboarding.careerJobs.saveButton
+          }
           onSubmit={careerJobForm.handleSubmit(handleCareerJobSubmit)}
+          isEditing={!!editingCareerJob}
+          isFormValid={careerJobForm.formState.isValid}
         >
           <Input
             label={onboarding.careerJobs.schoolLabel}

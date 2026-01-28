@@ -175,8 +175,10 @@ export const authContent = {
       titleLabel: "التخصص*",
       gradeLabel: "التقدير",
       graduationDateLabel: "سنة التخرج*",
-      modalTitle: "تعديل البيانات",
-      saveButton: "حفظ التغييرات",
+      modalTitle: "بيانات علمية",
+      modalEditTitle: "تعديل البيانات",
+      saveButton: "إضافة البيانات",
+      editButton: "حفظ التغييرات",
     },
     careerJobs: {
       title: "البيانات الوظيفية",
@@ -190,6 +192,10 @@ export const authContent = {
       startYearLabel: "سنة البداية*",
       endYearLabel: "سنة النهاية",
       currentJobLabel: "الوظيفة الحالية",
+      modalTitle: "بيانات وظيفية",
+      modalEditTitle: "تعديل البيانات",
+      saveButton: "إضافة البيانات",
+      editButton: "حفظ التغييرات",
     },
   },
 };

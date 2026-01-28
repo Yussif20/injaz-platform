@@ -21,7 +21,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           className={`
             w-full bg-white text-[#333] placeholder:text-[#B3B3B3]
-            text-xs md:text-sm font-light md:font-normal text-right leading-normal
+            text-xs sm:text-xs md:text-sm font-light sm:font-light md:font-normal text-right leading-normal
             px-3 py-2
             border rounded-2xl
             transition-colors duration-200
