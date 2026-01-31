@@ -114,7 +114,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/images/landing/testimonials/avatar.svg",
+        avatar: "",
       },
       {
         id: "3",
@@ -122,7 +122,7 @@ export const landingContent = {
         text: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         name: "نورا عبدالله",
         role: "وكيلة مدرسة",
-        avatar: "/images/landing/testimonials/avatar.svg",
+        avatar: null,
       },
       {
         id: "4",

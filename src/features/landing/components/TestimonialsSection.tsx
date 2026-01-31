@@ -74,9 +74,9 @@ export const TestimonialsSection: React.FC = () => {
 
                 {/* User Info */}
                 <div className="flex items-center justify-start gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-grey-200 shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
                     <Image
-                      src={testimonial.avatar}
+                      src={testimonial.avatar || "/logo/logo-cyan.svg"}
                       alt={testimonial.name}
                       width={48}
                       height={48}
