@@ -65,6 +65,12 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     useState<Qualification | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [qualificationToDelete, setQualificationToDelete] = useState<
+    number | null
+  >(null);
+  const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   // Hooks
   const { qualifications, isLoading } = useQualifications();
@@ -151,16 +157,29 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     }
   };
 
-  const handleDeleteQualification = async (id: number) => {
+  const handleDeleteQualification = (id: number) => {
+    setQualificationToDelete(id);
+    setShowDeleteConfirm(true);
+    setActiveMenuId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (qualificationToDelete === null) return;
     setError(null);
     try {
-      const response = await deleteQualificationAsync(id);
+      const response = await deleteQualificationAsync(qualificationToDelete);
       if (!response.status) {
         setError(response.message || "فشل في حذف المؤهل");
+      } else {
+        setShowDeleteToast(true);
+        setTimeout(() => setShowDeleteToast(false), 3000);
       }
     } catch (err) {
       console.error("Delete qualification error:", err);
       setError("حدث خطأ غير متوقع");
+    } finally {
+      setShowDeleteConfirm(false);
+      setQualificationToDelete(null);
     }
   };
 
@@ -203,6 +222,24 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     return degree?.label || value;
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest("[data-qualification-menu]")) {
+        setActiveMenuId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMenu = (qualificationId: number) => {
+    setActiveMenuId((current) =>
+      current === qualificationId ? null : qualificationId,
+    );
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -229,7 +266,8 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
           >
             <div className="flex-1 text-right border-r-2 border-[#008387] pr-3">
               <p className="font-normal text-[#333] text-sm md:text-lg">
-                {getDegreeLabel(qualification.degreeType)} {qualification.title || ""}
+                {getDegreeLabel(qualification.degreeType)}{" "}
+                {qualification.title || ""}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
                 {qualification.grade || "-"}
@@ -238,11 +276,12 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
                 {formatYear(qualification.graduationDate)}
               </p>
             </div>
-            <div className="relative group">
+            <div className="relative" data-qualification-menu>
               <button
                 type="button"
                 className="p-1"
                 aria-label="خيارات"
+                onClick={() => toggleMenu(qualification.id)}
               >
                 <svg
                   className="w-5 h-5 text-grey-500"
@@ -255,22 +294,42 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
                 </svg>
               </button>
               {/* Dropdown menu */}
-              <div className="absolute hidden group-hover:block left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
-                <button
-                  type="button"
-                  onClick={() => openEditModal(qualification)}
-                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700"
-                >
-                  تعديل
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteQualification(qualification.id)}
-                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500"
-                >
-                  حذف
-                </button>
-              </div>
+              {activeMenuId === qualification.id ? (
+                <div className="absolute left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      openEditModal(qualification);
+                      setActiveMenuId(null);
+                    }}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700 flex items-center justify-start gap-1"
+                  >
+                    <Image
+                      src="/icons/ui/edit-black.svg"
+                      alt="تعديل"
+                      width={16}
+                      height={16}
+                    />
+                    <span>تعديل</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteQualification(qualification.id);
+                      setActiveMenuId(null);
+                    }}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500 flex items-center justify-start gap-1"
+                  >
+                    <Image
+                      src="/icons/ui/delete.svg"
+                      alt="حذف"
+                      width={16}
+                      height={16}
+                    />
+                    <span>حذف</span>
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         ))}
@@ -295,6 +354,79 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
           </span>
         </button>
       </div>
+
+      {/* Delete Toast */}
+      {showDeleteToast && (
+        <div
+          className="fixed bottom-4 right-4 px-6 py-3 rounded-[20px] shadow-lg z-50 w-full md:w-[660px] h-[54px] flex items-center gap-3"
+          style={{ backgroundColor: "#f3d8da" }}
+        >
+          <Image
+            src="/icons/ui/information-circle.svg"
+            alt="info"
+            width={20}
+            height={20}
+          />
+          <p className="font-light" style={{ color: "#b1363e" }}>
+            تم حذف البيانات
+          </p>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setQualificationToDelete(null);
+                  }}
+                  className="p-1 hover:bg-grey-100 rounded-lg transition-colors"
+                  aria-label="إغلاق"
+                >
+                  <svg
+                    className="w-5 h-5 text-grey-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+                <p className="text-grey-600 text-center flex-1">
+                  هل انت متأكد من حذف البيانات؟
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 rounded-[20px] bg-warning-500 text-white hover:bg-warning-600 transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? "جاري الحذف..." : "حذف البيانات"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setQualificationToDelete(null);
+                  }}
+                  className="flex-1 px-4 py-3 rounded-[20px] border border-grey-200 text-grey-700 hover:bg-grey-50 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Qualification Modal */}
       <OnboardingDataModal

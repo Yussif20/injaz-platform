@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 interface QualificationCardProps {
   degree: string;
@@ -69,9 +70,15 @@ export function QualificationCard({
                   setShowMenu(false);
                   onEdit();
                 }}
-                className="w-full px-4 py-2 text-right text-sm text-grey-700 hover:bg-grey-100 transition-colors"
+                className="w-full px-4 py-2 text-right text-sm text-grey-700 hover:bg-grey-100 transition-colors flex items-center justify-start gap-1"
               >
-                تعديل
+                <Image
+                  src="/icons/ui/edit-black.svg"
+                  alt="تعديل"
+                  width={16}
+                  height={16}
+                />
+                <span>تعديل</span>
               </button>
               <button
                 type="button"
@@ -79,9 +86,15 @@ export function QualificationCard({
                   setShowMenu(false);
                   onDelete();
                 }}
-                className="w-full px-4 py-2 text-right text-sm text-warning-500 hover:bg-grey-100 transition-colors"
+                className="w-full px-4 py-2 text-right text-sm text-warning-500 hover:bg-grey-100 transition-colors flex items-center justify-start gap-1"
               >
-                حذف
+                <Image
+                  src="/icons/ui/delete.svg"
+                  alt="حذف"
+                  width={16}
+                  height={16}
+                />
+                <span>حذف</span>
               </button>
             </div>
           )}

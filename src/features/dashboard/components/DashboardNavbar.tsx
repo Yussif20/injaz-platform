@@ -109,14 +109,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
         {/* Right side - Logo and breadcrumb (RTL: appears on right) */}
         <div className="flex items-center gap-4">
           {/* Logo */}
-          <Link
-            href={ROUTES.DASHBOARD}
-            className={`${
-              pathname === ROUTES.DASHBOARD
-                ? "hidden sm:inline-flex"
-                : "inline-flex"
-            } shrink-0`}
-          >
+          <Link href={ROUTES.DASHBOARD} className="inline-flex shrink-0">
             <Image
               src="/logo/logo-cyan.svg"
               alt={navbar.logoAlt}
@@ -129,8 +122,8 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
           {/* Breadcrumb / Welcome */}
           {pathname === ROUTES.DASHBOARD ? (
-            <div className="flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
-              <div className="w-6 h-6 md:w-13.5 md:h-13.5 rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
+            <div className="hidden md:flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
+              <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
                 <Image
                   src={user?.imageUrl || "/icons/ui/user.svg"}
                   alt="صورة الملف الشخصي"
@@ -150,7 +143,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
               </div>
             </div>
           ) : (
-            <nav className="hidden lg:flex items-center text-sm">
+            <nav className="hidden md:flex items-center text-sm">
               <Link href={ROUTES.DASHBOARD} className="ml-2">
                 <svg
                   className="w-5 h-5 text-grey-500"
@@ -173,12 +166,12 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
         {/* Left side - Logout and menu (RTL: appears on left) */}
         <div className="flex items-center gap-4">
-          {/* Logout button (desktop only) */}
+          {/* Logout button - icon only on tablet, with text on desktop */}
           <Button
             variant="warning"
             size="sm"
             onClick={() => setShowLogoutModal(true)}
-            className="hidden lg:inline-flex w-auto h-10 px-4 items-center gap-2"
+            className="hidden md:inline-flex w-auto h-10 lg:px-4 md:w-10 md:h-10 md:p-0 lg:w-auto items-center justify-center lg:gap-2"
           >
             <Image
               src="/icons/ui/logout.svg"
@@ -186,13 +179,13 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
               width={13}
               height={13}
             />
-            <span className="hidden sm:inline">{navbar.logout}</span>
+            <span className="hidden lg:inline">{navbar.logout}</span>
           </Button>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button (mobile only, hidden on tablet+) */}
           <button
             onClick={onMenuToggle}
-            className="lg:hidden p-2 hover:bg-grey-100 rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-grey-100 rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
             <svg

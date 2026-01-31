@@ -88,6 +88,12 @@
   /* Text Colors */
   --color-text-dark: #333333;
   --color-text-muted: #4d4d4d;
+
+  /* Delete Toast Background */
+  --color-toast-delete: #f3d8da;
+
+  /* Delete Toast Text */
+  --color-delete-text: #b1363e;
 }
 
 html {

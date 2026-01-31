@@ -27,7 +27,7 @@ export default function DashboardLayout({
         <DashboardSidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
         {/* Main content */}
-        <main className="flex-1 p-4 lg:p-8 lg:pr-72 min-h-[calc(100vh-5rem)]">
+        <main className="flex-1 p-4 lg:p-8 md:pr-28 lg:pr-72 min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-5rem)]">
           {children}
         </main>
       </div>

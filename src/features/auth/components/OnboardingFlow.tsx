@@ -139,6 +139,11 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       useState<QualificationData | null>(null);
     const [editingCareerJob, setEditingCareerJob] =
       useState<CareerJobData | null>(null);
+    const [showQualDeleteConfirm, setShowQualDeleteConfirm] = useState(false);
+    const [qualToDelete, setQualToDelete] = useState<string | null>(null);
+    const [showJobDeleteConfirm, setShowJobDeleteConfirm] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+    const [showDeleteToast, setShowDeleteToast] = useState(false);
 
     // Basic info form
     const basicInfoForm = useForm<BasicInfoFormData>({
@@ -256,7 +261,18 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
     };
 
     const deleteQualification = (id: string) => {
-      setQualifications((prev) => prev.filter((q) => q.id !== id));
+      setQualToDelete(id);
+      setShowQualDeleteConfirm(true);
+    };
+
+    const handleConfirmQualDelete = () => {
+      if (qualToDelete) {
+        setQualifications((prev) => prev.filter((q) => q.id !== qualToDelete));
+        setShowDeleteToast(true);
+        setTimeout(() => setShowDeleteToast(false), 3000);
+        setShowQualDeleteConfirm(false);
+        setQualToDelete(null);
+      }
     };
 
     // Modal handlers for career jobs
@@ -287,7 +303,18 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
     };
 
     const deleteCareerJob = (id: string) => {
-      setCareerJobs((prev) => prev.filter((j) => j.id !== id));
+      setJobToDelete(id);
+      setShowJobDeleteConfirm(true);
+    };
+
+    const handleConfirmJobDelete = () => {
+      if (jobToDelete) {
+        setCareerJobs((prev) => prev.filter((j) => j.id !== jobToDelete));
+        setShowDeleteToast(true);
+        setTimeout(() => setShowDeleteToast(false), 3000);
+        setShowJobDeleteConfirm(false);
+        setJobToDelete(null);
+      }
     };
 
     // Navigation
@@ -690,6 +717,132 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
             />
           </div>
         </OnboardingDataModal>
+
+        {/* Delete Toast */}
+        {showDeleteToast && (
+          <div
+            className="fixed bottom-4 right-4 px-6 py-3 rounded-[20px] shadow-lg z-50 w-full md:w-[660px] h-[54px] flex items-center gap-3"
+            style={{ backgroundColor: "#f3d8da" }}
+          >
+            <Image
+              src="/icons/ui/information-circle.svg"
+              alt="info"
+              width={20}
+              height={20}
+            />
+            <p className="font-light" style={{ color: "#b1363e" }}>
+              تم حذف البيانات
+            </p>
+          </div>
+        )}
+
+        {/* Delete Qualification Confirmation Modal */}
+        {showQualDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={() => {
+                      setShowQualDeleteConfirm(false);
+                      setQualToDelete(null);
+                    }}
+                    className="p-1 hover:bg-grey-100 rounded-lg transition-colors"
+                    aria-label="إغلاق"
+                  >
+                    <svg
+                      className="w-5 h-5 text-grey-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  <p className="text-grey-600 text-center flex-1">
+                    هل انت متأكد من حذف البيانات؟
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleConfirmQualDelete}
+                    className="flex-1 px-4 py-3 rounded-[20px] bg-warning-500 text-white hover:bg-warning-600 transition-colors"
+                  >
+                    حذف البيانات
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowQualDeleteConfirm(false);
+                      setQualToDelete(null);
+                    }}
+                    className="flex-1 px-4 py-3 rounded-[20px] border border-grey-200 text-grey-700 hover:bg-grey-50 transition-colors"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Career Job Confirmation Modal */}
+        {showJobDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={() => {
+                      setShowJobDeleteConfirm(false);
+                      setJobToDelete(null);
+                    }}
+                    className="p-1 hover:bg-grey-100 rounded-lg transition-colors"
+                    aria-label="إغلاق"
+                  >
+                    <svg
+                      className="w-5 h-5 text-grey-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  <p className="text-grey-600 text-center flex-1">
+                    هل انت متأكد من حذف البيانات؟
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleConfirmJobDelete}
+                    className="flex-1 px-4 py-3 rounded-[20px] bg-warning-500 text-white hover:bg-warning-600 transition-colors"
+                  >
+                    حذف البيانات
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowJobDeleteConfirm(false);
+                      setJobToDelete(null);
+                    }}
+                    className="flex-1 px-4 py-3 rounded-[20px] border border-grey-200 text-grey-700 hover:bg-grey-50 transition-colors"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   },

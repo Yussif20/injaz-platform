@@ -61,6 +61,10 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   const [editingJob, setEditingJob] = useState<CareerJob | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState<number | null>(null);
+  const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   // Hooks
   const { careerJobs, isLoading } = useCareerJobs();
@@ -91,6 +95,22 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
 
   const isCurrent = watch("isCurrent");
   const isSaving = isAdding || isUpdating;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest("[data-job-menu]")) {
+        setActiveMenuId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMenu = (jobId: number) => {
+    setActiveMenuId((current) => (current === jobId ? null : jobId));
+  };
 
   // Reset form when editing job changes
   useEffect(() => {
@@ -159,16 +179,29 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     }
   };
 
-  const handleDeleteJob = async (id: number) => {
+  const handleDeleteJob = (id: number) => {
+    setJobToDelete(id);
+    setShowDeleteConfirm(true);
+    setActiveMenuId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (jobToDelete === null) return;
     setError(null);
     try {
-      const response = await deleteCareerJobAsync(id);
+      const response = await deleteCareerJobAsync(jobToDelete);
       if (!response.status) {
         setError(response.message || "فشل في حذف الوظيفة");
+      } else {
+        setShowDeleteToast(true);
+        setTimeout(() => setShowDeleteToast(false), 3000);
       }
     } catch (err) {
       console.error("Delete job error:", err);
       setError("حدث خطأ غير متوقع");
+    } finally {
+      setShowDeleteConfirm(false);
+      setJobToDelete(null);
     }
   };
 
@@ -233,11 +266,12 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
                 {job.endYear || "حتى الآن"} - {job.startYear}
               </p>
             </div>
-            <div className="relative group">
+            <div className="relative" data-job-menu>
               <button
                 type="button"
                 className="p-1"
                 aria-label="خيارات"
+                onClick={() => toggleMenu(job.id)}
               >
                 <svg
                   className="w-5 h-5 text-grey-500"
@@ -250,22 +284,42 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
                 </svg>
               </button>
               {/* Dropdown menu */}
-              <div className="absolute hidden group-hover:block left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
-                <button
-                  type="button"
-                  onClick={() => openEditModal(job)}
-                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700"
-                >
-                  تعديل
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteJob(job.id)}
-                  className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500"
-                >
-                  حذف
-                </button>
-              </div>
+              {activeMenuId === job.id ? (
+                <div className="absolute left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      openEditModal(job);
+                      setActiveMenuId(null);
+                    }}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700 flex items-center justify-start gap-1"
+                  >
+                    <Image
+                      src="/icons/ui/edit-black.svg"
+                      alt="تعديل"
+                      width={16}
+                      height={16}
+                    />
+                    <span>تعديل</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteJob(job.id);
+                      setActiveMenuId(null);
+                    }}
+                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500 flex items-center justify-start gap-1"
+                  >
+                    <Image
+                      src="/icons/ui/delete.svg"
+                      alt="حذف"
+                      width={16}
+                      height={16}
+                    />
+                    <span>حذف</span>
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         ))}
@@ -290,6 +344,79 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           </span>
         </button>
       </div>
+
+      {/* Delete Toast */}
+      {showDeleteToast && (
+        <div
+          className="fixed bottom-4 right-4 px-6 py-3 rounded-[20px] shadow-lg z-50 w-full md:w-[660px] h-[54px] flex items-center gap-3"
+          style={{ backgroundColor: "#f3d8da" }}
+        >
+          <Image
+            src="/icons/ui/information-circle.svg"
+            alt="info"
+            width={20}
+            height={20}
+          />
+          <p className="font-light" style={{ color: "#b1363e" }}>
+            تم حذف البيانات
+          </p>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setJobToDelete(null);
+                  }}
+                  className="p-1 hover:bg-grey-100 rounded-lg transition-colors"
+                  aria-label="إغلاق"
+                >
+                  <svg
+                    className="w-5 h-5 text-grey-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+                <p className="text-grey-600 text-center flex-1">
+                  هل انت متأكد من حذف البيانات؟
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 rounded-[20px] bg-warning-500 text-white hover:bg-warning-600 transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? "جاري الحذف..." : "حذف البيانات"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setJobToDelete(null);
+                  }}
+                  className="flex-1 px-4 py-3 rounded-[20px] border border-grey-200 text-grey-700 hover:bg-grey-50 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Career Job Modal */}
       <OnboardingDataModal
