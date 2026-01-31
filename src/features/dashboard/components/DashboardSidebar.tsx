@@ -330,20 +330,11 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                         md:flex-col md:gap-0 md:px-2 md:py-4
                         lg:flex-row lg:gap-3 lg:px-4 lg:py-3
                         transition-colors duration-200 relative
-                        ${
-                          active
-                            ? "bg-shade-100 text-primary-500"
-                            : "text-grey-600 hover:bg-grey-50 hover:text-secondary-800"
-                        }
+                        text-grey-600 hover:text-secondary-800
+                        ${active ? "bg-shade-100" : "hover:bg-grey-50"}
                       `}
                     >
-                      <span
-                        className={
-                          active ? "text-primary-500" : "text-grey-500"
-                        }
-                      >
-                        {item.icon}
-                      </span>
+                      <span className="text-grey-500">{item.icon}</span>
                       <span className="font-normal md:hidden lg:inline">
                         {item.label}
                       </span>
