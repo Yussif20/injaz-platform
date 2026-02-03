@@ -78,7 +78,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       const rect = accountButtonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.top,
-        right: window.innerWidth - rect.left + 8, // 8px gap
+        right: window.innerWidth - rect.left + 8,
       });
     }
   }, [showAccountDropdown]);
