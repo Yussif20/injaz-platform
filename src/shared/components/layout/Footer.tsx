@@ -54,6 +54,18 @@ export const Footer = () => {
               >
                 {footer.links.howToUse}
               </Link>
+              <Link
+                href="/sign/support"
+                className="text-base font-normal hover:text-primary-300 transition-colors"
+              >
+                {footer.links.technicalSupport}
+              </Link>
+              <Link
+                href="/sign/terms-conditions"
+                className="text-base font-normal hover:text-primary-300 transition-colors"
+              >
+                {footer.links.termsConditions}
+              </Link>
             </nav>
 
             {/* Social Links */}

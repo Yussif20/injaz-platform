@@ -7,6 +7,8 @@ export const ROUTES = {
   HOME: "/",
   TERMS: "/terms",
   PRIVACY: "/privacy",
+  TERMS_CONDITIONS: "/sign/terms-conditions",
+  TECHNICAL_SUPPORT: "/sign/support",
 
   // Auth routes
   SIGN_IN: "/sign/in",
@@ -27,12 +29,17 @@ export const ROUTES = {
   DASHBOARD_ACCOUNT: "/dashboard/account",
   DASHBOARD_ACCOUNT_INFO: "/dashboard/account/info",
   DASHBOARD_ACCOUNT_PROFILE_DATA: "/dashboard/account/profile-data",
-  DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL: "/dashboard/account/profile-data/personal",
-  DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION: "/dashboard/account/profile-data/education",
-  DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER: "/dashboard/account/profile-data/career",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL:
+    "/dashboard/account/profile-data/personal",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_EDUCATION:
+    "/dashboard/account/profile-data/education",
+  DASHBOARD_ACCOUNT_PROFILE_DATA_CAREER:
+    "/dashboard/account/profile-data/career",
   DASHBOARD_ACCOUNT_SUBSCRIPTION: "/dashboard/account/subscription",
-  DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE: "/dashboard/account/subscription/manage",
-  DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY: "/dashboard/account/subscription/history",
+  DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE:
+    "/dashboard/account/subscription/manage",
+  DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY:
+    "/dashboard/account/subscription/history",
   DASHBOARD_ACCOUNT_SUPPORT: "/dashboard/account/support",
   DASHBOARD_ACCOUNT_TERMS: "/dashboard/account/terms",
   DASHBOARD_ACCOUNT_HOW_TO_USE: "/dashboard/account/how-to-use",

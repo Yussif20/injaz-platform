@@ -9,7 +9,7 @@ import {
   TestimonialsSection,
   FAQSection,
   SubscriptionSection,
-  ShareExperienceSection,
+  // ShareExperienceSection,
 } from "@/features/landing";
 
 export default function Home() {
@@ -32,7 +32,7 @@ export default function Home() {
       <SubscriptionSection />
       <FAQSection />
       <TestimonialsSection />
-      <ShareExperienceSection />
+      {/* <ShareExperienceSection /> */}
       <Footer />
     </main>
   );

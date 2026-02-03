@@ -16,7 +16,7 @@ export default function SignLayout({
 
         {/* Foreground: form overlay */}
         <div className="relative z-10 min-h-screen w-full flex items-stretch">
-          <div className="w-full lg:w-1/2 xl:w-5/12">{children}</div>
+          <div className="w-full lg:w-1/2">{children}</div>
         </div>
       </div>
 

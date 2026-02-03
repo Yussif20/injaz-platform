@@ -21,6 +21,8 @@ export const commonContent = {
       createProfile: "أنشئ ملف",
       downloadApp: "حمل التطبيق",
       howToUse: "كيفية الإستخدام",
+      technicalSupport: "الدعم الفني",
+      termsConditions: "الشروط و الأحكام",
     },
     socialLinks: {
       x: "https://x.com",
