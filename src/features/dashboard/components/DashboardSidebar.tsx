@@ -45,7 +45,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { sidebar, accountSidebar } = dashboardContent;
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    right: 0,
+  });
   const dropdownRef = useRef<HTMLLIElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -65,6 +70,17 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [showAccountDropdown]);
+
+  // Calculate dropdown position when showing
+  useEffect(() => {
+    if (showAccountDropdown && accountButtonRef.current) {
+      const rect = accountButtonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.top,
+        right: window.innerWidth - rect.left + 8, // 8px gap
+      });
+    }
   }, [showAccountDropdown]);
 
   const accountNavItems: AccountNavItem[] = [
@@ -301,6 +317,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     ref={isAccountItem ? dropdownRef : null}
                   >
                     <button
+                      ref={isAccountItem ? accountButtonRef : null}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -360,7 +377,13 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
                     {/* Account dropdown for tablet */}
                     {isAccountItem && showAccountDropdown && (
-                      <div className="hidden md:block lg:hidden absolute left-full top-0 ml-2 w-64 bg-white rounded-xl shadow-lg border border-grey-200 z-[60]">
+                      <div
+                        className="hidden md:block lg:hidden fixed w-64 bg-white rounded-xl shadow-lg border border-grey-200 z-[60] max-h-[80vh] overflow-y-auto"
+                        style={{
+                          top: dropdownPosition.top,
+                          right: dropdownPosition.right,
+                        }}
+                      >
                         <div className="p-4">
                           <ul className="space-y-1">
                             {item.submenu?.map((subitem) => {
