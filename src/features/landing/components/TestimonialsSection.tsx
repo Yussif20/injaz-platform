@@ -63,7 +63,7 @@ export const TestimonialsSection: React.FC = () => {
                 className="bg-primary-500 shadow-md rounded-2xl w-70 shrink-0 overflow-hidden flex flex-col"
               >
                 {/* Card Content - White Background */}
-                <div className="bg-white p-4 sm:p-6 flex-1 rounded-br-[2rem]">
+                <div className="bg-white p-4 sm:p-6 flex-1 rounded-br-4xl">
                   {/* Star Rating - Centered */}
                   <div className="mb-4">
                     <StarRating rating={testimonial.rating} />

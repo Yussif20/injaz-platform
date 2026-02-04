@@ -88,9 +88,24 @@ feature-name/
 | Qualifications CRUD | ✅ Done |
 | Image Management | ✅ Done |
 | Share Links | ✅ Done |
-| Profile Management | 🔶 Partial |
-| Subscriptions | 🔲 Pending |
-| Public Profile Viewer | 🔲 Pending |
+| Profile Management | ✅ Done |
+| Public Profile Viewer | ✅ Done |
+| Subscriptions | 🔶 In Progress (waiting for backend) |
+
+## Current Tasks
+
+| Task | Details |
+|------|---------|
+| Saudi phone format (+966) | Make numbers follow Saudi pattern |
+| Custom birthday calendar | Add custom calendar picker |
+| Zig-zag pattern fix | Increase slope & darken color in profile default template |
+| Achievement section responsive | Fix squished images on medium/small screens |
+| Profile data tabs responsive | Fix /dashboard/account/profile-data on mobile |
+| Profile sections image upload | Fix images not being added |
+| Career add error | Fix error when adding new career in profile data |
+| Test real endpoints | Test all features against real backend endpoints |
+
+> **Note:** Admin features handled in separate website.
 
 ## API Response Format
 

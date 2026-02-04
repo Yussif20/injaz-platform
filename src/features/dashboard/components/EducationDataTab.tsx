@@ -264,7 +264,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
             key={qualification.id}
             className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
           >
-            <div className="flex-1 text-right border-r-2 border-[#008387] pr-3">
+            <div className="flex-1 text-right border-r-2 border-primary-500 pr-3">
               <p className="font-normal text-[#333] text-sm md:text-lg">
                 {getDegreeLabel(qualification.degreeType)}{" "}
                 {qualification.title || ""}
@@ -358,7 +358,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
       {/* Delete Toast */}
       {showDeleteToast && (
         <div
-          className="fixed bottom-4 right-4 px-6 py-3 rounded-[20px] shadow-lg z-50 w-full md:w-[660px] h-[54px] flex items-center gap-3"
+          className="fixed bottom-4 right-4 px-6 py-3 rounded-[20px] shadow-lg z-50 w-full md:w-165 h-13.5 flex items-center gap-3"
           style={{ backgroundColor: "#f3d8da" }}
         >
           <Image
