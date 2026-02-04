@@ -21,16 +21,16 @@ interface DefaultPersonalInfoSectionProps {
 const ConnectorLine = ({ className }: { className?: string }) => (
   <svg
     className={className}
-    viewBox="0 0 200 400"
+    viewBox="0 0 400 400"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
   >
     <path
-      d="M100 0 C 100 50, 180 80, 180 120 S 20 180, 20 240 S 180 300, 180 340 S 100 380, 100 400"
-      stroke="#B8D8D8"
-      strokeWidth="2"
-      strokeDasharray="8 8"
+      d="M200 0 C 200 40, 380 60, 380 100 S 20 160, 20 200 S 380 260, 380 300 S 200 360, 200 400"
+      stroke="#8CBFBF"
+      strokeWidth="2.5"
+      strokeDasharray="10 8"
       fill="none"
     />
   </svg>
@@ -84,20 +84,23 @@ export const DefaultPersonalInfoSection = ({
   const birthDate = formatDate(personalInfo?.birthDate ?? null);
 
   // Card data configuration
+  // patternSide: "start" means pattern renders first in flex (right in RTL), "end" means last (left in RTL)
   const cards = [
     {
       id: "birthday",
       label: content.birthday,
       value: birthDate,
       pattern: "/images/profiles/default/birthday-pattern.svg",
-      position: "right" as const, // Card positioned right, pattern on left
+      position: "right" as const,
+      patternSide: "end" as const, // Pattern on left/inner side
     },
     {
       id: "email",
       label: content.email,
       value: personalInfo?.email,
       pattern: "/images/profiles/default/email-pattern.svg",
-      position: "left" as const, // Card positioned left, pattern on right
+      position: "left" as const,
+      patternSide: "start" as const, // Pattern on right/inner side
     },
     {
       id: "nationalId",
@@ -105,6 +108,7 @@ export const DefaultPersonalInfoSection = ({
       value: personalInfo?.nationalId,
       pattern: "/images/profiles/default/id-pattern.svg",
       position: "right" as const,
+      patternSide: "start" as const, // Pattern on right/outer side
     },
     {
       id: "origin",
@@ -112,6 +116,7 @@ export const DefaultPersonalInfoSection = ({
       value: personalInfo?.address,
       pattern: "/images/profiles/default/city-pattern.svg",
       position: "left" as const,
+      patternSide: "end" as const, // Pattern on left/inner side
     },
   ].filter((card) => card.value); // Only show cards with values
 
@@ -139,7 +144,7 @@ export const DefaultPersonalInfoSection = ({
       <div className="hidden md:block relative">
         {/* Connector Line - positioned behind cards */}
         <div className="absolute inset-0 flex justify-center pointer-events-none">
-          <ConnectorLine className="w-48 h-full opacity-60" />
+          <ConnectorLine className="w-[70%] lg:w-[65%] max-w-[600px] h-full opacity-80" />
         </div>
 
         {/* Cards */}
@@ -148,15 +153,15 @@ export const DefaultPersonalInfoSection = ({
             <div
               key={card.id}
               className={`flex ${
-                card.position === "right" ? "justify-end" : "justify-start"
+                card.position === "right" ? "justify-start" : "justify-end"
               }`}
             >
               <div
                 className="w-[320px] lg:w-[380px] rounded-[28px] lg:rounded-[36px] overflow-hidden flex"
                 style={{ backgroundColor: theme.primary }}
               >
-                {/* Pattern - Left side for right-positioned cards */}
-                {card.position === "right" && (
+                {/* Pattern - renders first (right side in RTL) */}
+                {card.patternSide === "start" && (
                   <div className="w-20 lg:w-24 shrink-0 relative">
                     <Image
                       src={card.pattern}
@@ -181,8 +186,8 @@ export const DefaultPersonalInfoSection = ({
                   </p>
                 </div>
 
-                {/* Pattern - Right side for left-positioned cards */}
-                {card.position === "left" && (
+                {/* Pattern - renders last (left side in RTL) */}
+                {card.patternSide === "end" && (
                   <div className="w-20 lg:w-24 shrink-0 relative">
                     <Image
                       src={card.pattern}
@@ -211,15 +216,15 @@ export const DefaultPersonalInfoSection = ({
             <div
               key={card.id}
               className={`flex ${
-                index % 2 === 0 ? "justify-end" : "justify-start"
+                index % 2 === 0 ? "justify-start" : "justify-end"
               }`}
             >
               <div
                 className="w-[85%] max-w-[300px] rounded-[24px] overflow-hidden flex"
                 style={{ backgroundColor: theme.primary }}
               >
-                {/* Pattern - alternates based on index */}
-                {index % 2 === 0 && (
+                {/* Pattern - renders first (right side in RTL) */}
+                {card.patternSide === "start" && (
                   <div className="w-16 shrink-0 relative">
                     <Image
                       src={card.pattern}
@@ -233,7 +238,7 @@ export const DefaultPersonalInfoSection = ({
                 {/* Content */}
                 <div
                   className={`flex-1 flex flex-col justify-center py-4 px-4 ${
-                    index % 2 === 0 ? "text-right" : "text-left"
+                    card.position === "right" ? "text-right" : "text-left"
                   }`}
                 >
                   <h3 className="text-white text-sm font-semibold mb-1">
@@ -244,8 +249,8 @@ export const DefaultPersonalInfoSection = ({
                   </p>
                 </div>
 
-                {/* Pattern - alternates based on index */}
-                {index % 2 !== 0 && (
+                {/* Pattern - renders last (left side in RTL) */}
+                {card.patternSide === "end" && (
                   <div className="w-16 shrink-0 relative">
                     <Image
                       src={card.pattern}
