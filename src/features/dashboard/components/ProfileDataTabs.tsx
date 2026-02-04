@@ -29,6 +29,28 @@ interface ProfileDataTabsProps {
   initialTab?: ProfileDataTabId;
 }
 
+// Edit button component to avoid duplication
+const EditButton: React.FC<{
+  isEditing: boolean;
+  onClick: () => void;
+  cancelText: string;
+  editText: string;
+  className?: string;
+}> = ({ isEditing, onClick, cancelText, editText, className = "" }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex items-center gap-2 transition-colors ${
+      isEditing
+        ? "text-warning-500 hover:text-warning-700"
+        : "text-primary-500 hover:text-primary-700"
+    } ${className}`}
+  >
+    <Image src="/icons/ui/edit.svg" alt="edit" width={24} height={24} />
+    <span className="text-lg font-light">{isEditing ? cancelText : editText}</span>
+  </button>
+);
+
 export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
   initialTab = "myData",
 }) => {
@@ -61,10 +83,27 @@ export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
     setIsEditing(false);
   };
 
+  // Mobile edit button to pass to ProfileDataTab
+  const mobileEditButton = (
+    <EditButton
+      isEditing={isEditing}
+      onClick={toggleEditMode}
+      cancelText={profileData.cancel}
+      editText={profileData.edit}
+      className="md:hidden"
+    />
+  );
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "myData":
-        return <ProfileDataTab isEditing={isEditing} onSave={handleSave} />;
+        return (
+          <ProfileDataTab
+            isEditing={isEditing}
+            onSave={handleSave}
+            mobileEditButton={mobileEditButton}
+          />
+        );
       case "education":
         return <EducationDataTab isEditing={isEditing} onSave={handleSave} />;
       case "job":
@@ -84,25 +123,13 @@ export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
         className="mb-6"
         rightContent={
           activeTab === "myData" ? (
-            <button
-              type="button"
+            <EditButton
+              isEditing={isEditing}
               onClick={toggleEditMode}
-              className={`flex items-center gap-2 transition-colors ${
-                isEditing
-                  ? "text-warning-500 hover:text-warning-700"
-                  : "text-primary-500 hover:text-primary-700"
-              }`}
-            >
-              <Image
-                src="/icons/ui/edit.svg"
-                alt="edit"
-                width={24}
-                height={24}
-              />
-              <span className="text-lg font-light">
-                {isEditing ? profileData.cancel : profileData.edit}
-              </span>
-            </button>
+              cancelText={profileData.cancel}
+              editText={profileData.edit}
+              className="hidden md:flex"
+            />
           ) : null
         }
       />

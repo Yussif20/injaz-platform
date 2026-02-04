@@ -44,6 +44,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { logout, isLoading: isLoggingOut } = useLogout();
   const { sidebar, accountSidebar } = dashboardContent;
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [expandedNestedMenus, setExpandedNestedMenus] = useState<string[]>([]);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
@@ -51,6 +52,24 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   });
   const dropdownRef = useRef<HTMLLIElement>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-expand nested menus based on current path (mobile)
+  useEffect(() => {
+    const menusToExpand: string[] = [];
+    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION)) {
+      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION);
+    }
+    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA)) {
+      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA);
+    }
+    setExpandedNestedMenus(menusToExpand);
+  }, [pathname]);
+
+  const toggleNestedMenu = (href: string) => {
+    setExpandedNestedMenus((prev) =>
+      prev.includes(href) ? prev.filter((m) => m !== href) : [...prev, href]
+    );
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -502,40 +521,122 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                           const subActive = isAccountLinkActive(subitem);
                           const hasNestedSubmenu =
                             subitem.submenu && subitem.submenu.length > 0;
-
-                          // For items with nested submenu (like subscription), navigate to first nested item
-                          const targetHref = hasNestedSubmenu
-                            ? subitem.submenu![0].href
-                            : subitem.href;
+                          const isNestedExpanded = expandedNestedMenus.includes(
+                            subitem.href
+                          );
 
                           return (
                             <li key={subitem.href}>
-                              <Link
-                                href={targetHref}
-                                onClick={onClose}
-                                className={`
-                                  flex items-center gap-3 px-4 py-2 rounded-lg
-                                  transition-colors duration-200 text-sm
-                                  ${
-                                    subActive
-                                      ? "text-primary-500 bg-shade-50"
-                                      : "text-grey-600 hover:text-secondary-800"
-                                  }
-                                `}
-                              >
-                                <span
-                                  className={
-                                    subActive
-                                      ? "text-primary-500"
-                                      : "text-grey-400"
-                                  }
+                              {hasNestedSubmenu ? (
+                                // Item with nested submenu
+                                <div>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleNestedMenu(subitem.href)}
+                                    className={`
+                                      w-full flex items-center gap-3 px-4 py-2 rounded-lg
+                                      transition-colors duration-200 text-sm
+                                      ${
+                                        subActive
+                                          ? "text-primary-500 bg-shade-50"
+                                          : "text-grey-600 hover:text-secondary-800"
+                                      }
+                                    `}
+                                  >
+                                    <span
+                                      className={
+                                        subActive
+                                          ? "text-primary-500"
+                                          : "text-grey-400"
+                                      }
+                                    >
+                                      {subitem.icon}
+                                    </span>
+                                    <span className="font-normal">
+                                      {subitem.label}
+                                    </span>
+                                    <svg
+                                      className={`w-4 h-4 mr-auto transition-transform ${
+                                        isNestedExpanded ? "rotate-180" : ""
+                                      }`}
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 9l-7 7-7-7"
+                                      />
+                                    </svg>
+                                  </button>
+
+                                  {/* Nested submenu */}
+                                  {isNestedExpanded && (
+                                    <ul className="mt-1 mr-7 space-y-1">
+                                      {subitem.submenu?.map((nestedItem) => {
+                                        const nestedActive =
+                                          pathname === nestedItem.href;
+                                        return (
+                                          <li key={nestedItem.href}>
+                                            <Link
+                                              href={nestedItem.href}
+                                              onClick={onClose}
+                                              className={`
+                                                flex items-center gap-2 px-4 py-2 rounded-lg
+                                                transition-colors duration-200 text-sm
+                                                ${
+                                                  nestedActive
+                                                    ? "text-primary-500 bg-shade-50"
+                                                    : "text-grey-500 hover:text-secondary-800 hover:bg-grey-50"
+                                                }
+                                              `}
+                                            >
+                                              <span
+                                                className={`w-1.5 h-1.5 rounded-full ${
+                                                  nestedActive
+                                                    ? "bg-primary-500"
+                                                    : "bg-grey-300"
+                                                }`}
+                                              />
+                                              <span>{nestedItem.label}</span>
+                                            </Link>
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  )}
+                                </div>
+                              ) : (
+                                // Regular item without nested submenu
+                                <Link
+                                  href={subitem.href}
+                                  onClick={onClose}
+                                  className={`
+                                    flex items-center gap-3 px-4 py-2 rounded-lg
+                                    transition-colors duration-200 text-sm
+                                    ${
+                                      subActive
+                                        ? "text-primary-500 bg-shade-50"
+                                        : "text-grey-600 hover:text-secondary-800"
+                                    }
+                                  `}
                                 >
-                                  {subitem.icon}
-                                </span>
-                                <span className="font-normal">
-                                  {subitem.label}
-                                </span>
-                              </Link>
+                                  <span
+                                    className={
+                                      subActive
+                                        ? "text-primary-500"
+                                        : "text-grey-400"
+                                    }
+                                  >
+                                    {subitem.icon}
+                                  </span>
+                                  <span className="font-normal">
+                                    {subitem.label}
+                                  </span>
+                                </Link>
+                              )}
                             </li>
                           );
                         })}

@@ -26,11 +26,13 @@ type MyDataFormData = z.infer<typeof myDataSchema>;
 interface ProfileDataTabProps {
   isEditing: boolean;
   onSave?: () => void;
+  mobileEditButton?: React.ReactNode;
 }
 
 export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
   isEditing,
   onSave,
+  mobileEditButton,
 }) => {
   const { profileData } = dashboardContent;
   const [error, setError] = useState<string | null>(null);
@@ -127,9 +129,12 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
 
         {/* General Data Section */}
         <div>
-          <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-            {profileData.generalData}
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-primary-500 text-lg font-medium text-right">
+              {profileData.generalData}
+            </h3>
+            {mobileEditButton}
+          </div>
           <div className="space-y-4">
             <Input
               label={`${profileData.fields.nationalId}*`}
@@ -192,9 +197,12 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
     <div className="space-y-6">
       {/* General Data Section */}
       <div>
-        <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-          {profileData.generalData}
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-primary-500 text-lg font-medium text-right">
+            {profileData.generalData}
+          </h3>
+          {mobileEditButton}
+        </div>
         <div className="bg-shade-100 rounded-xl py-5 px-6 space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
