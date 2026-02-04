@@ -33,9 +33,9 @@ export interface PersonalInfo {
  */
 export interface UpdatePersonalInfoRequest {
   rankId?: number;
-  nationalId?: string;  // 14 digits
-  birthDate?: string;   // ISO date - Required by backend for full update
-  address?: string;     // Max 500 chars - Required by backend for full update
+  nationalId?: string; // 14 digits
+  birthDate?: string; // ISO date - Required by backend for full update
+  address?: string; // Max 500 chars - Required by backend for full update
   email?: string;
 }
 
@@ -51,7 +51,7 @@ export interface Qualification {
   degreeType: string | null;
   title: string | null;
   grade: string | null;
-  graduationDate: string;  // ISO date
+  graduationDate: string; // ISO date
 }
 
 /**
@@ -61,7 +61,7 @@ export interface CreateQualificationRequest {
   degreeType?: string;
   title?: string;
   grade?: string;
-  graduationDate: string;  // ISO date - Required
+  graduationDate: string; // ISO date - Required
 }
 
 /**
@@ -71,7 +71,7 @@ export interface UpdateQualificationRequest {
   degreeType?: string;
   title?: string;
   grade?: string;
-  graduationDate: string;  // ISO date - Required
+  graduationDate: string; // ISO date - Required
 }
 
 // ============================================
@@ -95,11 +95,10 @@ export interface CareerJob {
  * Request body for POST /api/my-career-jobs
  */
 export interface CreateCareerJobRequest {
-  title: string;           // 1-200 chars
-  rank: string;            // 1-100 chars
-  school: string;          // 1-200 chars
+  rank: string; // 1-100 chars
+  school: string; // 1-200 chars
   educationalStage: string; // 1-100 chars
-  startYear: number;       // 1900-2100
+  startYear: number; // 1900-2100
   endYear?: number | null; // 1900-2100, null if current
 }
 
@@ -107,11 +106,10 @@ export interface CreateCareerJobRequest {
  * Request body for PUT /api/my-career-jobs/{id}
  */
 export interface UpdateCareerJobRequest {
-  title: string;           // 1-200 chars
-  rank: string;            // 1-100 chars
-  school: string;          // 1-200 chars
+  rank: string; // 1-100 chars
+  school: string; // 1-200 chars
   educationalStage: string; // 1-100 chars
-  startYear: number;       // 1900-2100
+  startYear: number; // 1900-2100
   endYear?: number | null; // 1900-2100, null if current
 }
 
@@ -170,7 +168,7 @@ export interface UserProfile {
   id: number;
   phone: string | null;
   fullName: string | null;
-  gender: number;  // 1 = Male, 2 = Female (backend values)
+  gender: number; // 1 = Male, 2 = Female (backend values)
   role: string | null;
   imageUrl: string | null;
   personalInfo: PersonalInfo | null;
@@ -203,7 +201,7 @@ export interface BasicUserInfo {
  */
 export interface UpdateBasicInfoRequest {
   fullName?: string;
-  gender?: number;  // 1 = Male, 2 = Female
+  gender?: number; // 1 = Male, 2 = Female
 }
 
 // ============================================
@@ -256,7 +254,10 @@ export interface MeApiResponse<T> {
 /**
  * Get display-friendly gender label
  */
-export function getGenderLabel(gender: number | null | undefined, locale: "ar" | "en" = "ar"): string {
+export function getGenderLabel(
+  gender: number | null | undefined,
+  locale: "ar" | "en" = "ar",
+): string {
   if (gender === 1) return locale === "ar" ? "ذكر" : "Male";
   if (gender === 2) return locale === "ar" ? "أنثى" : "Female";
   return locale === "ar" ? "غير محدد" : "Not specified";
@@ -265,7 +266,9 @@ export function getGenderLabel(gender: number | null | undefined, locale: "ar" |
 /**
  * Convert backend gender (1=Male, 2=Female) to form value
  */
-export function genderToFormValue(gender: number | null | undefined): "male" | "female" | "" {
+export function genderToFormValue(
+  gender: number | null | undefined,
+): "male" | "female" | "" {
   if (gender === 1) return "male";
   if (gender === 2) return "female";
   return "";
@@ -274,7 +277,9 @@ export function genderToFormValue(gender: number | null | undefined): "male" | "
 /**
  * Convert form value to backend gender
  */
-export function formValueToGender(value: "male" | "female" | ""): number | undefined {
+export function formValueToGender(
+  value: "male" | "female" | "",
+): number | undefined {
   if (value === "male") return 1;
   if (value === "female") return 2;
   return undefined;
@@ -296,9 +301,14 @@ export function formatDate(dateString: string | null | undefined): string {
 /**
  * Get rank title based on gender
  */
-export function getRankTitle(personalInfo: PersonalInfo | null, gender: number): string {
+export function getRankTitle(
+  personalInfo: PersonalInfo | null,
+  gender: number,
+): string {
   if (!personalInfo) return "";
-  if (gender === 1 && personalInfo.rankTitleMale) return personalInfo.rankTitleMale;
-  if (gender === 2 && personalInfo.rankTitleFemale) return personalInfo.rankTitleFemale;
+  if (gender === 1 && personalInfo.rankTitleMale)
+    return personalInfo.rankTitleMale;
+  if (gender === 2 && personalInfo.rankTitleFemale)
+    return personalInfo.rankTitleFemale;
   return personalInfo.rankTitle || "";
 }

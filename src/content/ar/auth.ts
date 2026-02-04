@@ -186,7 +186,7 @@ export const authContent = {
       firstAddButton: "إضافة بيانات وظيفية",
       addButton: "إضافة بيانات وظيفية أخرى",
       schoolLabel: "اسم المدرسة*",
-      positionLabel: "المسمى الوظيفي*",
+      positionLabel: "المسمى الوظيفي",
       rankLabel: "الدرجة الوظيفية*",
       stageLabel: "المرحلة التعليمية*",
       startYearLabel: "سنة البداية*",

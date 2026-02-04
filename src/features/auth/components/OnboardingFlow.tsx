@@ -29,7 +29,7 @@ const basicInfoSchema = z.object({
   nationalId: z
     .string()
     .min(1, "رقم الهوية مطلوب")
-    .regex(/^\d{10,14}$/, "رقم الهوية يجب أن يكون بين 10-14 رقم"),
+    .regex(/^\d{10}$/, "رقم الهوية يجب أن يكون 10 أرقام"),
   address: z.string().min(1, "المنشأ مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
   email: z
@@ -55,7 +55,6 @@ interface QualificationData {
 interface CareerJobData {
   id: string;
   school: string;
-  position: string;
   rank: string;
   stage: string;
   startYear: number;
@@ -76,7 +75,6 @@ type QualificationFormData = z.infer<typeof qualificationSchema>;
 // Career job form schema
 const careerJobSchema = z.object({
   school: z.string().min(1, "اسم المدرسة مطلوب"),
-  position: z.string().min(1, "المسمى الوظيفي مطلوب"),
   rank: z.string().min(1, "الدرجة الوظيفية مطلوبة"),
   stage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
   startYear: z.string().min(1, "سنة البداية مطلوبة"),
@@ -174,7 +172,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       resolver: zodResolver(careerJobSchema),
       defaultValues: {
         school: "",
-        position: "",
         rank: "",
         stage: "",
         startYear: "",
@@ -214,7 +211,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       const jobData: CareerJobData = {
         id: editingCareerJob?.id || generateId(),
         school: data.school,
-        position: data.position,
         rank: data.rank,
         stage: data.stage,
         startYear: parseInt(data.startYear),
@@ -286,7 +282,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       setEditingCareerJob(job);
       careerJobForm.reset({
         school: job.school,
-        position: job.position,
         rank: job.rank,
         stage: job.stage,
         startYear: job.startYear.toString(),
@@ -529,7 +524,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         {careerJobs.map((job) => (
                           <QualificationCard
                             key={job.id}
-                            degree={job.position}
+                            degree={job.rank}
                             institution={job.school}
                             year={
                               job.isCurrent
@@ -669,12 +664,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
             placeholder="اسم المدرسة"
             error={careerJobForm.formState.errors.school?.message}
             {...careerJobForm.register("school")}
-          />
-          <Input
-            label={onboarding.careerJobs.positionLabel}
-            placeholder="المسمى الوظيفي"
-            error={careerJobForm.formState.errors.position?.message}
-            {...careerJobForm.register("position")}
           />
           <Input
             label={onboarding.careerJobs.rankLabel}

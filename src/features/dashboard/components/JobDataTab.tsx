@@ -19,7 +19,6 @@ import type { CareerJob, CreateCareerJobRequest } from "../types/me.types";
 // Validation schema for single job form
 const jobSchema = z.object({
   school: z.string().min(1, "اسم المدرسة مطلوب"),
-  title: z.string().min(1, "المسمى الوظيفي مطلوب"),
   rank: z.string().min(1, "الدرجة الوظيفية مطلوبة"),
   educationalStage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
   startYear: z.string().min(1, "سنة البداية مطلوبة"),
@@ -84,7 +83,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     mode: "onChange",
     defaultValues: {
       school: "",
-      title: "",
       rank: "",
       educationalStage: "",
       startYear: "",
@@ -117,7 +115,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     if (editingJob) {
       reset({
         school: editingJob.school || "",
-        title: editingJob.title || "",
         rank: editingJob.rank || "",
         educationalStage: editingJob.educationalStage || "",
         startYear: editingJob.startYear?.toString() || "",
@@ -127,7 +124,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     } else {
       reset({
         school: "",
-        title: "",
         rank: "",
         educationalStage: "",
         startYear: "",
@@ -142,7 +138,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     try {
       const requestData: CreateCareerJobRequest = {
         school: data.school,
-        title: data.title,
         rank: data.rank,
         educationalStage: data.educationalStage,
         startYear: parseInt(data.startYear),
@@ -209,7 +204,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     setEditingJob(null);
     reset({
       school: "",
-      title: "",
       rank: "",
       educationalStage: "",
       startYear: "",
@@ -257,7 +251,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           >
             <div className="flex-1 text-right border-r-2 border-[#008387] pr-3">
               <p className="font-normal text-[#333] text-sm md:text-lg">
-                {job.title || "وظيفة"} - {job.rank || ""}
+                {job.rank || "وظيفة"}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
                 {job.school || "-"} - {job.educationalStage || ""}
@@ -442,12 +436,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           placeholder="اسم المدرسة"
           error={errors.school?.message}
           {...register("school")}
-        />
-        <Input
-          label={onboarding.careerJobs.positionLabel}
-          placeholder="المسمى الوظيفي"
-          error={errors.title?.message}
-          {...register("title")}
         />
         <Input
           label={onboarding.careerJobs.rankLabel}

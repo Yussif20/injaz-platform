@@ -329,7 +329,7 @@ export function RegisterForm() {
                   }
                 `}
                 style={{
-                  backgroundImage: "url('/pages/sign/arrow-down.svg')",
+                  backgroundImage: "url('/icons/ui/arrow-down.svg')",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "left 0.75rem center",
                   backgroundSize: "16px 16px",

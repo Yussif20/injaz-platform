@@ -12,7 +12,10 @@ import type { UpdatePersonalInfoRequest } from "../types/me.types";
 
 // Validation schema
 const myDataSchema = z.object({
-  nationalId: z.string().min(1, "رقم الهوية مطلوب"),
+  nationalId: z
+    .string()
+    .min(1, "رقم الهوية مطلوب")
+    .regex(/^\d{10}$/, "رقم الهوية يجب أن يكون 10 أرقام"),
   address: z.string().min(1, "العنوان مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
   email: z.string().email("البريد الإلكتروني غير صالح").or(z.literal("")),
@@ -34,7 +37,8 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
 
   // Hooks
   const { profile, isLoading } = useMyProfile();
-  const { updatePersonalInfoAsync, isLoading: isSaving } = useUpdatePersonalInfo();
+  const { updatePersonalInfoAsync, isLoading: isSaving } =
+    useUpdatePersonalInfo();
 
   const personalInfo = profile?.personalInfo;
 
@@ -59,7 +63,9 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
       reset({
         nationalId: personalInfo.nationalId || "",
         address: personalInfo.address || "",
-        birthDate: personalInfo.birthDate ? personalInfo.birthDate.split("T")[0] : "",
+        birthDate: personalInfo.birthDate
+          ? personalInfo.birthDate.split("T")[0]
+          : "",
         email: personalInfo.email || "",
       });
     }
