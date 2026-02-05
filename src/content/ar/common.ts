@@ -29,8 +29,17 @@ export const commonContent = {
       whatsapp: "https://wa.me",
       tiktok: "https://tiktok.com",
       instagram: "https://instagram.com",
+      facebook: "https://facebook.com",
+      snapchat: "https://snapchat.com",
     },
     downloadApp: "حمل التطبيق",
+    quickLinks: "روابط سريعة",
+    contactUs: "تواصل معنا",
+    followUs: "تابعنا على",
+    phone: "الجوال",
+    email: "البريد الإلكتروني",
+    phoneNumber: "+966 1234567891",
+    emailAddress: "enjazmuallim@gmail.com",
   },
 
   comingSoon: {

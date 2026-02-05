@@ -101,7 +101,7 @@ export default function ProfilePreviewPage() {
       if (backButton) backButton.style.visibility = "hidden";
       if (themeButton) themeButton.style.visibility = "hidden";
 
-      // Capture the content
+      // Capture the content with color format workaround
       const canvas = await html2canvas(contentRef.current, {
         scale: 2,
         useCORS: true,
@@ -109,6 +109,39 @@ export default function ProfilePreviewPage() {
         backgroundColor: theme.background,
         scrollY: -window.scrollY,
         windowHeight: contentRef.current.scrollHeight,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Force all elements to use computed RGB colors instead of oklab
+          const allElements = clonedDoc.body.querySelectorAll("*");
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              const computed = window.getComputedStyle(el);
+
+              // Apply computed colors as inline styles to override oklab
+              if (computed.color) {
+                el.style.color = computed.color;
+              }
+              if (
+                computed.backgroundColor &&
+                computed.backgroundColor !== "rgba(0, 0, 0, 0)"
+              ) {
+                el.style.backgroundColor = computed.backgroundColor;
+              }
+              if (computed.borderTopColor) {
+                el.style.borderTopColor = computed.borderTopColor;
+              }
+              if (computed.borderRightColor) {
+                el.style.borderRightColor = computed.borderRightColor;
+              }
+              if (computed.borderBottomColor) {
+                el.style.borderBottomColor = computed.borderBottomColor;
+              }
+              if (computed.borderLeftColor) {
+                el.style.borderLeftColor = computed.borderLeftColor;
+              }
+            }
+          });
+        },
       });
 
       // Show buttons again
