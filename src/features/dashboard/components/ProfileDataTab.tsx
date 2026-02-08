@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
-import { Button, Input } from "@/shared/components/ui";
+import { Button, DatePicker, Input } from "@/shared/components/ui";
 import { DataCard } from "./DataCard";
 import { useMyProfile, useUpdatePersonalInfo } from "../hooks";
 import type { UpdatePersonalInfoRequest } from "../types/me.types";
@@ -48,6 +48,8 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isDirty },
   } = useForm<MyDataFormData>({
     resolver: zodResolver(myDataSchema),
@@ -146,13 +148,16 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
               error={errors.address?.message}
               {...register("address")}
             />
-            <Input
+            <DatePicker
               label={`${profileData.fields.birthDate}*`}
-              type="date"
-              dir="ltr"
-              className="text-left"
+              value={watch("birthDate")}
+              onChange={(val) =>
+                setValue("birthDate", val, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
               error={errors.birthDate?.message}
-              {...register("birthDate")}
             />
             <Input
               label={profileData.fields.workEmail}
