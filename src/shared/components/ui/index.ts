@@ -6,6 +6,7 @@ export { Accordion } from "./Accordion";
 export type { AccordionItem } from "./Accordion";
 export { Button } from "./Button";
 export { ConfirmModal } from "./ConfirmModal";
+export { DatePicker } from "./DatePicker";
 export { Input } from "./Input";
 export { Select } from "./Select";
 export { Tabs } from "./Tabs";

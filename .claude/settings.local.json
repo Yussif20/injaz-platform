@@ -17,7 +17,10 @@
       "Bash(npm run lint)",
       "Bash(npm run build:*)",
       "Bash(tree:*)",
-      "Bash(ls -la \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\public\\\\icons\"\" 2>/dev/null || echo \"Directory not found \")"
+      "Bash(ls -la \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\public\\\\icons\"\" 2>/dev/null || echo \"Directory not found \")",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_evaluate"
     ]
   },
   "enableAllProjectMcpServers": true,

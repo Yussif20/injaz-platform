@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { Button, Input, Select } from "@/shared/components/ui";
+import { Button, DatePicker, Input, Select } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
 import {
@@ -416,18 +416,21 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             }
                             {...basicInfoForm.register("address")}
                           />
-                          <Input
+                          <DatePicker
                             label={onboarding.basicInfo.birthDateLabel}
                             placeholder={
                               onboarding.basicInfo.birthDatePlaceholder
                             }
-                            type="date"
-                            dir="ltr"
-                            className="text-left"
+                            value={basicInfoForm.watch("birthDate")}
+                            onChange={(val) =>
+                              basicInfoForm.setValue("birthDate", val, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }
                             error={
                               basicInfoForm.formState.errors.birthDate?.message
                             }
-                            {...basicInfoForm.register("birthDate")}
                           />
                           <Input
                             label={onboarding.basicInfo.emailLabel}
