@@ -1,0 +1,10 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome to Injaz",
+  "sidebar": {
+    "home": "Home",
+    "users": "Users",
+    "settings": "Settings",
+    "reports": "Reports"
+  }
+}

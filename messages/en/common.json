@@ -1,0 +1,15 @@
+{
+  "appName": "Injaz",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search"
+  },
+  "status": {
+    "loading": "Loading...",
+    "success": "Operation completed successfully",
+    "error": "An error occurred"
+  }
+}
