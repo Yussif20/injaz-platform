@@ -125,7 +125,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
             <div className="hidden md:flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
               <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
                 <Image
-                  src={user?.imageUrl || "/icons/ui/user.svg"}
+                  src={user?.profileImage || "/icons/ui/user.svg"}
                   alt="صورة الملف الشخصي"
                   width={54}
                   height={54}
