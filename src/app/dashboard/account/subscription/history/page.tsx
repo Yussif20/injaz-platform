@@ -7,8 +7,7 @@ import { dashboardContent } from "@/content";
 export default function SubscriptionHistoryPage() {
   const { subscription } = dashboardContent;
 
-  // TODO: BYPASS - Remove before production
-  // Mock data - empty history for now
+  // TODO: Replace with real subscription history from API
   const subscriptionHistory: Array<{
     id: number;
     plan: string;

@@ -1,11 +1,8 @@
 /**
  * Templates service - Client-side API calls for template management
- * TODO: BYPASS - Remove bypass logic before production
  */
 
 import { clientApi } from "@/shared/lib/api";
-import { isBypassUser } from "@/shared/lib/bypass-storage";
-import { MOCK_TEMPLATES, getMockTemplateById } from "@/shared/lib/mock-data";
 import type {
   Template,
   TemplateSummary,
@@ -20,18 +17,8 @@ import type { ProfileResponse } from "../types/profile.types";
 
 /**
  * Get all available templates
- * TODO: BYPASS - Uses mock data for bypass user
  */
 export async function getTemplates(): Promise<TemplatesResponse> {
-  // TODO: BYPASS - Remove before production
-  if (isBypassUser()) {
-    return {
-      status: true,
-      message: "Test bypass - Templates fetched",
-      data: MOCK_TEMPLATES,
-    };
-  }
-
   // When backend endpoint is ready, use this:
   // const response = await clientApi.get<TemplatesResponse>("/api/templates");
   // return response.data;
@@ -47,18 +34,8 @@ export async function getTemplates(): Promise<TemplatesResponse> {
 
 /**
  * Get template summaries (lightweight list for selectors)
- * TODO: BYPASS - Uses mock data for bypass user
  */
 export async function getTemplateSummaryList(): Promise<{ status: boolean; message: string; data?: TemplateSummary[] }> {
-  // TODO: BYPASS - Remove before production
-  if (isBypassUser()) {
-    return {
-      status: true,
-      message: "Test bypass - Template summaries fetched",
-      data: getTemplateSummaries(),
-    };
-  }
-
   // When backend endpoint is ready, use this:
   // const response = await clientApi.get<{ status: boolean; message: string; data?: TemplateSummary[] }>("/api/templates/summaries");
   // return response.data;
@@ -73,26 +50,8 @@ export async function getTemplateSummaryList(): Promise<{ status: boolean; messa
 
 /**
  * Get a single template by ID
- * TODO: BYPASS - Uses mock data for bypass user
  */
 export async function getTemplateById(templateId: number): Promise<TemplateResponse> {
-  // TODO: BYPASS - Remove before production
-  if (isBypassUser()) {
-    const template = getMockTemplateById(templateId);
-    if (template) {
-      return {
-        status: true,
-        message: "Test bypass - Template fetched",
-        data: template,
-      };
-    }
-    return {
-      status: false,
-      message: "Template not found",
-      errors: ["Template not found"],
-    };
-  }
-
   // When backend endpoint is ready, use this:
   // const response = await clientApi.get<TemplateResponse>(`/api/templates/${templateId}`);
   // return response.data;
@@ -116,17 +75,6 @@ export async function updateProfileTemplate(
   profileId: number,
   templateId: number
 ): Promise<ProfileResponse> {
-  // TODO: BYPASS - Remove before production
-  if (isBypassUser()) {
-    // For bypass mode, we just return success
-    // The actual profile update is handled by bypass-storage
-    return {
-      status: true,
-      message: "Test bypass - Template updated",
-      data: undefined, // Profile will be refetched
-    };
-  }
-
   const requestBody: UpdateProfileTemplateRequest = {
     templateId,
   };

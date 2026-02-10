@@ -7,8 +7,6 @@ import type { NextRequest } from "next/server";
 
 // Cookie name for auth token
 const AUTH_COOKIE = "auth_token";
-// TODO: BYPASS - Remove before production
-const BYPASS_COOKIE = "bypass_auth";
 
 // Routes that require authentication
 const PROTECTED_ROUTES = [
@@ -27,11 +25,8 @@ const AUTH_ROUTES = [
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(AUTH_COOKIE)?.value;
-  // TODO: BYPASS - Remove before production
-  const bypassAuth = request.cookies.get(BYPASS_COOKIE)?.value === "true";
 
-  // Check if user is authenticated (either real token or bypass)
-  const isAuthenticated = !!token || bypassAuth;
+  const isAuthenticated = !!token;
 
   // Check if it's a protected route
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>

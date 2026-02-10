@@ -89,7 +89,7 @@ export interface UpdateProfileTemplateRequest {
 
 // ============================================
 // Default Template Configurations
-// These are used for bypass mode and as fallbacks
+// These are used as fallbacks when backend templates endpoint is not available
 // ============================================
 
 export const TEMPLATE_CONFIGS: Record<TemplateId, Template> = {

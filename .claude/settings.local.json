@@ -20,7 +20,9 @@
       "Bash(ls -la \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\public\\\\icons\"\" 2>/dev/null || echo \"Directory not found \")",
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__puppeteer__puppeteer_screenshot",
-      "mcp__puppeteer__puppeteer_evaluate"
+      "mcp__puppeteer__puppeteer_evaluate",
+      "Bash(del \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\src\\\\shared\\\\lib\\\\mock-data.ts\")",
+      "Bash(del \"E:\\\\current\\\\the client\\\\injaz-almoalem\\\\src\\\\shared\\\\lib\\\\bypass-storage.ts\")"
     ]
   },
   "enableAllProjectMcpServers": true,
