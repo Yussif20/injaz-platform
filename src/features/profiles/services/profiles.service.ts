@@ -4,9 +4,6 @@
 
 import { clientApi } from "@/shared/lib/api";
 import type {
-  Profile,
-  ProfileDetails,
-  ProfileSaveValidation,
   CreateProfileRequest,
   UpdateAcademicYearRequest,
   UpdateProfileTypeRequest,

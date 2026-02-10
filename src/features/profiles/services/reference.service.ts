@@ -4,9 +4,6 @@
 
 import { clientApi } from "@/shared/lib/api";
 import type {
-  AcademicYear,
-  ProfileType,
-  Rank,
   AcademicYearsResponse,
   ProfileTypesResponse,
   ProfileTypeResponse,

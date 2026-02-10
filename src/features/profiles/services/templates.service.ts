@@ -4,7 +4,6 @@
 
 import { clientApi } from "@/shared/lib/api";
 import type {
-  Template,
   TemplateSummary,
   TemplatesResponse,
   TemplateResponse,

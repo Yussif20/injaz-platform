@@ -9,7 +9,6 @@ import type {
   UpdatePersonalInfoRequest,
   UpdateBasicInfoRequest,
   ChangePasswordRequest,
-  MeApiResponse,
 } from "../types/me.types";
 
 // Response types
