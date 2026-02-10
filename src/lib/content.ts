@@ -112,6 +112,14 @@ export const content = {
       noOffers: "لا يوجد",
       viewFiles: "عرض ملفات السنة",
     },
+    terms: {
+      title: "الشروط والأحكام",
+      textContent: "محتوى النص",
+      save: "حفظ",
+      preview: "معاينة",
+      previewTitle: "معاينة الشروط والأحكام",
+      subscriptionEnd: "انتهاء الإشتراك",
+    },
     reviews: {
       title: "إدارة التقييمات",
       addReview: "أضف تقييم جديد",
@@ -312,6 +320,14 @@ export const content = {
       currency: "SAR",
       noOffers: "None",
       viewFiles: "View Year Files",
+    },
+    terms: {
+      title: "Terms & Conditions",
+      textContent: "Text Content",
+      save: "Save",
+      preview: "Preview",
+      previewTitle: "Preview Terms & Conditions",
+      subscriptionEnd: "Subscription Expiry",
     },
     reviews: {
       title: "Assessment Management",

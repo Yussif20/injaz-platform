@@ -3,6 +3,7 @@
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useRouter } from "@/i18n/navigation";
 import { Scale, ChevronLeft } from "lucide-react";
+import { TermsContent } from "@/features/terms";
 
 export default function TermsPage() {
   const { t } = useTranslation();
@@ -26,8 +27,8 @@ export default function TermsPage() {
         </button>
       </div>
 
-      <div className="mt-8 flex items-center justify-center rounded-2xl border border-grey-200 bg-white p-16">
-        <p className="text-xl text-grey-400">{commonT.comingSoon}</p>
+      <div className="mt-6">
+        <TermsContent />
       </div>
     </div>
   );
