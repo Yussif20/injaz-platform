@@ -20,7 +20,7 @@ export function useDeleteImage() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (params: DeleteImageParams) => deleteImage(params.imageId, params.profileId),
+    mutationFn: (params: DeleteImageParams) => deleteImage(params.imageId),
     onSuccess: (response, variables) => {
       if (response.status === "Success") {
         // Invalidate relevant caches if provided

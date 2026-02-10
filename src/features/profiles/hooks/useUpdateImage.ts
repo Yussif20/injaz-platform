@@ -23,7 +23,7 @@ export function useUpdateImage() {
 
   const mutation = useMutation({
     mutationFn: (params: UpdateImageParams) =>
-      updateImage(params.imageId, params.data, params.file, params.profileId),
+      updateImage(params.imageId, params.data, params.file),
     onSuccess: (response, variables) => {
       if (response.status === "Success") {
         // Invalidate relevant caches if provided

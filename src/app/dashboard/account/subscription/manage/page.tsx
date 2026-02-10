@@ -218,8 +218,7 @@ export default function ManageSubscriptionPage() {
   const [cvv, setCvv] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
 
-  // TODO: BYPASS - Remove before production
-  // Mock data for unsubscribed state
+  // TODO: Replace with real subscription data from API
   const isSubscribed = false;
 
   // Calculate expiry date (1 year from now)

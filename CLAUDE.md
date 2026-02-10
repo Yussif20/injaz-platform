@@ -124,15 +124,6 @@ enum Gender { Female = 0, Male = 1 }
 enum ProfileStatus { Draft = 0, Unpublished = 1, Published = 2 }
 ```
 
-## Development Bypass
-
-Test credentials for frontend development (remove before production):
-- Phone: `00001234567`
-- Password: `123456`
-- OTP: `123456`
-
-Find bypass code: `grep -rn "TODO: BYPASS" src/`
-
 ## Quick Links
 
 - Full documentation: `docs/PROJECT.md`

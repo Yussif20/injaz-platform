@@ -6,8 +6,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfileTemplate } from "../services/templates.service";
-import { updateBypassProfile } from "@/shared/lib/bypass-storage";
-import { isBypassUser } from "@/shared/lib/bypass-storage";
 
 // Query keys for invalidation
 const MY_PROFILES_QUERY_KEY = ["myProfiles"];
@@ -26,17 +24,6 @@ export function useUpdateProfileTemplate() {
 
   const mutation = useMutation({
     mutationFn: async ({ profileId, templateId }: UpdateTemplateParams) => {
-      // TODO: BYPASS - Remove before production
-      if (isBypassUser()) {
-        // Update bypass storage
-        const updated = updateBypassProfile(profileId, { templateId });
-        if (!updated) {
-          throw new Error("Profile not found");
-        }
-        return { status: true, message: "Template updated", data: updated };
-      }
-
-      // Call the API
       const response = await updateProfileTemplate(profileId, templateId);
       if (!response.status) {
         throw new Error(response.message || "Failed to update template");
