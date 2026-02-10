@@ -1,0 +1,207 @@
+"use client";
+
+import { useState } from "react";
+import { X, Plus, Star, Upload, ChevronDown } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
+import { Button } from "@/shared/components/ui";
+
+interface AddReviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
+  const { t } = useTranslation();
+  const modalT = (t("reviews") as any).modal;
+  const jobTitlesT = (t("reviews") as any).jobTitles;
+
+  const [rating, setRating] = useState(4);
+  const [hoveredStar, setHoveredStar] = useState(0);
+  const [showLogo, setShowLogo] = useState(false);
+  const [jobTitleOpen, setJobTitleOpen] = useState(false);
+  const [selectedJobTitle, setSelectedJobTitle] = useState("");
+
+  if (!isOpen) return null;
+
+  const jobTitleOptions = [
+    { value: "expertTeacher", label: jobTitlesT.expertTeacher },
+    { value: "practiceTeacher", label: jobTitlesT.practiceTeacher },
+    { value: "advancedTeacher", label: jobTitlesT.advancedTeacher },
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Add review submitted");
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-medium text-text-dark">
+            {modalT.title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1 text-grey-400 hover:bg-grey-100"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Client Name */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.clientName}
+            </label>
+            <input
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              placeholder={modalT.clientNamePlaceholder}
+            />
+          </div>
+
+          {/* Job Title - Dropdown */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.jobTitle}
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setJobTitleOpen(!jobTitleOpen)}
+                className="flex w-full items-center justify-between rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              >
+                <span className={selectedJobTitle ? "text-text-dark" : "text-text-muted"}>
+                  {selectedJobTitle
+                    ? jobTitleOptions.find((o) => o.value === selectedJobTitle)?.label
+                    : modalT.jobTitlePlaceholder}
+                </span>
+                <ChevronDown className="h-4 w-4 text-grey-400" />
+              </button>
+              {jobTitleOpen && (
+                <div className="absolute z-10 mt-1 w-full rounded-lg border border-grey-200 bg-white shadow-lg">
+                  {jobTitleOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setSelectedJobTitle(option.value);
+                        setJobTitleOpen(false);
+                      }}
+                      className="block w-full px-4 py-2.5 text-right text-sm text-text-dark hover:bg-grey-50"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Review Content */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.content}
+            </label>
+            <textarea
+              rows={4}
+              className="w-full resize-none rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              placeholder={modalT.contentPlaceholder}
+            />
+          </div>
+
+          {/* Star Rating */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.selectRating}
+            </label>
+            <div className="flex gap-1">
+              {Array.from({ length: 5 }).map((_, i) => {
+                const starIndex = 5 - i; // RTL: 5 stars right-to-left
+                const isActive = starIndex <= (hoveredStar || rating);
+                return (
+                  <button
+                    key={starIndex}
+                    type="button"
+                    onClick={() => setRating(starIndex)}
+                    onMouseEnter={() => setHoveredStar(starIndex)}
+                    onMouseLeave={() => setHoveredStar(0)}
+                    className="p-0.5"
+                  >
+                    <Star
+                      className={`h-7 w-7 ${
+                        isActive
+                          ? "fill-amber-400 text-amber-400"
+                          : "fill-grey-200 text-grey-200"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Client Image Upload */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.clientImage}
+            </label>
+            <div className="rounded-lg border border-dashed border-grey-300 bg-[#f6f6f6] px-6 py-6 text-center">
+              <Upload className="mx-auto h-6 w-6 text-grey-400" />
+              <p className="mt-2 text-xs text-grey-400">
+                {modalT.imageMaxSize}
+              </p>
+              <button
+                type="button"
+                className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700"
+              >
+                <Upload className="h-4 w-4" />
+                {modalT.uploadImage}
+              </button>
+            </div>
+          </div>
+
+          {/* Show Site Logo Toggle */}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setShowLogo(!showLogo)}
+              className={`relative h-6 w-11 rounded-full transition-colors ${
+                showLogo ? "bg-primary-500" : "bg-grey-300"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  showLogo ? "start-0.5" : "end-0.5"
+                }`}
+              />
+            </button>
+            <label className="text-sm font-medium text-text-dark">
+              {modalT.showSiteLogo}
+            </label>
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            className="w-full rounded-[20px]! font-light!"
+            size="lg"
+          >
+            <Plus className="h-5 w-5" />
+            {modalT.add}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}

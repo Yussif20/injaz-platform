@@ -3,6 +3,7 @@
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useRouter } from "@/i18n/navigation";
 import { ClipboardList, ChevronLeft } from "lucide-react";
+import { ReviewsContent } from "@/features/reviews";
 
 export default function AssessmentsPage() {
   const { t } = useTranslation();
@@ -26,8 +27,8 @@ export default function AssessmentsPage() {
         </button>
       </div>
 
-      <div className="mt-8 flex items-center justify-center rounded-2xl border border-grey-200 bg-white p-16">
-        <p className="text-xl text-grey-400">{commonT.comingSoon}</p>
+      <div className="mt-6">
+        <ReviewsContent />
       </div>
     </div>
   );

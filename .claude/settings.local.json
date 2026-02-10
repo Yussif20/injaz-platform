@@ -3,7 +3,8 @@
     "allow": [
       "Bash(ls -la \"E:\\\\current\\\\the client\\\\injaz-dashboard\\\\src\\\\shared\\\\components\"\" 2>/dev/null || echo \"Directory may not exist yet \")",
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx next build:*)"
     ]
   }
 }
