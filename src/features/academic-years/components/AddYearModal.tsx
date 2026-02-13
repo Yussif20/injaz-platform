@@ -1,163 +1,218 @@
 "use client";
 
-import { useState } from "react";
-import { X, Plus, Calendar } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, Save, Calendar } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
-import { Button } from "@/shared/components/ui";
-import type { YearStatus } from "../data/academic-years.mock";
+import { Button, Modal, Input } from "@/shared/components/ui";
+import { useCreateAcademicYear, useUpdateAcademicYear } from "../hooks";
+import type { AcademicYearDto } from "../types/academic-years.types";
+import {
+  academicYearSchema,
+  type AcademicYearFormData,
+} from "../validations/academic-years.schemas";
+
+type StatusValue = "Active" | "Inactive" | "Closed";
 
 interface AddYearModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
+  initialData?: AcademicYearDto | null;
 }
 
-export function AddYearModal({ isOpen, onClose }: AddYearModalProps) {
+export function AddYearModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  initialData,
+}: AddYearModalProps) {
   const { t } = useTranslation();
-  const ayT = t("academicYears") as any;
-  const modalT = ayT.modal;
-  const statusT = ayT.status;
+  const ayT = t("academicYears") as Record<string, unknown>;
+  const modalT = ayT.modal as Record<string, string>;
+  const statusT = ayT.status as Record<string, string>;
+  const commonT = t("common") as Record<string, unknown>;
+  const actionsT = commonT.actions as Record<string, string>;
 
-  const [selectedStatus, setSelectedStatus] = useState<YearStatus>("active");
+  const isEditMode = !!initialData;
 
-  if (!isOpen) return null;
+  const createYear = useCreateAcademicYear();
+  const updateYear = useUpdateAcademicYear();
 
-  const statusOptions: { value: YearStatus; label: string }[] = [
-    { value: "active", label: statusT.active },
-    { value: "inactive", label: statusT.inactive },
-    { value: "expired", label: statusT.expired },
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<AcademicYearFormData>({
+    resolver: zodResolver(academicYearSchema),
+    defaultValues: {
+      yearName: "",
+      startDate: "",
+      endDate: "",
+      status: "Active",
+    },
+  });
+
+  const selectedStatus = watch("status") as StatusValue;
+
+  // Reset form when modal opens/closes or initialData changes
+  useEffect(() => {
+    if (isOpen && initialData) {
+      reset({
+        yearName: initialData.yearName,
+        startDate: initialData.startDate.split("T")[0], // Extract date part
+        endDate: initialData.endDate.split("T")[0],
+        status: initialData.status,
+      });
+    } else if (isOpen && !initialData) {
+      reset({
+        yearName: "",
+        startDate: "",
+        endDate: "",
+        status: "Active",
+      });
+    }
+  }, [isOpen, initialData, reset]);
+
+  const statusOptions: { value: StatusValue; label: string }[] = [
+    { value: "Active", label: statusT.active },
+    { value: "Inactive", label: statusT.inactive },
+    { value: "Closed", label: statusT.expired ?? "مغلقة" },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Add year submitted");
-    onClose();
+  const onSubmit = (data: AcademicYearFormData) => {
+    const payload = {
+      yearName: data.yearName,
+      startDate: new Date(data.startDate).toISOString(),
+      endDate: new Date(data.endDate).toISOString(),
+      status: data.status,
+    };
+
+    if (isEditMode && initialData) {
+      updateYear.mutate(
+        { id: initialData.id, data: payload },
+        {
+          onSuccess: () => onSuccess?.(),
+          onError: () => {},
+        },
+      );
+    } else {
+      createYear.mutate(payload, {
+        onSuccess: () => onSuccess?.(),
+        onError: () => {},
+      });
+    }
   };
 
+  const isPending = createYear.isPending || updateYear.isPending;
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isEditMode ? (modalT.editTitle ?? "تعديل السنة") : modalT.title}
+      maxWidth="max-w-lg"
     >
-      <div
-        className="w-full max-w-lg rounded-2xl bg-white p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-text-dark">{modalT.title}</h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-grey-400 hover:bg-grey-100"
-          >
-            <X className="h-5 w-5" />
-          </button>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {/* Year Name */}
+        <Input
+          label={modalT.yearName ?? "اسم السنة"}
+          placeholder={modalT.enterYear}
+          error={errors.yearName?.message}
+          {...register("yearName")}
+        />
+
+        {/* Status Selector */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-text-dark">
+            {modalT.yearStatus}
+          </label>
+          <div className="flex gap-2">
+            {statusOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setValue("status", option.value)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                  selectedStatus === option.value
+                    ? "border-primary-500 bg-primary-500 text-white"
+                    : "border-grey-200 bg-white text-grey-500 hover:border-grey-300"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Hijri & Gregorian Year */}
-          <div className="grid grid-cols-2 gap-4">
-            <ModalField
-              label={modalT.hijriYear}
-              placeholder={modalT.enterYear}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
-            <ModalField
-              label={modalT.gregorianYear}
-              placeholder={modalT.enterYear}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
-          </div>
-
-          {/* Status Selector */}
+        {/* Dates */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-text-dark">
-              {modalT.yearStatus}
+              {modalT.startDate ?? "تاريخ البداية"}
             </label>
-            <div className="flex gap-2">
-              {statusOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setSelectedStatus(option.value)}
-                  className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                    selectedStatus === option.value
-                      ? "border-primary-500 bg-primary-500 text-white"
-                      : "border-grey-200 bg-white text-grey-500 hover:border-grey-300"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="relative">
+              <div className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2">
+                <Calendar className="h-4 w-4 text-grey-400" />
+              </div>
+              <input
+                type="date"
+                {...register("startDate")}
+                className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              />
             </div>
+            {errors.startDate && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.startDate.message}
+              </p>
+            )}
           </div>
-
-          {/* Hijri Dates */}
-          <div className="grid grid-cols-2 gap-4">
-            <ModalField
-              label={modalT.hijriStartDate}
-              placeholder={modalT.enterDate}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
-            <ModalField
-              label={modalT.hijriEndDate}
-              placeholder={modalT.enterDate}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              {modalT.endDate ?? "تاريخ النهاية"}
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2">
+                <Calendar className="h-4 w-4 text-grey-400" />
+              </div>
+              <input
+                type="date"
+                {...register("endDate")}
+                className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              />
+            </div>
+            {errors.endDate && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.endDate.message}
+              </p>
+            )}
           </div>
-
-          {/* Gregorian Dates */}
-          <div className="grid grid-cols-2 gap-4">
-            <ModalField
-              label={modalT.gregorianStartDate}
-              placeholder={modalT.enterDate}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
-            <ModalField
-              label={modalT.gregorianEndDate}
-              placeholder={modalT.enterDate}
-              icon={<Calendar className="h-4 w-4 text-grey-400" />}
-            />
-          </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            className="w-full rounded-[20px]! font-light!"
-            size="lg"
-          >
-            <Plus className="h-5 w-5" />
-            {modalT.add}
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function ModalField({
-  label,
-  placeholder,
-  icon,
-}: {
-  label: string;
-  placeholder: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-text-dark">
-        {label}
-      </label>
-      <div className="relative">
-        <div className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2">
-          {icon}
         </div>
-        <input
-          className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
-          placeholder={placeholder}
-        />
-      </div>
-    </div>
+
+        {/* Submit */}
+        <Button
+          type="submit"
+          className="w-full rounded-[20px]! font-light!"
+          size="lg"
+          loading={isPending}
+        >
+          {isEditMode ? (
+            <>
+              <Save className="h-5 w-5" />
+              {actionsT.save}
+            </>
+          ) : (
+            <>
+              <Plus className="h-5 w-5" />
+              {modalT.add}
+            </>
+          )}
+        </Button>
+      </form>
+    </Modal>
   );
 }

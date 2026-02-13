@@ -18,6 +18,23 @@ export const content = {
       },
       goBack: "العودة للسابق",
       comingSoon: "قريباً",
+      pagination: {
+        first: "الأولى",
+        last: "الأخيرة",
+        previous: "السابق",
+        next: "التالي",
+      },
+      toast: {
+        success: "تمت العملية بنجاح",
+        error: "حدث خطأ، يرجى المحاولة مرة أخرى",
+        deleted: "تم الحذف بنجاح",
+      },
+      confirm: {
+        deleteTitle: "تأكيد الحذف",
+        deleteMessage: "هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+        delete: "حذف",
+        cancel: "إلغاء",
+      },
     },
     auth: {
       login: {
@@ -227,6 +244,23 @@ export const content = {
       },
       goBack: "Go Back",
       comingSoon: "Coming Soon",
+      pagination: {
+        first: "First",
+        last: "Last",
+        previous: "Previous",
+        next: "Next",
+      },
+      toast: {
+        success: "Operation completed successfully",
+        error: "An error occurred, please try again",
+        deleted: "Deleted successfully",
+      },
+      confirm: {
+        deleteTitle: "Confirm Delete",
+        deleteMessage: "Are you sure you want to delete this item? This action cannot be undone.",
+        delete: "Delete",
+        cancel: "Cancel",
+      },
     },
     auth: {
       login: {

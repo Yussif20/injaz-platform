@@ -28,7 +28,7 @@ export function Navbar({ isMenuOpen, onMenuToggle }: NavbarProps) {
       <div className="flex items-center gap-2">
         <CircleUserRound className="h-6 w-6 text-grey-400" />
         {user && (
-          <span className="text-sm font-medium text-grey-700">{user.name}</span>
+          <span className="text-sm font-medium text-grey-700">{user.fullName}</span>
         )}
         <ChevronDown className="h-4 w-4 text-grey-400" />
       </div>

@@ -28,13 +28,13 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <Input
-        id="phone"
+        id="phoneNumber"
         label={loginT.phone}
         placeholder={loginT.phonePlaceholder}
         type="tel"
         dir="ltr"
-        error={errors.phone?.message}
-        {...register("phone")}
+        error={errors.phoneNumber?.message}
+        {...register("phoneNumber")}
       />
 
       <Input
