@@ -170,6 +170,7 @@ export interface ProfileResponse {
   message: string;
   data?: Profile;
   errors?: string[] | null;
+  debug?: unknown;
 }
 
 export interface ProfileDetailsResponse {
