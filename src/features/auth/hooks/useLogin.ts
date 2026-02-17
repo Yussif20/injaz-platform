@@ -12,7 +12,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => login(credentials),
     onSuccess: () => {
-      router.push(ROUTES.HOME);
+      router.push(ROUTES.DASHBOARD);
     },
   });
 }

@@ -48,7 +48,7 @@ export function Sidebar({ open }: SidebarProps) {
     >
       {/* Logo */}
       <div className="flex items-center px-5 py-4">
-        <Link href={ROUTES.HOME} className="flex items-center gap-2">
+        <Link href={ROUTES.DASHBOARD} className="flex items-center gap-2">
           <Image src="/logo.svg" alt="إنجاز المعلم" width={126} height={42} />
         </Link>
       </div>

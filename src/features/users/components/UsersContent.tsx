@@ -26,6 +26,17 @@ import { Gender } from "@/shared/types";
 
 const PAGE_SIZE = 10;
 
+// Helper to validate image URLs
+function isValidImageUrl(url: string | null | undefined): boolean {
+  if (!url || url.trim() === "") return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function UsersContent() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -285,7 +296,7 @@ export function UsersContent() {
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      {user.imageUrl ? (
+                      {isValidImageUrl(user.imageUrl) ? (
                         <Image
                           src={user.imageUrl}
                           alt={user.fullName}

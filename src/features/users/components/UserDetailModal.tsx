@@ -5,6 +5,17 @@ import { Modal, StatusBadge } from "@/shared/components/ui";
 import type { UserDto } from "../types/users.types";
 import { Gender } from "@/shared/types";
 
+// Helper to validate image URLs
+function isValidImageUrl(url: string | null | undefined): boolean {
+  if (!url || url.trim() === "") return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 interface UserDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -66,7 +77,7 @@ export function UserDetailModal({
       <div className="space-y-6">
         {/* Header with avatar */}
         <div className="flex items-center gap-4">
-          {user.imageUrl ? (
+          {isValidImageUrl(user.imageUrl) ? (
             <Image
               src={user.imageUrl}
               alt={user.fullName}
