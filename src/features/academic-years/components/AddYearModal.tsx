@@ -13,8 +13,6 @@ import {
   type AcademicYearFormData,
 } from "../validations/academic-years.schemas";
 
-type StatusValue = "Active" | "Inactive" | "Closed";
-
 interface AddYearModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -31,7 +29,6 @@ export function AddYearModal({
   const { t } = useTranslation();
   const ayT = t("academicYears") as Record<string, unknown>;
   const modalT = ayT.modal as Record<string, string>;
-  const statusT = ayT.status as Record<string, string>;
   const commonT = t("common") as Record<string, unknown>;
   const actionsT = commonT.actions as Record<string, string>;
 
@@ -44,8 +41,6 @@ export function AddYearModal({
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<AcademicYearFormData>({
     resolver: zodResolver(academicYearSchema),
@@ -53,11 +48,8 @@ export function AddYearModal({
       yearName: "",
       startDate: "",
       endDate: "",
-      status: "Active",
     },
   });
-
-  const selectedStatus = watch("status") as StatusValue;
 
   // Reset form when modal opens/closes or initialData changes
   useEffect(() => {
@@ -66,30 +58,22 @@ export function AddYearModal({
         yearName: initialData.yearName,
         startDate: initialData.startDate.split("T")[0], // Extract date part
         endDate: initialData.endDate.split("T")[0],
-        status: initialData.status,
       });
     } else if (isOpen && !initialData) {
       reset({
         yearName: "",
         startDate: "",
         endDate: "",
-        status: "Active",
       });
     }
   }, [isOpen, initialData, reset]);
 
-  const statusOptions: { value: StatusValue; label: string }[] = [
-    { value: "Active", label: statusT.active },
-    { value: "Inactive", label: statusT.inactive },
-    { value: "Closed", label: statusT.expired ?? "مغلقة" },
-  ];
-
   const onSubmit = (data: AcademicYearFormData) => {
+    // Convert dates to ISO format for backend
     const payload = {
       yearName: data.yearName,
       startDate: new Date(data.startDate).toISOString(),
       endDate: new Date(data.endDate).toISOString(),
-      status: data.status,
     };
 
     if (isEditMode && initialData) {
@@ -125,29 +109,6 @@ export function AddYearModal({
           error={errors.yearName?.message}
           {...register("yearName")}
         />
-
-        {/* Status Selector */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-text-dark">
-            {modalT.yearStatus}
-          </label>
-          <div className="flex gap-2">
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setValue("status", option.value)}
-                className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                  selectedStatus === option.value
-                    ? "border-primary-500 bg-primary-500 text-white"
-                    : "border-grey-200 bg-white text-grey-500 hover:border-grey-300"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
