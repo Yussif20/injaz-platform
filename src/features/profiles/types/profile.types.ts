@@ -129,23 +129,23 @@ export interface ProfileSaveValidation {
   message: string | null;
 }
 
-// Request types
+// Request types - IDs are integers matching the backend API
 export interface CreateProfileRequest {
-  academicYearId: string;     // GUID
-  profileTypeId: string;      // GUID
-  title?: string;             // Custom title (optional)
+  academicYearId: number;     // Integer ID from backend
+  profileTypeId: number;      // Integer ID from backend
+  templateId?: number;        // Optional template ID
 }
 
 export interface UpdateTemplateRequest {
-  templateId: string;
+  templateId: number;
 }
 
 export interface UpdateAcademicYearRequest {
-  academicYearId: string;
+  academicYearId: number;
 }
 
 export interface UpdateProfileTypeRequest {
-  profileTypeId: string;
+  profileTypeId: number;
 }
 
 export interface SetPasswordRequest {
