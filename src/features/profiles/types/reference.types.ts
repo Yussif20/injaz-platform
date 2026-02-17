@@ -78,7 +78,7 @@ export interface Rank {
 }
 
 // Profile Type with full Sections (including subsections)
-export interface ProfileTypeWithSections extends ProfileType {
+export interface ProfileTypeWithSections extends Omit<ProfileType, 'sections'> {
   sections: Section[];
 }
 
