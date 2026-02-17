@@ -14,10 +14,19 @@ export function useProfileTypes() {
     queryKey: PROFILE_TYPES_QUERY_KEY,
     queryFn: async () => {
       const response = await getAvailableProfileTypes();
-      if (!response.status) {
+      
+      // Log the full response for debugging
+      console.log("Profile types API response:", response);
+      
+      // Handle both boolean and string status
+      const isSuccess = response.status === true || response.status === "Success";
+      
+      if (!isSuccess) {
         console.warn("Profile types fetch returned error:", response.message);
         return [];
       }
+      
+      console.log("Profile types data:", response.data);
       return response.data ?? [];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes

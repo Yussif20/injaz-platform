@@ -29,8 +29,29 @@ export async function getMyProfiles(): Promise<ProfilesResponse> {
  * Create a new profile
  */
 export async function createProfile(data: CreateProfileRequest): Promise<ProfileResponse> {
-  const response = await clientApi.post<ProfileResponse>("/api/profiles", data);
-  return response.data;
+  try {
+    const response = await clientApi.post<ProfileResponse>("/api/profiles", data);
+    return response.data;
+  } catch (error: unknown) {
+    // Handle axios error - extract response data if available
+    const axiosError = error as {
+      response?: {
+        data?: ProfileResponse & { debug?: unknown };
+      };
+    };
+    
+    if (axiosError?.response?.data) {
+      // Return the error response from the server
+      return axiosError.response.data;
+    }
+    
+    // Return a generic error response
+    return {
+      status: false,
+      message: "فشل في الاتصال بالخادم",
+      errors: [(error as Error)?.message || "خطأ غير معروف"],
+    };
+  }
 }
 
 /**
