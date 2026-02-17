@@ -22,4 +22,14 @@ export const queryKeys = {
   subscriptionDiscounts: createKeys("subscriptionDiscounts"),
   subscriptionSettings: createKeys("subscriptionSettings"),
   systemParameters: createKeys("systemParameters"),
+  reports: {
+    all: () => ["reports"] as const,
+    stats: () => ["reports", "stats"] as const,
+    latestSubscriptions: (limit: number) =>
+      ["reports", "latestSubscriptions", limit] as const,
+    profitChart: () => ["reports", "profitChart"] as const,
+    filesChart: () => ["reports", "filesChart"] as const,
+    latestFiles: (limit: number) =>
+      ["reports", "latestFiles", limit] as const,
+  },
 };

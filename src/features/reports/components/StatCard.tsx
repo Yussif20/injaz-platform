@@ -11,6 +11,7 @@ interface StatCardProps {
   trendValue: number;
   trendDirection: "up" | "down";
   iconBgClass: string;
+  isLoading?: boolean;
 }
 
 export function StatCard({
@@ -21,7 +22,21 @@ export function StatCard({
   trendValue,
   trendDirection,
   iconBgClass,
+  isLoading = false,
 }: StatCardProps) {
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-grey-200 bg-white p-5">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 animate-pulse rounded-full bg-grey-200" />
+          <div className="h-4 w-24 animate-pulse rounded bg-grey-200" />
+        </div>
+        <div className="mt-3 h-8 w-32 animate-pulse rounded bg-grey-200" />
+        <div className="mt-2 h-5 w-28 animate-pulse rounded bg-grey-200" />
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-grey-200 bg-white p-5">
       <div className="flex items-center gap-2 text-text-dark">

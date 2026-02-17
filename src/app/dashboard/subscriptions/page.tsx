@@ -3,6 +3,7 @@
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useRouter } from "@/i18n/navigation";
 import { CreditCard, ChevronLeft } from "lucide-react";
+import { SubscriptionsContent } from "@/features/subscriptions";
 
 export default function SubscriptionsPage() {
   const { t } = useTranslation();
@@ -26,8 +27,8 @@ export default function SubscriptionsPage() {
         </button>
       </div>
 
-      <div className="mt-8 flex items-center justify-center rounded-2xl border border-grey-200 bg-white p-16">
-        <p className="text-xl text-grey-400">{commonT.comingSoon}</p>
+      <div className="mt-8">
+        <SubscriptionsContent />
       </div>
     </div>
   );

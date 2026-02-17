@@ -5,3 +5,4 @@ export { Pagination } from "./Pagination";
 export { StatusBadge } from "./StatusBadge";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { SearchInput } from "./SearchInput";
+export { Select } from "./Select";

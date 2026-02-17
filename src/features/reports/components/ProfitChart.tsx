@@ -12,7 +12,7 @@ import {
 import { CircleDollarSign } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { TrendBadge } from "./TrendBadge";
-import { profitChartData } from "../data/reports.mock";
+import { useProfitChartData } from "../hooks";
 
 function CustomTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
@@ -32,6 +32,21 @@ export function ProfitChart() {
   const { t } = useTranslation();
   const reportsT = t("reports");
 
+  const { data: chartData = [], isLoading } = useProfitChartData();
+
+  // Calculate total and trend
+  const totalProfit = chartData.reduce((sum, d) => sum + d.value, 0);
+  const currentMonthIndex = new Date().getMonth();
+  const currentMonthValue = chartData[currentMonthIndex]?.value ?? 0;
+  const lastMonthValue =
+    chartData[currentMonthIndex > 0 ? currentMonthIndex - 1 : 11]?.value ?? 0;
+  const trendValue =
+    lastMonthValue > 0
+      ? Math.round(
+          ((currentMonthValue - lastMonthValue) / lastMonthValue) * 100,
+        )
+      : 0;
+
   const monthLabels: Record<string, string> = {
     jan: reportsT.months.jan,
     feb: reportsT.months.feb,
@@ -48,6 +63,18 @@ export function ProfitChart() {
     dec: reportsT.months.dec,
   };
 
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-grey-200 bg-white p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="h-6 w-40 animate-pulse rounded bg-grey-200" />
+          <div className="h-5 w-20 animate-pulse rounded bg-grey-200" />
+        </div>
+        <div className="h-[280px] w-full animate-pulse rounded bg-grey-100" />
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-grey-200 bg-white p-5">
       <div className="mb-1 flex items-center justify-between">
@@ -55,14 +82,17 @@ export function ProfitChart() {
           <CircleDollarSign className="h-5 w-5" />
           <h3 className="text-base font-semibold">{reportsT.charts.profitStats}</h3>
         </div>
-        <TrendBadge value={30} direction="up" />
+        <TrendBadge
+          value={Math.abs(trendValue)}
+          direction={trendValue >= 0 ? "up" : "down"}
+        />
       </div>
       <p className="mb-4 text-xs text-grey-400">{reportsT.charts.weekProfits}</p>
 
       <div dir="ltr" className="h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={profitChartData}
+            data={chartData}
             margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
           >
             <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e5e7eb" />
