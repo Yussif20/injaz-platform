@@ -94,6 +94,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    
+    // Log the request body for debugging
+    console.log("Create profile request body:", JSON.stringify(body, null, 2));
 
     const response = await serverApi.post<ApiResponse<Profile>>(
       API_ENDPOINTS.MY_PROFILES,
@@ -122,32 +125,39 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 }
     );
-  } catch (error) {
-    console.error("Create profile error:", error);
-
-    if (error && typeof error === "object" && "response" in error) {
-      const axiosError = error as {
-        response?: {
-          data?: ApiResponse<null>;
-          status?: number;
-        };
+  } catch (error: unknown) {
+    // Extract detailed error info from axios error
+    const axiosError = error as {
+      response?: {
+        data?: ApiResponse<null> & { errors?: string[] | Record<string, string[]> };
+        status?: number;
       };
-      const errorData = axiosError.response?.data;
-      const statusCode = axiosError.response?.status || 500;
+      message?: string;
+    };
+    
+    const errorData = axiosError?.response?.data;
+    const statusCode = axiosError?.response?.status || 500;
+    
+    // Log everything for debugging
+    console.error("=== CREATE PROFILE ERROR ===");
+    console.error("Status code:", statusCode);
+    console.error("Error data:", JSON.stringify(errorData, null, 2));
+    console.error("Error message:", axiosError?.message);
+    console.error("============================");
 
-      return NextResponse.json(
-        {
-          status: false,
-          message: errorData?.message || "فشل في إنشاء الملف",
-          errors: errorData?.errors || null,
-        },
-        { status: statusCode }
-      );
-    }
-
+    // Return detailed error to frontend for debugging
     return NextResponse.json(
-      { status: false, message: "حدث خطأ غير متوقع", data: null },
-      { status: 500 }
+      {
+        status: false,
+        message: errorData?.message || "فشل في إنشاء الملف",
+        errors: errorData?.errors || null,
+        debug: {
+          statusCode,
+          backendMessage: errorData?.message,
+          backendErrors: errorData?.errors,
+        },
+      },
+      { status: statusCode }
     );
   }
 }

@@ -7,6 +7,7 @@ import { MobilePromoSidebar } from "@/features/dashboard";
 import {
   useAcademicYears,
   useRanks,
+  useProfileTypes,
   useCreateProfile,
 } from "@/features/profiles";
 import { Button } from "@/shared/components/ui";
@@ -26,6 +27,7 @@ function CreateFileContent() {
   // Fetch data from API
   const { academicYears, isLoading: yearsLoading } = useAcademicYears();
   const { ranks, isLoading: ranksLoading } = useRanks();
+  const { profileTypes, isLoading: profileTypesLoading } = useProfileTypes();
   const { createProfileAsync, isLoading: creating } = useCreateProfile();
 
   // Form state - IDs are numbers from the API
@@ -39,8 +41,14 @@ function CreateFileContent() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const isLoading = yearsLoading || ranksLoading;
-  const isFormValid = selectedYear !== null && selectedRank !== null;
+  const isLoading = yearsLoading || ranksLoading || profileTypesLoading;
+  
+  // Check if we have required data
+  const hasProfileTypes = profileTypes.length > 0;
+  const isFormValid = selectedYear !== null && selectedRank !== null && hasProfileTypes;
+  
+  // Log available profile types for debugging
+  console.log("Available profile types:", profileTypes);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,21 +79,34 @@ function CreateFileContent() {
     setError(null);
 
     try {
-      // Create profile with academic year and a default profile type (ID 1)
+      // Get the first available profile type ID (or default to 1)
+      const defaultProfileTypeId = profileTypes.length > 0 ? profileTypes[0].id : 1;
+      
+      // Create profile with academic year and profile type
       // The rank will be stored separately via the /api/Me/personal-info endpoint
       const response = await createProfileAsync({
         academicYearId: selectedYear!,
-        profileTypeId: 1, // Default to first profile type (integer ID)
-        templateId: 1,    // Default template
+        profileTypeId: defaultProfileTypeId,
       });
+      
+      console.log("Create profile response:", response);
 
       if (response.status) {
         router.push(ROUTES.DASHBOARD);
       } else {
-        setError(response.message || "فشل في إنشاء الملف");
+        // Show detailed error info for debugging
+        const errorInfo = response.debug 
+          ? `${response.message} - Backend: ${JSON.stringify(response.debug)}`
+          : response.message || "فشل في إنشاء الملف";
+        setError(errorInfo);
+        console.error("Create profile failed:", response);
       }
-    } catch (err) {
-      setError("حدث خطأ غير متوقع");
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string; response?: { data?: unknown } };
+      const errorDetail = errorObj?.response?.data 
+        ? JSON.stringify(errorObj.response.data)
+        : errorObj?.message || "حدث خطأ غير متوقع";
+      setError(errorDetail);
       console.error("Create profile error:", err);
     }
   };
@@ -123,6 +144,13 @@ function CreateFileContent() {
           {error && (
             <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg">
               {error}
+            </div>
+          )}
+          
+          {/* Warning if no profile types available */}
+          {!isLoading && !hasProfileTypes && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+              <strong>تنبيه:</strong> لا توجد أنواع ملفات متاحة حالياً. يرجى التواصل مع الإدارة لإضافة أنواع الملفات.
             </div>
           )}
 
