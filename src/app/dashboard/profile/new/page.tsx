@@ -28,9 +28,9 @@ function CreateFileContent() {
   const { ranks, isLoading: ranksLoading } = useRanks();
   const { createProfileAsync, isLoading: creating } = useCreateProfile();
 
-  // Form state
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
-  const [selectedRank, setSelectedRank] = useState<string | null>(null);
+  // Form state - IDs are numbers from the API
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedRank, setSelectedRank] = useState<number | null>(null);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const [rankDropdownOpen, setRankDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,11 +71,12 @@ function CreateFileContent() {
     setError(null);
 
     try {
-      // For now, we'll create with academic year and a default profile type
-      // The rank will be stored separately or used in a different way
+      // Create profile with academic year and a default profile type (ID 1)
+      // The rank will be stored separately via the /api/Me/personal-info endpoint
       const response = await createProfileAsync({
         academicYearId: selectedYear!,
-        profileTypeId: "pt-001", // Default to first profile type
+        profileTypeId: 1, // Default to first profile type (integer ID)
+        templateId: 1,    // Default template
       });
 
       if (response.status) {
@@ -91,11 +92,11 @@ function CreateFileContent() {
 
   const selectedYearName = academicYears.find(
     (y) => y.id === selectedYear,
-  )?.name;
+  )?.yearName;
   // Get rank name based on user gender (assuming female for now based on test user)
   const selectedRankData = ranks.find((r) => r.id === selectedRank);
   const selectedRankName =
-    selectedRankData?.nameFemale || selectedRankData?.nameMale;
+    selectedRankData?.titleFemale || selectedRankData?.titleMale;
 
   if (isLoading) {
     return (
@@ -283,7 +284,7 @@ function CreateFileContent() {
                             </svg>
                           )}
                           <span className="text-secondary-800">
-                            {year.name}
+                            {year.yearName}
                           </span>
                         </button>
                       ))
@@ -369,9 +370,9 @@ function CreateFileContent() {
                               />
                             </svg>
                           )}
-                          {/* Show female name for female users, male name for male users */}
+                          {/* Show female title for female users, male title for male users */}
                           <span className="text-secondary-800">
-                            {rank.nameFemale || rank.nameMale}
+                            {rank.titleFemale || rank.titleMale}
                           </span>
                         </button>
                       ))
