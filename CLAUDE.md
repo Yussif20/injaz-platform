@@ -97,14 +97,22 @@ feature-name/
 | Task | Details |
 |------|---------|
 | Saudi phone format (+966) | Make numbers follow Saudi pattern |
-| Custom birthday calendar | Add custom calendar picker |
 | Zig-zag pattern fix | Increase slope & darken color in profile default template |
 | Achievement section responsive | Fix squished images on medium/small screens |
 | Profile sections image upload | Fix images not being added |
 | Career add error | Fix error when adding new career in profile data |
 | Test real endpoints | Test all features against real backend endpoints |
 
-> **Note:** Admin features handled in separate website.
+> **Note:** Admin features handled in `injaz-dashboard` (separate project at `../injaz-dashboard`).
+
+## Shared DatePicker Component
+
+Custom dual-mode calendar at `src/shared/components/ui/DatePicker.tsx`:
+- Supports both **Hijri** (هجري) and **Gregorian** (ميلادي) modes
+- `defaultMode`: `"gregorian"` | `"hijri"` — which calendar opens first
+- `showModeToggle`: show/hide the mode switcher radio buttons (default `true`)
+- Returns ISO `YYYY-MM-DD` string via `onChange`
+- Also ported to `injaz-dashboard` for admin forms
 
 ## API Response Format
 
