@@ -45,6 +45,7 @@ export function RanksContent() {
   const [editingRank, setEditingRank] = useState<RankDto | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<RankDto | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
@@ -199,19 +200,24 @@ export function RanksContent() {
                   <td className="px-6 py-4 text-sm text-text-dark">
                     {rank.titleFemale}
                   </td>
-                  <td className="relative px-6 py-4">
+                  <td className="px-6 py-4">
                     <button
-                      onClick={() =>
-                        setOpenMenuId(openMenuId === rank.id ? null : rank.id)
-                      }
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const menuWidth = 176;
+                        const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+                        setMenuPos({ top: rect.bottom + 4, left });
+                        setOpenMenuId(openMenuId === rank.id ? null : rank.id);
+                      }}
                       className="rounded-lg p-1.5 text-grey-400 hover:bg-grey-100"
                     >
                       <MoreHorizontal className="h-5 w-5" />
                     </button>
-                    {openMenuId === rank.id && (
+                    {openMenuId === rank.id && menuPos && (
                       <div
                         ref={menuRef}
-                        className="absolute end-6 top-full z-20 w-44 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
+                        style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+                        className="z-[9999] w-44 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
                       >
                         <button
                           onClick={() => handleEdit(rank)}

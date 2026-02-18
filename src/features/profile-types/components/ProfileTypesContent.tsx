@@ -92,6 +92,7 @@ export function ProfileTypesContent() {
   const [deleteTarget, setDeleteTarget] = useState<ProfileTypeDto | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
@@ -334,19 +335,24 @@ export function ProfileTypesContent() {
                     <td className="px-4 py-4 text-sm text-text-dark">
                       {pt.sections?.length ?? 0}
                     </td>
-                    <td className="relative px-4 py-4">
+                    <td className="px-4 py-4">
                       <button
-                        onClick={() =>
-                          setOpenMenuId(openMenuId === pt.id ? null : pt.id)
-                        }
+                        onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const menuWidth = 192;
+                          const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+                          setMenuPos({ top: rect.bottom + 4, left });
+                          setOpenMenuId(openMenuId === pt.id ? null : pt.id);
+                        }}
                         className="rounded-lg p-1.5 text-grey-400 hover:bg-grey-100"
                       >
                         <MoreHorizontal className="h-5 w-5" />
                       </button>
-                      {openMenuId === pt.id && (
+                      {openMenuId === pt.id && menuPos && (
                         <div
                           ref={menuRef}
-                          className="absolute end-4 top-full z-20 w-48 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
+                          style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+                          className="z-[9999] w-48 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
                         >
                           <button
                             onClick={() => handleEdit(pt)}

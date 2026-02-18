@@ -19,7 +19,7 @@ export default function TermsPage() {
           <h1 className="text-xl font-normal">{sidebarT.terms}</h1>
         </div>
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/dashboard/reports")}
           className="flex items-center text-primary-500"
         >
           <h1 className="text-lg font-light">{commonT.goBack}</h1>

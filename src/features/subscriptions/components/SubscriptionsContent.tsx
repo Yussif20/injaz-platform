@@ -1,52 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { SubscriptionsTab } from "./SubscriptionsTab";
+import { CurrentYearTab } from "./CurrentYearTab";
 import { DiscountsTab } from "./DiscountsTab";
-import { SettingsTab } from "./SettingsTab";
+import { SubscriptionsTab } from "./SubscriptionsTab";
 
-type Tab = "subscriptions" | "discounts" | "settings";
+type Section = "currentYear" | "discounts" | "invoices";
+
+const NAV_ITEMS: { key: Section; label: string }[] = [
+  { key: "currentYear", label: "إشتراك السنة الحالية" },
+  { key: "discounts", label: "تاريخ عروض السنة" },
+  { key: "invoices", label: "فواتير الإشتراكات" },
+];
 
 export function SubscriptionsContent() {
-  const [activeTab, setActiveTab] = useState<Tab>("subscriptions");
-
-  // Translations (fallback inline for subscriptions feature)
-  const tabsT = {
-    subscriptions: "الاشتراكات",
-    discounts: "الخصومات",
-    settings: "الإعدادات",
-  };
-
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "subscriptions", label: tabsT.subscriptions },
-    { key: "discounts", label: tabsT.discounts },
-    { key: "settings", label: tabsT.settings },
-  ];
+  const [activeSection, setActiveSection] = useState<Section>("currentYear");
 
   return (
-    <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="flex gap-2 rounded-xl border border-grey-200 bg-white p-1.5">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? "bg-primary-500 text-white"
-                : "text-grey-600 hover:bg-grey-100"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="flex gap-6">
+      {/* Secondary Sidebar — first in RTL = renders on the right, next to main sidebar */}
+      <div className="w-52 shrink-0">
+        <nav className="space-y-1 rounded-2xl border border-grey-200 bg-white p-2">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setActiveSection(item.key)}
+              className={`w-full rounded-lg px-4 py-3 text-right text-sm transition-colors ${
+                activeSection === item.key
+                  ? "bg-primary-50 font-medium text-primary-600"
+                  : "text-grey-600 hover:bg-grey-50"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Tab Content */}
-      <div>
-        {activeTab === "subscriptions" && <SubscriptionsTab />}
-        {activeTab === "discounts" && <DiscountsTab />}
-        {activeTab === "settings" && <SettingsTab />}
+      {/* Main Content */}
+      <div className="flex-1">
+        {activeSection === "currentYear" && <CurrentYearTab />}
+        {activeSection === "discounts" && <DiscountsTab />}
+        {activeSection === "invoices" && <SubscriptionsTab />}
       </div>
     </div>
   );

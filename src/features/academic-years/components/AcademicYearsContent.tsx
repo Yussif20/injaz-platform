@@ -76,6 +76,7 @@ export function AcademicYearsContent() {
     null,
   );
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
@@ -226,10 +227,10 @@ export function AcademicYearsContent() {
                   {tableT.status}
                 </th>
                 <th className="px-6 py-4 text-right font-medium">
-                  {tableT.startDate ?? "تاريخ البداية"}
+                  {tableT.subscription ?? "الإشتراك الخاص بالسنة"}
                 </th>
                 <th className="px-6 py-4 text-right font-medium">
-                  {tableT.endDate ?? "تاريخ النهاية"}
+                  {tableT.activeOffers ?? "العروض المفعلة"}
                 </th>
                 <th className="px-6 py-4 text-right font-medium">
                   {tableT.files}
@@ -265,10 +266,12 @@ export function AcademicYearsContent() {
                     />
                   </td>
                   <td className="px-6 py-4 text-sm text-text-dark">
-                    {new Date(year.startDate).toLocaleDateString("ar-SA")}
+                    {year.subscriptionFee != null
+                      ? `${year.subscriptionFee} ${ayT.currency as string}`
+                      : "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-text-dark">
-                    {new Date(year.endDate).toLocaleDateString("ar-SA")}
+                    {year.activeDeal ?? (ayT.noOffers as string)}
                   </td>
                   <td className="px-6 py-4">
                     <button className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-4 py-1.5 text-xs text-white hover:bg-primary-700">
@@ -276,19 +279,24 @@ export function AcademicYearsContent() {
                       <ExternalLink className="h-3.5 w-3.5" />
                     </button>
                   </td>
-                  <td className="relative px-6 py-4">
+                  <td className="px-6 py-4">
                     <button
-                      onClick={() =>
-                        setOpenMenuId(openMenuId === year.id ? null : year.id)
-                      }
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const menuWidth = 176;
+                        const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+                        setMenuPos({ top: rect.bottom + 4, left });
+                        setOpenMenuId(openMenuId === year.id ? null : year.id);
+                      }}
                       className="rounded-lg p-1.5 text-grey-400 hover:bg-grey-100"
                     >
                       <MoreHorizontal className="h-5 w-5" />
                     </button>
-                    {openMenuId === year.id && (
+                    {openMenuId === year.id && menuPos && (
                       <div
                         ref={menuRef}
-                        className="absolute end-6 top-full z-20 w-44 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
+                        style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+                        className="z-[9999] w-44 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
                       >
                         <button
                           onClick={() => handleEdit(year)}

@@ -1,15 +1,15 @@
 "use client";
 
-import { X, Link as LinkIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
-import { mockPreviewSections } from "../data/terms.mock";
 
 interface PreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
+  html: string;
 }
 
-export function PreviewModal({ isOpen, onClose }: PreviewModalProps) {
+export function PreviewModal({ isOpen, onClose, html }: PreviewModalProps) {
   const { t } = useTranslation();
   const termsT = t("terms") as any;
 
@@ -37,26 +37,12 @@ export function PreviewModal({ isOpen, onClose }: PreviewModalProps) {
           </button>
         </div>
 
-        {/* Content sections */}
-        <div className="space-y-8">
-          {mockPreviewSections.map((section, index) => (
-            <div key={index} className="relative">
-              {/* Link icon on the side */}
-              <div className="absolute -start-2 top-0">
-                <LinkIcon className="h-4 w-4 text-grey-300" />
-              </div>
-
-              {section.heading && (
-                <h3 className="mb-3 text-center text-base font-medium text-text-dark">
-                  {section.heading}
-                </h3>
-              )}
-              <p className="text-sm leading-relaxed text-text-dark">
-                {section.content}
-              </p>
-            </div>
-          ))}
-        </div>
+        {/* Rendered content */}
+        <div
+          dir="rtl"
+          className="prose prose-sm max-w-none text-sm leading-relaxed text-text-dark"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </div>
     </div>
   );

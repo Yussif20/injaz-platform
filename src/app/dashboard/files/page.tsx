@@ -3,7 +3,7 @@
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useRouter } from "@/i18n/navigation";
 import { FolderOpen, ChevronLeft } from "lucide-react";
-import { ProfileTypesContent } from "@/features/profile-types";
+import { FilesContent } from "@/features/profiles/components/FilesContent";
 
 export default function FilesPage() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export default function FilesPage() {
           <h1 className="text-xl font-normal">{sidebarT.files}</h1>
         </div>
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/dashboard/reports")}
           className="flex items-center text-primary-500"
         >
           <h1 className="text-lg font-light">{commonT.goBack}</h1>
@@ -28,7 +28,7 @@ export default function FilesPage() {
       </div>
 
       <div className="mt-8">
-        <ProfileTypesContent />
+        <FilesContent />
       </div>
     </div>
   );

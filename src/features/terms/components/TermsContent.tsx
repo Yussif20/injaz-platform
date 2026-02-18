@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/shared/components/ui";
 import { mockTermsContent } from "../data/terms.mock";
@@ -11,11 +11,26 @@ export function TermsContent() {
   const { t } = useTranslation();
   const termsT = t("terms") as any;
 
-  const [content, setContent] = useState(mockTermsContent);
+  const editorRef = useRef<HTMLDivElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
+
+  // Set initial content once on mount (not via dangerouslySetInnerHTML to avoid React overwriting user edits)
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = mockTermsContent;
+    }
+  }, []);
 
   const handleSave = () => {
-    console.log("Terms saved:", content);
+    const html = editorRef.current?.innerHTML ?? "";
+    console.log("Terms saved:", html);
+    // TODO: POST to API
+  };
+
+  const handlePreview = () => {
+    setPreviewHtml(editorRef.current?.innerHTML ?? "");
+    setIsPreviewOpen(true);
   };
 
   return (
@@ -24,7 +39,7 @@ export function TermsContent() {
       <div className="rounded-2xl border border-grey-200 bg-white p-6">
         {/* Toolbar */}
         <div className="mb-4 flex justify-center">
-          <EditorToolbar />
+          <EditorToolbar editorRef={editorRef} />
         </div>
 
         {/* Label */}
@@ -32,12 +47,13 @@ export function TermsContent() {
           {termsT.textContent}
         </h3>
 
-        {/* Text editor area */}
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="min-h-[400px] w-full resize-none rounded-lg border border-grey-200 bg-white p-4 text-sm leading-relaxed text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+        {/* Contenteditable editor */}
+        <div
+          ref={editorRef}
+          contentEditable
+          suppressContentEditableWarning
           dir="rtl"
+          className="min-h-[400px] w-full rounded-lg border border-grey-200 bg-white p-4 text-sm leading-relaxed text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
         />
       </div>
 
@@ -46,7 +62,7 @@ export function TermsContent() {
         <Button
           variant="outline"
           size="lg"
-          onClick={() => setIsPreviewOpen(true)}
+          onClick={handlePreview}
           className="w-full rounded-[20px]! font-light!"
         >
           {termsT.preview}
@@ -64,6 +80,7 @@ export function TermsContent() {
       <PreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
+        html={previewHtml}
       />
     </>
   );

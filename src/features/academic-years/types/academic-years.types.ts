@@ -4,6 +4,8 @@ export interface AcademicYearDto {
   startDate: string; // ISO date-time format
   endDate: string; // ISO date-time format
   status: "Active" | "Inactive" | "Closed";
+  subscriptionFee?: number | null;
+  activeDeal?: string | null;
 }
 
 // Backend CreateAcademicYearDto - status is managed via activate/deactivate/close endpoints

@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save, Calendar } from "lucide-react";
-import { useTranslation } from "@/i18n/TranslationContext";
-import { Button, Modal, Input } from "@/shared/components/ui";
-import { useCreateAcademicYear, useUpdateAcademicYear } from "../hooks";
+import { Plus, Save, X } from "lucide-react";
+import { Button, DatePicker } from "@/shared/components/ui";
+import {
+  useCreateAcademicYear,
+  useUpdateAcademicYear,
+  useActivateAcademicYear,
+  useDeactivateAcademicYear,
+  useCloseAcademicYear,
+} from "../hooks";
 import type { AcademicYearDto } from "../types/academic-years.types";
 import {
   academicYearSchema,
@@ -20,58 +25,130 @@ interface AddYearModalProps {
   initialData?: AcademicYearDto | null;
 }
 
+const STATUS_OPTIONS = [
+  {
+    value: "Active" as const,
+    label: "مفعلة",
+    selectedClass: "bg-[#DCFCE7] text-[#166534] border-[#86EFAC]",
+  },
+  {
+    value: "Inactive" as const,
+    label: "غير مفعلة",
+    selectedClass: "bg-grey-100 text-grey-600 border-grey-200",
+  },
+  {
+    value: "Closed" as const,
+    label: "منتهية",
+    selectedClass: "bg-[#FFE4E6] text-[#9F1239] border-[#FECDD3]",
+  },
+];
+
+function parseYearName(yearName: string) {
+  const parts = yearName.split(" / ");
+  const gregorianYear = parts[0]?.replace(" م", "").trim() ?? yearName;
+  const hijriYear = parts[1]?.replace(" هـ", "").trim() ?? "";
+  return { gregorianYear, hijriYear };
+}
+
+// Year range helpers
+function getGregorianYears() {
+  const current = new Date().getFullYear();
+  const years: string[] = [];
+  for (let y = current + 5; y >= 2000; y--) years.push(String(y));
+  return years;
+}
+
+function getHijriYears() {
+  const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { year: "numeric" });
+  const parts = formatter.formatToParts(new Date());
+  const currentHijri = parseInt(
+    parts.find((p) => p.type === "year")!.value.replace(/[^\d]/g, ""),
+    10,
+  );
+  const years: string[] = [];
+  for (let y = currentHijri + 5; y >= 1420; y--) years.push(String(y));
+  return years;
+}
+
 export function AddYearModal({
   isOpen,
   onClose,
   onSuccess,
   initialData,
 }: AddYearModalProps) {
-  const { t } = useTranslation();
-  const ayT = t("academicYears") as Record<string, unknown>;
-  const modalT = ayT.modal as Record<string, string>;
-  const commonT = t("common") as Record<string, unknown>;
-  const actionsT = commonT.actions as Record<string, string>;
-
   const isEditMode = !!initialData;
 
   const createYear = useCreateAcademicYear();
   const updateYear = useUpdateAcademicYear();
+  const activateYear = useActivateAcademicYear();
+  const deactivateYear = useDeactivateAcademicYear();
+  const closeYear = useCloseAcademicYear();
+
+  const gregorianYears = useMemo(getGregorianYears, []);
+  const hijriYears = useMemo(getHijriYears, []);
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
+    control,
     formState: { errors },
   } = useForm<AcademicYearFormData>({
     resolver: zodResolver(academicYearSchema),
     defaultValues: {
-      yearName: "",
+      hijriYear: "",
+      gregorianYear: "",
+      status: "Active",
+      hijriStartDate: "",
+      hijriEndDate: "",
       startDate: "",
       endDate: "",
     },
   });
 
-  // Reset form when modal opens/closes or initialData changes
+  const selectedStatus = watch("status");
+
   useEffect(() => {
     if (isOpen && initialData) {
+      const { gregorianYear, hijriYear } = parseYearName(initialData.yearName);
       reset({
-        yearName: initialData.yearName,
-        startDate: initialData.startDate.split("T")[0], // Extract date part
+        gregorianYear,
+        hijriYear,
+        status: initialData.status,
+        hijriStartDate: "",
+        hijriEndDate: "",
+        startDate: initialData.startDate.split("T")[0],
         endDate: initialData.endDate.split("T")[0],
       });
     } else if (isOpen && !initialData) {
       reset({
-        yearName: "",
+        hijriYear: "",
+        gregorianYear: "",
+        status: "Active",
+        hijriStartDate: "",
+        hijriEndDate: "",
         startDate: "",
         endDate: "",
       });
     }
   }, [isOpen, initialData, reset]);
 
+  const applyStatus = (id: number, status: string, cb: () => void) => {
+    if (status === "Active") {
+      activateYear.mutate(id, { onSuccess: cb, onError: cb });
+    } else if (status === "Closed") {
+      closeYear.mutate(id, { onSuccess: cb, onError: cb });
+    } else {
+      deactivateYear.mutate(id, { onSuccess: cb, onError: cb });
+    }
+  };
+
   const onSubmit = (data: AcademicYearFormData) => {
-    // Convert dates to ISO format for backend
+    const yearName = `${data.gregorianYear} م / ${data.hijriYear} هـ`;
     const payload = {
-      yearName: data.yearName,
+      yearName,
       startDate: new Date(data.startDate).toISOString(),
       endDate: new Date(data.endDate).toISOString(),
     };
@@ -80,100 +157,216 @@ export function AddYearModal({
       updateYear.mutate(
         { id: initialData.id, data: payload },
         {
-          onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onSuccess: () => {
+            if (data.status !== initialData.status) {
+              applyStatus(initialData.id, data.status, () => onSuccess?.());
+            } else {
+              onSuccess?.();
+            }
+          },
         },
       );
     } else {
       createYear.mutate(payload, {
-        onSuccess: () => onSuccess?.(),
-        onError: () => {},
+        onSuccess: (created) => {
+          if (data.status !== "Inactive") {
+            applyStatus(created.id, data.status, () => onSuccess?.());
+          } else {
+            onSuccess?.();
+          }
+        },
       });
     }
   };
 
-  const isPending = createYear.isPending || updateYear.isPending;
+  const isPending =
+    createYear.isPending ||
+    updateYear.isPending ||
+    activateYear.isPending ||
+    deactivateYear.isPending ||
+    closeYear.isPending;
+
+  if (!isOpen) return null;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEditMode ? (modalT.editTitle ?? "تعديل السنة") : modalT.title}
-      maxWidth="max-w-lg"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      onClick={onClose}
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        {/* Year Name */}
-        <Input
-          label={modalT.yearName ?? "اسم السنة"}
-          placeholder={modalT.enterYear}
-          error={errors.yearName?.message}
-          {...register("yearName")}
-        />
-
-        {/* Dates */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-text-dark">
-              {modalT.startDate ?? "تاريخ البداية"}
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2">
-                <Calendar className="h-4 w-4 text-grey-400" />
-              </div>
-              <input
-                type="date"
-                {...register("startDate")}
-                className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
-              />
-            </div>
-            {errors.startDate && (
-              <p className="mt-1 text-xs text-warning-500">
-                {errors.startDate.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-text-dark">
-              {modalT.endDate ?? "تاريخ النهاية"}
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2">
-                <Calendar className="h-4 w-4 text-grey-400" />
-              </div>
-              <input
-                type="date"
-                {...register("endDate")}
-                className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
-              />
-            </div>
-            {errors.endDate && (
-              <p className="mt-1 text-xs text-warning-500">
-                {errors.endDate.message}
-              </p>
-            )}
-          </div>
+      <div
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="relative mb-6 flex items-center justify-center">
+          <h2 className="text-lg font-semibold text-grey-900">
+            {isEditMode ? "تعديل السنة الدراسية" : "إضافة سنة دراسية جديدة"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="absolute right-0 cursor-pointer rounded-lg p-1 text-grey-400 transition-colors hover:bg-grey-100 hover:text-grey-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        {/* Submit */}
-        <Button
-          type="submit"
-          className="w-full rounded-[20px]! font-light!"
-          size="lg"
-          loading={isPending}
-        >
-          {isEditMode ? (
-            <>
-              <Save className="h-5 w-5" />
-              {actionsT.save}
-            </>
-          ) : (
-            <>
-              <Plus className="h-5 w-5" />
-              {modalT.add}
-            </>
-          )}
-        </Button>
-      </form>
-    </Modal>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Hijri Year Select */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-grey-700">
+              اختر العام الدراسي هجريا
+            </label>
+            <select
+              {...register("hijriYear")}
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            >
+              <option value="">اختر العام الهجري</option>
+              {hijriYears.map((y) => (
+                <option key={y} value={y}>
+                  {y} هـ
+                </option>
+              ))}
+            </select>
+            {errors.hijriYear && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.hijriYear.message}
+              </p>
+            )}
+          </div>
+
+          {/* Gregorian Year Select */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-grey-700">
+              اختر العام الدراسي ميلاديا
+            </label>
+            <select
+              {...register("gregorianYear")}
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            >
+              <option value="">اختر العام الميلادي</option>
+              {gregorianYears.map((y) => (
+                <option key={y} value={y}>
+                  {y} م
+                </option>
+              ))}
+            </select>
+            {errors.gregorianYear && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.gregorianYear.message}
+              </p>
+            )}
+          </div>
+
+          {/* Status Toggle */}
+          <div>
+            <label className="mb-3 block text-sm font-medium text-grey-700">
+              حالة العام الدراسي
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {STATUS_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setValue("status", option.value)}
+                  className={`rounded-full border py-2.5 text-sm font-medium transition-colors ${
+                    selectedStatus === option.value
+                      ? option.selectedClass
+                      : "border-grey-200 bg-white text-grey-400 hover:bg-grey-50"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Hijri Dates */}
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="hijriStartDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="تاريخ البداية هجريا"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="اختر تاريخ البداية"
+                  defaultMode="hijri"
+                  showModeToggle={false}
+                />
+              )}
+            />
+            <Controller
+              name="hijriEndDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="تاريخ الإنتهاء هجريا"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="اختر تاريخ الإنتهاء"
+                  defaultMode="hijri"
+                  showModeToggle={false}
+                />
+              )}
+            />
+          </div>
+
+          {/* Gregorian Dates */}
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="startDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="تاريخ البداية ميلاديا"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="اختر تاريخ البداية"
+                  defaultMode="gregorian"
+                  showModeToggle={false}
+                  error={errors.startDate?.message}
+                />
+              )}
+            />
+            <Controller
+              name="endDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="تاريخ الإنتهاء ميلاديا"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="اختر تاريخ الإنتهاء"
+                  defaultMode="gregorian"
+                  showModeToggle={false}
+                  error={errors.endDate?.message}
+                />
+              )}
+            />
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            className="w-full rounded-[20px]! font-light!"
+            size="lg"
+            loading={isPending}
+          >
+            {isEditMode ? (
+              <>
+                <Save className="h-5 w-5" />
+                حفظ التعديلات
+              </>
+            ) : (
+              <>
+                إضافة
+                <Plus className="h-5 w-5" />
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 }

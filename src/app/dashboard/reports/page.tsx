@@ -1,15 +1,36 @@
 "use client";
 
 import { useTranslation } from "@/i18n/TranslationContext";
-import { useRouter } from "@/i18n/navigation";
-import { BarChart3, ChevronLeft } from "lucide-react";
+import { BarChart3, CalendarDays, ChevronDown } from "lucide-react";
 import { ReportsContent } from "@/features/reports";
+
+function TodayDateDisplay() {
+  const today = new Date();
+
+  const gregorianDate = today.toLocaleDateString("ar", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const hijriDate = new Intl.DateTimeFormat("ar-u-ca-islamic-umalqura", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(today);
+
+  return (
+    <div className="flex items-center gap-2 text-sm font-medium text-grey-700">
+      <ChevronDown className="h-4 w-4" />
+      <CalendarDays className="h-4 w-4" />
+      <span>{gregorianDate} / {hijriDate}</span>
+    </div>
+  );
+}
 
 export default function ReportsPage() {
   const { t } = useTranslation();
   const sidebarT = t("dashboard").sidebar;
-  const commonT = t("common");
-  const router = useRouter();
 
   return (
     <div>
@@ -18,13 +39,7 @@ export default function ReportsPage() {
           <BarChart3 className="ml-2 inline-block h-6 w-6" />
           <h1 className="text-xl font-normal">{sidebarT.reports}</h1>
         </div>
-        <button
-          onClick={() => router.back()}
-          className="flex items-center text-primary-500"
-        >
-          <h1 className="text-lg font-light">{commonT.goBack}</h1>
-          <ChevronLeft className="mr-2 inline-block h-6 w-6" />
-        </button>
+        <TodayDateDisplay />
       </div>
 
       <div className="mt-6">

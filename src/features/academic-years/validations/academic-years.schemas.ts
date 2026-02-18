@@ -1,11 +1,13 @@
 import { z } from "zod";
 
-// Schema for creating/updating academic years
-// Status is managed via separate activate/deactivate/close API endpoints
 export const academicYearSchema = z.object({
-  yearName: z.string().min(1, "اسم السنة مطلوب"),
-  startDate: z.string().min(1, "تاريخ البداية مطلوب"),
-  endDate: z.string().min(1, "تاريخ النهاية مطلوب"),
+  hijriYear: z.string().min(1, "العام الهجري مطلوب"),
+  gregorianYear: z.string().min(1, "العام الميلادي مطلوب"),
+  status: z.enum(["Active", "Inactive", "Closed"]),
+  hijriStartDate: z.string().optional(),
+  hijriEndDate: z.string().optional(),
+  startDate: z.string().min(1, "تاريخ البداية الميلادي مطلوب"),
+  endDate: z.string().min(1, "تاريخ النهاية الميلادي مطلوب"),
 });
 
 export type AcademicYearFormData = z.infer<typeof academicYearSchema>;

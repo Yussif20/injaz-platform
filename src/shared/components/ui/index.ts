@@ -1,4 +1,5 @@
 export { Button } from "./Button";
+export { DatePicker } from "./DatePicker";
 export { Input } from "./Input";
 export { Modal } from "./Modal";
 export { Pagination } from "./Pagination";
