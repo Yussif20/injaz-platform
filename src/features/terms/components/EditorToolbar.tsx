@@ -20,7 +20,7 @@ const FONT_SIZE_TO_EXEC: Record<number, string> = {
 };
 
 interface EditorToolbarProps {
-  editorRef: React.RefObject<HTMLDivElement>;
+  editorRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function EditorToolbar({ editorRef }: EditorToolbarProps) {
