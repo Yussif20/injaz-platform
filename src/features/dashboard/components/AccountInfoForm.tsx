@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
-import { Button, ConfirmModal, Input, Select } from "@/shared/components/ui";
+import { Button, ConfirmModal, Input, ProfileImage, Select } from "@/shared/components/ui";
 import { useAuth } from "@/features/auth";
 import {
   useMyProfile,
@@ -167,22 +167,38 @@ export const AccountInfoForm: React.FC = () => {
       }
 
       // Update personal info (email) if changed
+      // Send current personal info along with new email so backend receives required fields (birthDate, address, etc.)
       if (data.email !== displayData.email) {
-        await new Promise<void>((resolve, reject) => {
-          updatePersonalInfo(
-            { email: data.email || undefined },
-            {
+        const personalInfo = profile?.personalInfo;
+        const personalInfoPayload = {
+          ...(personalInfo && {
+            nationalId: personalInfo.nationalId ?? undefined,
+            address: personalInfo.address ?? undefined,
+            birthDate: personalInfo.birthDate
+              ? personalInfo.birthDate.split("T")[0]
+              : undefined,
+            rankId: personalInfo.rankId ?? undefined,
+          }),
+          email: data.email || undefined,
+        };
+        const updateResult = await new Promise<{ ok: boolean; message?: string }>(
+          (resolve, reject) => {
+            updatePersonalInfo(personalInfoPayload, {
               onSuccess: (response) => {
                 if (response.status) {
-                  resolve();
+                  resolve({ ok: true });
                 } else {
-                  reject(new Error(response.message));
+                  resolve({ ok: false, message: response.message });
                 }
               },
               onError: (error) => reject(error),
-            },
-          );
-        });
+            });
+          }
+        );
+        if (!updateResult.ok) {
+          setErrorMessage(updateResult.message || errorMessages.updateFailed);
+          return;
+        }
       }
 
       // Reset image change state
@@ -271,31 +287,14 @@ export const AccountInfoForm: React.FC = () => {
           <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
             <div className="relative">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-grey-200">
-                {profileImage ? (
-                  <Image
-                    src={profileImage}
-                    alt={accountInfo.profileImageAlt}
-                    width={70}
-                    height={70}
-                    className="w-full h-full object-cover"
-                  />
-                ) : displayData.profileImage ? (
-                  <Image
-                    src={displayData.profileImage}
-                    alt={accountInfo.profileImageAlt}
-                    width={70}
-                    height={70}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src="/images/dashboard/account-info/avatar.svg"
-                    alt={accountInfo.profileImageAlt}
-                    width={70}
-                    height={70}
-                    className="w-full h-full object-cover"
-                  />
-                )}
+                <ProfileImage
+                  src={profileImage ?? displayData.profileImage}
+                  alt={accountInfo.profileImageAlt}
+                  width={70}
+                  height={70}
+                  className="w-full h-full object-cover"
+                  fallbackSrc="/images/dashboard/account-info/avatar.svg"
+                />
               </div>
               <input
                 type="file"

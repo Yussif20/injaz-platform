@@ -77,7 +77,7 @@ export const DarkEducationSection = ({
                   {qual.degreeType} {qual.title}
                 </h3>
                 <p className="text-[#BABABA] text-[12px] md:text-[20px] lg:text-[24px] font-light md:font-normal">
-                  {qual.grade || "—"}
+                  {qual.institution || qual.grade || "—"}
                 </p>
                 <p className="text-[#BABABA] text-[12px] md:text-[20px] lg:text-[24px] font-light md:font-normal">
                   {formatYear(qual.graduationDate)}

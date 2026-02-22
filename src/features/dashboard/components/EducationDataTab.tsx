@@ -23,6 +23,7 @@ import type {
 const qualificationSchema = z.object({
   degreeType: z.string().min(1, "نوع الشهادة مطلوب"),
   title: z.string().min(1, "التخصص مطلوب"),
+  institution: z.string().min(1, "المؤسسة/الجامعة مطلوبة"),
   grade: z.string().optional(),
   graduationDate: z.string().min(1, "سنة التخرج مطلوبة"),
 });
@@ -91,6 +92,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     defaultValues: {
       degreeType: "",
       title: "",
+      institution: "",
       grade: "",
       graduationDate: "",
     },
@@ -104,6 +106,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
       reset({
         degreeType: editingQualification.degreeType || "",
         title: editingQualification.title || "",
+        institution: editingQualification.institution || editingQualification.grade || "",
         grade: editingQualification.grade || "",
         graduationDate: editingQualification.graduationDate
           ? new Date(editingQualification.graduationDate)
@@ -115,6 +118,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
       reset({
         degreeType: "",
         title: "",
+        institution: "",
         grade: "",
         graduationDate: "",
       });
@@ -127,6 +131,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
       const requestData: CreateQualificationRequest = {
         degreeType: data.degreeType,
         title: data.title,
+        institution: data.institution || undefined,
         grade: data.grade || undefined,
         graduationDate: `${data.graduationDate}-01-01`,
       };
@@ -188,6 +193,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     reset({
       degreeType: "",
       title: "",
+      institution: "",
       grade: "",
       graduationDate: "",
     });
@@ -270,7 +276,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
                 {qualification.title || ""}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {qualification.grade || "-"}
+                {qualification.institution || qualification.grade || "-"}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
                 {formatYear(qualification.graduationDate)}
@@ -457,8 +463,8 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
         <Input
           label={onboarding.qualifications.institutionLabel}
           placeholder="مثال: جامعة الملك فهد"
-          error={errors.grade?.message}
-          {...register("grade")}
+          error={errors.institution?.message}
+          {...register("institution")}
         />
         <Input
           label={onboarding.qualifications.titleLabel}

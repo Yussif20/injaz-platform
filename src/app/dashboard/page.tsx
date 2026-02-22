@@ -15,6 +15,7 @@ import {
 } from "@/features/dashboard";
 import {
   useMyProfiles,
+  useAcademicYears,
   useUnpublishProfile,
   useDeleteProfile,
 } from "@/features/profiles";
@@ -69,6 +70,7 @@ export default function DashboardPage() {
     isLoading: profilesLoading,
     refetch: refetchProfiles,
   } = useMyProfiles();
+  const { academicYears } = useAcademicYears();
   const { unpublish } = useUnpublishProfile();
   const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
 
@@ -79,7 +81,6 @@ export default function DashboardPage() {
   // Filter states
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<FileStatus | null>(null);
-  const [dateType, setDateType] = useState<"gregorian" | "hijri">("gregorian");
 
   // Password modal states
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -275,17 +276,15 @@ export default function DashboardPage() {
         {/* Filters sidebar - left side */}
         <div className="hidden lg:block w-64 flex-shrink-0">
           <FileFilters
+            years={academicYears.map((y) => y.yearName)}
             selectedYear={selectedYear}
             selectedStatus={selectedStatus}
-            dateType={dateType}
             onYearChange={setSelectedYear}
             onStatusChange={setSelectedStatus}
-            onDateTypeChange={setDateType}
             onApplyFilters={() => {
               console.log("Applying filters:", {
                 selectedYear,
                 selectedStatus,
-                dateType,
               });
             }}
           />

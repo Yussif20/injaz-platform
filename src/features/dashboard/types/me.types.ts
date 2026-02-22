@@ -50,6 +50,7 @@ export interface Qualification {
   id: number;
   degreeType: string | null;
   title: string | null;
+  institution?: string | null; // University/institution name (optional for backward compat)
   grade: string | null;
   graduationDate: string; // ISO date
 }
@@ -60,6 +61,7 @@ export interface Qualification {
 export interface CreateQualificationRequest {
   degreeType?: string;
   title?: string;
+  institution?: string;
   grade?: string;
   graduationDate: string; // ISO date - Required
 }
@@ -70,6 +72,7 @@ export interface CreateQualificationRequest {
 export interface UpdateQualificationRequest {
   degreeType?: string;
   title?: string;
+  institution?: string;
   grade?: string;
   graduationDate: string; // ISO date - Required
 }

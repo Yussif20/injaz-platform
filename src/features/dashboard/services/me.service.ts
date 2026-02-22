@@ -2,6 +2,7 @@
  * Me service - Client-side API calls for user profile management
  */
 
+import axios from "axios";
 import { clientApi } from "@/shared/lib/api";
 import type {
   UserProfile,
@@ -61,8 +62,29 @@ export async function getMyPersonalInfo(): Promise<PersonalInfoResponse> {
 export async function updatePersonalInfo(
   data: UpdatePersonalInfoRequest
 ): Promise<PersonalInfoResponse> {
-  const response = await clientApi.put<PersonalInfoResponse>("/api/me/personal-info", data);
-  return response.data;
+  try {
+    const response = await clientApi.put<PersonalInfoResponse>("/api/me/personal-info", data);
+    return response.data;
+  } catch (error) {
+    if (error && typeof error === "object" && "response" in error) {
+      const axiosError = error as { response?: { data?: PersonalInfoResponse; status?: number } };
+      if (axiosError.response?.data) {
+        const responseData = axiosError.response.data;
+        return {
+          status: responseData.status ?? false,
+          message: responseData.message || "فشل في تحديث البيانات",
+          data: responseData.data,
+          errors: responseData.errors ?? null,
+        };
+      }
+    }
+    return {
+      status: false,
+      message: "فشل في تحديث البيانات",
+      data: undefined,
+      errors: null,
+    };
+  }
 }
 
 /**
@@ -77,15 +99,16 @@ export async function updateBasicInfo(
 
 /**
  * Upload profile image
+ * Use axios.post directly (no default Content-Type) so the request is sent as
+ * multipart/form-data with boundary. clientApi defaults to application/json which causes 400.
  */
 export async function uploadProfileImage(file: File): Promise<ImageUploadResponse> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const response = await clientApi.post<ImageUploadResponse>("/api/me/image", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+  const response = await axios.post<ImageUploadResponse>("/api/me/image", formData, {
+    withCredentials: true, // send cookies (auth)
+    timeout: 30000,
   });
   return response.data;
 }

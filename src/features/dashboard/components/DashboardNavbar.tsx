@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
-import { Button, ConfirmModal } from "@/shared/components/ui";
+import { Button, ConfirmModal, ProfileImage } from "@/shared/components/ui";
 import { useLogout } from "@/features/auth";
 import { useAuth } from "@/features/auth";
 
@@ -124,12 +124,13 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
           {pathname === ROUTES.DASHBOARD ? (
             <div className="hidden md:flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
               <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
-                <Image
-                  src={user?.profileImage || "/icons/ui/user.svg"}
+                <ProfileImage
+                  src={user?.profileImage}
                   alt="صورة الملف الشخصي"
                   width={54}
                   height={54}
                   className="object-cover w-full h-full"
+                  fallbackSrc="/icons/ui/user.svg"
                 />
               </div>
               <div className="leading-snug text-right">

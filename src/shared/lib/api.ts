@@ -4,9 +4,14 @@
 
 import axios from "axios";
 
-// Backend API base URL
+// Backend API base URL (server-side; use in API routes)
 export const BACKEND_API_URL =
   process.env.BACKEND_API_URL || "https://staging.enjazfile.com";
+
+/** Backend base URL for client (e.g. resolving relative imageUrl). Set NEXT_PUBLIC_API_URL if different from default. */
+export const PUBLIC_API_BASE_URL =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
+  "https://staging.enjazfile.com";
 
 // Server-side axios instance (for API routes)
 export const serverApi = axios.create({

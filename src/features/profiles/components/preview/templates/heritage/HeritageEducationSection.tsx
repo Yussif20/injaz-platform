@@ -70,7 +70,7 @@ export const HeritageEducationSection = ({
                   {qual.degreeType} {qual.title}
                 </h3>
                 <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
-                  {qual.grade || "—"}
+                  {qual.institution || qual.grade || "—"}
                 </p>
                 <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
                   {formatYear(qual.graduationDate)}

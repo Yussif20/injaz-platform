@@ -30,6 +30,7 @@ export interface Qualification {
   id: number;
   degreeType: string | null;
   title: string | null;
+  institution?: string | null; // University/institution name
   grade: string | null;
   graduationDate: string;
 }

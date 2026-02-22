@@ -49,6 +49,8 @@ export const dashboardContent = {
     filterByYear: "تصنيف حسب السنة",
     filterByStatus: "تصنيف حسب حالة الملف",
     filterButton: "تصنيف",
+    allYears: "كل السنوات",
+    allStatuses: "الكل",
     gregorian: "تاريخ ميلادي",
     hijri: "تاريخ هجري",
     years: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"],

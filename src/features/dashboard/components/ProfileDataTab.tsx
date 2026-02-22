@@ -15,7 +15,7 @@ const myDataSchema = z.object({
   nationalId: z
     .string()
     .min(1, "رقم الهوية مطلوب")
-    .regex(/^\d{10}$/, "رقم الهوية يجب أن يكون 10 أرقام"),
+    .regex(/^\d{14}$/, "رقم الهوية يجب أن يكون 14 أرقام"),
   address: z.string().min(1, "العنوان مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
   email: z.string().email("البريد الإلكتروني غير صالح").or(z.literal("")),

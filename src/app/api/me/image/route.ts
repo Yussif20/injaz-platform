@@ -4,8 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 import { getAccessToken } from "@/shared/lib/cookies";
-import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
+import { BACKEND_API_URL, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
 
 interface ImageUploadResponse {
@@ -34,17 +35,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create a new FormData for the backend request
+    // Backend expects multipart field name "file" (not "image")
     const backendFormData = new FormData();
-    backendFormData.append("image", imageFile);
+    backendFormData.append("file", imageFile);
 
-    const response = await serverApi.post<ApiResponse<ImageUploadResponse>>(
-      API_ENDPOINTS.MY_IMAGE,
+    // Use axios.post directly without default Content-Type so the request is sent as
+    // multipart/form-data with boundary. serverApi has Content-Type: application/json
+    // which causes the backend to return 415 Unsupported Media Type.
+    const response = await axios.post<ApiResponse<ImageUploadResponse>>(
+      `${BACKEND_API_URL}${API_ENDPOINTS.MY_IMAGE}`,
       backendFormData,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        timeout: 30000,
       }
     );
 
