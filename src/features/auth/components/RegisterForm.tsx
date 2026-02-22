@@ -43,6 +43,7 @@ export function RegisterForm() {
     isVerifyingOtp,
     verifyOtpError,
     register: registerUser,
+    isRegistering,
     registerError,
     reset: resetMutations,
   } = useRegister();
@@ -61,84 +62,35 @@ export function RegisterForm() {
     },
   });
 
-  // Watch acceptTerms value to control submit button state without using watch() inline
+  // Watch acceptTerms value to control submit button state
   const isTermsAccepted = useWatch({
     control: detailsForm.control,
     name: "acceptTerms",
   });
 
-  // Resend timer countdown
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendTimer]);
-
-  // Step indicator removed, helper not needed
-
-  // Step 1: Submit details and send OTP
-  const handleDetailsSubmit = async (data: RegisterDetailsFormValues) => {
-    try {
-      const sanitizedPhone = data.phone;
-      await sendOtpAsync(sanitizedPhone);
-      setPendingDetails(data);
-      setPhone(sanitizedPhone);
-      setStep("otp");
-      setResendTimer(60);
-    } catch {
-      // Error is handled by mutation
-    }
+  // Direct register (OTP path commented out): submit form → register endpoint
+  const handleDetailsSubmit = (data: RegisterDetailsFormValues) => {
+    registerUser({
+      fullName: data.fullName,
+      phone: data.phone,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      gender: data.gender as Gender,
+      email: data.email || "",
+      verificationCode: "11111", // Fixed OTP for now (backend has no OTP path)
+    });
   };
 
-  // Step 2: Handle OTP verification then complete registration
-  const handleOtpVerify = async () => {
-    if (otpCode.length !== 6) {
-      setOtpError(otp.errorLength6);
-      return;
-    }
-
-    setOtpError("");
-    try {
-      await verifyOtpAsync({ phone, code: otpCode });
-      if (pendingDetails) {
-        registerUser({
-          fullName: pendingDetails.fullName,
-          phone,
-          password: pendingDetails.password,
-          confirmPassword: pendingDetails.confirmPassword,
-          gender: pendingDetails.gender as Gender,
-          email: pendingDetails.email || "",
-          verificationCode: otpCode,
-        });
-      }
-    } catch {
-      setOtpError(verifyOtpError?.message || otp.errorInvalid);
-    }
-  };
-
-  // Resend OTP
-  const handleResendOtp = () => {
-    if (resendTimer > 0) return;
-    sendOtp(phone);
-    setResendTimer(60);
-    setOtpCode("");
-    setOtpError("");
-  };
-
-  // Registration now happens after OTP verification
-
-  // Go back to previous step
-  const handleBack = () => {
-    resetMutations();
-    if (step === "otp") {
-      setStep("details");
-      setOtpCode("");
-      setOtpError("");
-    } else if (step === "details") {
-      // stay in details
-    }
-  };
+  // --- OTP path (commented out for now) ---
+  // const [step, setStep] = useState<RegistrationStep>("details");
+  // const [phone, setPhone] = useState("");
+  // const [otpCode, setOtpCode] = useState("");
+  // const [otpError, setOtpError] = useState("");
+  // const [resendTimer, setResendTimer] = useState(0);
+  // const [pendingDetails, setPendingDetails] = useState<RegisterDetailsFormValues | null>(null);
+  // Step 1 used to: sendOtpAsync(phone) → setStep("otp")
+  // Step 2 used to: verifyOtpAsync({ phone, code }) → registerUser({ ...pendingDetails, verificationCode: otpCode })
+  // handleResendOtp, handleBack, handleOtpVerify — removed while OTP is disabled
 
   // Handle phone input - only allow numbers and +
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,84 +101,18 @@ export function RegisterForm() {
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
-      {/* Step 2: OTP Verification */}
+      {/* OTP step commented out — direct register only
       {step === "otp" && (
-        <div className="flex flex-col gap-5 sm:gap-6 text-right max-w-md mx-auto lg:mx-0 lg:max-w-none">
-          {verifyOtpError && (
-            <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
-              {verifyOtpError.message}
-            </div>
-          )}
-
-          <div className="text-center">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-medium text-text-dark mb-3">
-              {otp.titleConfirm}
-            </h2>
-            <p className="text-sm sm:text-base text-grey-500 mb-6">
-              {otp.subtitleRegister} <span dir="ltr">{phone}</span>
-            </p>
-          </div>
-
-          <OtpInput
-            length={6}
-            value={otpCode}
-            onChange={setOtpCode}
-            error={otpError}
-            disabled={isVerifyingOtp}
-          />
-
-          <div className="flex justify-center gap-2 text-sm sm:text-base mt-2">
-            <span className="text-grey-500">{otp.resendText}</span>
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              disabled={resendTimer > 0}
-              className={`text-primary-500 font-medium ${
-                resendTimer > 0
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:underline"
-              }`}
-            >
-              {resendTimer > 0
-                ? `${otp.resendButton} (${resendTimer})`
-                : otp.resendButton}
-            </button>
-          </div>
-
-          <div className="flex gap-3 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-              className="flex-1 py-3 sm:py-3.5 rounded-xl"
-            >
-              {buttons.back}
-            </Button>
-            <Button
-              type="button"
-              onClick={handleOtpVerify}
-              isLoading={isVerifyingOtp}
-              disabled={isVerifyingOtp || otpCode.length !== 6}
-              className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 sm:py-3.5 rounded-xl transition-colors"
-            >
-              {otp.verifyButton}
-            </Button>
-          </div>
-        </div>
+        <div> ... OtpInput, resend, verify button, handleBack ... </div>
       )}
+      */}
 
-      {/* Step 1: Registration Details + Phone */}
-      {step === "details" && (
-        <form
-          onSubmit={detailsForm.handleSubmit(handleDetailsSubmit)}
-          className="flex flex-col gap-5 sm:gap-6 text-right"
-        >
-          {sendOtpError && (
-            <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
-              {sendOtpError.message}
-            </div>
-          )}
-          {registerError && (
+      {/* Registration form — submits directly to register endpoint */}
+      <form
+        onSubmit={detailsForm.handleSubmit(handleDetailsSubmit)}
+        className="flex flex-col gap-5 sm:gap-6 text-right"
+      >
+        {registerError && (
             <div className="bg-warning-50 border border-warning-500 text-warning-700 px-4 py-3 rounded-xl text-sm text-right">
               {registerError.message}
             </div>
@@ -504,27 +390,26 @@ export function RegisterForm() {
             )}
           </div>
 
-          <div className="mt-4">
-            <Button
-              type="submit"
-              isLoading={isSendingOtp}
-              disabled={isSendingOtp || !isTermsAccepted}
-              className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
-            >
-              {signUp.submitButton}
-            </Button>
-          </div>
+        <div className="mt-4">
+          <Button
+            type="submit"
+            isLoading={isRegistering}
+            disabled={isRegistering || !isTermsAccepted}
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
+          >
+            {signUp.submitButton}
+          </Button>
+        </div>
 
-          <div className="text-center lg:text-right text-primary-500 text-sm sm:text-base font-light mt-2">
-            <Link
-              href={ROUTES.SIGN_IN}
-              className="hover:underline transition-colors"
-            >
-              {signUp.signInLink}
-            </Link>
-          </div>
-        </form>
-      )}
+        <div className="text-center lg:text-right text-primary-500 text-sm sm:text-base font-light mt-2">
+          <Link
+            href={ROUTES.SIGN_IN}
+            className="hover:underline transition-colors"
+          >
+            {signUp.signInLink}
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }

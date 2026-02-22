@@ -30,6 +30,7 @@ export const clientApi = axios.create({
 export const API_ENDPOINTS = {
   // Auth endpoints (backend)
   LOGIN: "/api/Auth/login",
+  REGISTER: "/api/Auth/register",
   REGISTER_WITH_OTP: "/api/Auth/register-with-otp",
   SEND_REGISTRATION_OTP: "/api/Auth/send-registration-otp",
   VERIFY_REGISTRATION_OTP: "/api/Auth/verify-registration-otp",
