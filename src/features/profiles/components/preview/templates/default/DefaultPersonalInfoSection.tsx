@@ -101,6 +101,7 @@ export const DefaultPersonalInfoSection = ({
       pattern: "/images/profiles/default/email-pattern.svg",
       position: "left" as const,
       patternSide: "start" as const, // Pattern on right/inner side
+      contentAlign: "right" as const, // Title and value aligned right
     },
     {
       id: "nationalId",
@@ -124,31 +125,38 @@ export const DefaultPersonalInfoSection = ({
 
   return (
     <div className="px-4 py-6">
-      {/* Section Header */}
-      <div className="flex items-center justify-start gap-2 md:gap-3 mb-6 md:mb-10">
-        {/* Star Icon */}
-        <div className="w-8.75 h-8.75 md:w-13.75 md:h-13.75 relative">
-          <Image src="/images/profiles/default/star.svg" alt="" fill />
-        </div>
-        <div className="text-right flex flex-col gap-2 md:gap-4">
-          <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
-            {content.title}
-          </h2>
-          <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
-            {content.subtitle}
-          </p>
-        </div>
-      </div>
-
-      {/* Cards Container - Desktop with zigzag layout */}
-      <div className="hidden md:block relative">
-        {/* Connector Line - positioned behind cards */}
-        <div className="absolute inset-0 flex justify-center pointer-events-none">
+      {/* Full section wrapper: header + cards, with zig-zag from section start */}
+      <div className="relative">
+        {/* Desktop: Connector Line - spans from section start (header) through cards */}
+        <div className="absolute inset-0 hidden md:flex justify-center pointer-events-none">
           <ConnectorLine className="w-[70%] lg:w-[65%] max-w-[600px] h-full opacity-80" />
         </div>
 
-        {/* Cards */}
-        <div className="relative space-y-6 lg:space-y-8">
+        {/* Mobile: Connector Line - spans from section start through cards */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 md:hidden pointer-events-none w-24">
+          <MobileConnectorLine className="w-full h-full opacity-60" />
+        </div>
+
+        {/* Section Header */}
+        <div className="flex items-center justify-start gap-2 md:gap-3 mb-6 md:mb-10 relative">
+          {/* Star Icon */}
+          <div className="w-8.75 h-8.75 md:w-13.75 md:h-13.75 relative">
+            <Image src="/images/profiles/default/star.svg" alt="" fill />
+          </div>
+          <div className="text-right flex flex-col gap-2 md:gap-4">
+            <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
+              {content.title}
+            </h2>
+            <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
+              {content.subtitle}
+            </p>
+          </div>
+        </div>
+
+        {/* Cards Container - Desktop with zigzag layout */}
+        <div className="hidden md:block relative">
+          {/* Cards */}
+          <div className="relative space-y-6 lg:space-y-8">
           {cards.map((card) => (
             <div
               key={card.id}
@@ -174,14 +182,20 @@ export const DefaultPersonalInfoSection = ({
 
                 {/* Content */}
                 <div
-                  className={`flex-1 flex flex-col justify-center py-5 lg:py-6 px-4 lg:px-6 ${
-                    card.position === "right" ? "text-right" : "text-left"
+                  className={`flex-1 min-w-0 flex flex-col justify-center py-5 lg:py-6 px-4 lg:px-6 ${
+                    (card as { contentAlign?: "right" | "left" }).contentAlign === "right"
+                      ? "text-right"
+                      : (card as { contentAlign?: "right" | "left" }).contentAlign === "left"
+                        ? "text-left"
+                        : card.position === "right"
+                          ? "text-right"
+                          : "text-left"
                   }`}
                 >
                   <h3 className="text-white text-base lg:text-lg font-semibold mb-1 lg:mb-2">
                     {card.label}
                   </h3>
-                  <p className="text-white/90 text-sm lg:text-base font-light">
+                  <p className="text-white/90 text-sm lg:text-base font-light break-words">
                     {card.value}
                   </p>
                 </div>
@@ -200,18 +214,13 @@ export const DefaultPersonalInfoSection = ({
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Cards Container - Mobile/Tablet stacked layout */}
-      <div className="md:hidden relative">
-        {/* Connector Line - positioned behind cards */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 pointer-events-none">
-          <MobileConnectorLine className="w-24 h-full opacity-60" />
+          </div>
         </div>
 
-        {/* Cards */}
-        <div className="relative space-y-4">
+        {/* Cards Container - Mobile/Tablet stacked layout */}
+        <div className="md:hidden relative">
+          {/* Cards */}
+          <div className="relative space-y-4">
           {cards.map((card, index) => (
             <div
               key={card.id}
@@ -237,14 +246,20 @@ export const DefaultPersonalInfoSection = ({
 
                 {/* Content */}
                 <div
-                  className={`flex-1 flex flex-col justify-center py-4 px-4 ${
-                    card.position === "right" ? "text-right" : "text-left"
+                  className={`flex-1 min-w-0 flex flex-col justify-center py-4 px-4 ${
+                    (card as { contentAlign?: "right" | "left" }).contentAlign === "right"
+                      ? "text-right"
+                      : (card as { contentAlign?: "right" | "left" }).contentAlign === "left"
+                        ? "text-left"
+                        : card.position === "right"
+                          ? "text-right"
+                          : "text-left"
                   }`}
                 >
                   <h3 className="text-white text-sm font-semibold mb-1">
                     {card.label}
                   </h3>
-                  <p className="text-white/90 text-xs font-light">
+                  <p className="text-white/90 text-xs font-light break-words">
                     {card.value}
                   </p>
                 </div>
@@ -263,6 +278,7 @@ export const DefaultPersonalInfoSection = ({
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </div>

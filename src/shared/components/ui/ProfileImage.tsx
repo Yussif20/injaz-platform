@@ -38,7 +38,7 @@ export function ProfileImage({
   width = 70,
   height = 70,
   className = "w-full h-full object-cover",
-  fallbackSrc = "/icons/ui/user.svg",
+  fallbackSrc = "/logo/logo-cyan.svg",
 }: ProfileImageProps) {
   const rawSrc = src && typeof src === "string" && src.trim() ? src.trim() : null;
   const effectiveSrc = rawSrc ? normalizeImageSrc(rawSrc) : fallbackSrc;

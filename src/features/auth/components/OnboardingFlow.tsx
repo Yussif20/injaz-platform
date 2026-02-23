@@ -455,6 +455,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             placeholder={
                               onboarding.basicInfo.whatsappPlaceholder
                             }
+                            dir="ltr"
                             {...basicInfoForm.register("whatsapp")}
                           />
                         </div>

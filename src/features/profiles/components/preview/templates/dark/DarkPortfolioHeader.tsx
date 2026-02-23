@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Image as ImageIcon } from "lucide-react";
 import type { ThemeColors } from "@/features/profiles/types/theme.types";
 
 interface DarkHeaderBarProps {
@@ -16,11 +17,13 @@ interface DarkPortfolioHeaderProps {
   teacherRank: string;
   academicYear: string;
   onDownload: () => void;
+  onDownloadAsImage?: () => void;
   onShare: () => void;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
     downloadFile: string;
+    downloadAsImage?: string;
     shareFile: string;
     fileTitle: string;
     publishFile?: string;
@@ -37,6 +40,7 @@ const DarkHeaderBar = ({
 }: DarkHeaderBarProps) => (
   <div className="flex items-center justify-between mb-6 md:mb-8">
     <button
+      data-back-button
       onClick={onBack}
       className="text-white hover:text-gray-300 transition-colors"
       aria-label="Back"
@@ -58,6 +62,7 @@ const DarkHeaderBar = ({
     </h3>
 
     <button
+      data-share-button
       onClick={onPublish}
       className="bg-white text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl hover:bg-gray-100 transition-colors"
       style={{ color: primaryColor, border: `2px solid ${primaryColor}` }}
@@ -71,6 +76,7 @@ export const DarkPortfolioHeader = ({
   teacherName,
   teacherRank,
   onDownload,
+  onDownloadAsImage,
   onShare,
   onBack,
   isDownloading = false,
@@ -122,7 +128,10 @@ export const DarkPortfolioHeader = ({
             <p className="text-white text-sm md:text-2xl lg:text-[28px] font-normal">
               {content.fileTitle} - 2025
             </p>
-            <h1 className="text-lg md:text-[28px] lg:text-4xl font-normal bg-clip-text text-transparent bg-[linear-gradient(90deg,#1940A6_-22.92%,#478AE2_59.95%,#FFFFFF_119.01%)]">
+            <h1
+              className="text-lg md:text-[28px] lg:text-4xl font-normal bg-clip-text text-transparent bg-[linear-gradient(90deg,#1940A6_-22.92%,#478AE2_59.95%,#FFFFFF_119.01%)]"
+              data-screenshot-text-color="#FFFFFF"
+            >
               {teacherName}
             </h1>
             <p className="text-white text-sm md:text-2xl lg:text-[28px] font-normal">
@@ -132,6 +141,7 @@ export const DarkPortfolioHeader = ({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mt-2 justify-center">
               <button
+                data-download-button
                 onClick={onDownload}
                 disabled={isDownloading}
                 className="flex bg-[#263B74] text-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
@@ -148,7 +158,23 @@ export const DarkPortfolioHeader = ({
                 {isDownloading ? "جاري التحميل..." : content.downloadFile}
               </button>
 
+              {onDownloadAsImage && content.downloadAsImage && (
+                <button
+                  data-download-image-button
+                  onClick={onDownloadAsImage}
+                  disabled={isDownloading}
+                  className="flex bg-transparent text-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center border border-white"
+                  style={{
+                    opacity: isDownloading ? 0.8 : 1,
+                  }}
+                >
+                  <ImageIcon className="w-6 h-6 shrink-0 text-white" />
+                  {content.downloadAsImage}
+                </button>
+              )}
+
               <button
+                data-share-button
                 onClick={onShare}
                 className="bg-transparent text-white flex outline outline-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
               >

@@ -94,20 +94,33 @@ function CreateFileContent() {
       if (response.status) {
         router.push(ROUTES.DASHBOARD);
       } else {
-        // Show detailed error info for debugging
-        const errorInfo = response.debug 
-          ? `${response.message} - Backend: ${JSON.stringify(response.debug)}`
-          : response.message || "فشل في إنشاء الملف";
+        const backendMsg =
+          (response as { debug?: { backendMessage?: string } }).debug
+            ?.backendMessage ?? (response as { message?: string }).message ?? "";
+        const isAlreadyHasProfile =
+          typeof backendMsg === "string" &&
+          backendMsg.includes("ملف لهذه السنة");
+        const errorInfo = isAlreadyHasProfile
+          ? createFile.errorAlreadyHasProfileForYear
+          : (response.message || "فشل في إنشاء الملف");
         setError(errorInfo);
-        console.error("Create profile failed:", response);
+        if (!isAlreadyHasProfile) console.error("Create profile failed:", response);
       }
     } catch (err: unknown) {
-      const errorObj = err as { message?: string; response?: { data?: unknown } };
-      const errorDetail = errorObj?.response?.data 
-        ? JSON.stringify(errorObj.response.data)
-        : errorObj?.message || "حدث خطأ غير متوقع";
+      const errorObj = err as {
+        message?: string;
+        response?: { data?: { message?: string; debug?: { backendMessage?: string } } };
+      };
+      const data = errorObj?.response?.data;
+      const backendMsg = data?.debug?.backendMessage ?? data?.message ?? "";
+      const isAlreadyHasProfile =
+        typeof backendMsg === "string" &&
+        backendMsg.includes("ملف لهذه السنة");
+      const errorDetail = isAlreadyHasProfile
+        ? createFile.errorAlreadyHasProfileForYear
+        : data?.message || errorObj?.message || "حدث خطأ غير متوقع";
       setError(errorDetail);
-      console.error("Create profile error:", err);
+      if (!isAlreadyHasProfile) console.error("Create profile error:", err);
     }
   };
 

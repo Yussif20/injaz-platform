@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Return user data without tokens
     const user: User = {
-      userId: data.userId,
+      userId: String(data.userId),
       phone: data.phone,
       fullName: data.fullName,
       userName: data.userName,

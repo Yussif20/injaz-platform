@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Image as ImageIcon } from "lucide-react";
 import type { ThemeColors } from "@/features/profiles/types/theme.types";
 
 interface HeritageHeaderBarProps {
@@ -14,11 +15,13 @@ interface HeritagePortfolioHeaderProps {
   teacherRank: string;
   academicYear: string;
   onDownload: () => void;
+  onDownloadAsImage?: () => void;
   onShare: () => void;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
     downloadFile: string;
+    downloadAsImage?: string;
     shareFile: string;
     fileTitle: string;
     publishFile?: string;
@@ -31,6 +34,7 @@ export const HeritagePortfolioHeader = ({
   teacherRank,
   academicYear,
   onDownload,
+  onDownloadAsImage,
   onShare,
   onBack,
   isDownloading = false,
@@ -94,6 +98,7 @@ export const HeritagePortfolioHeader = ({
               <div className="flex flex-row gap-3 mt-4 md:mt-6">
                 {/* Share Button - Cream/White */}
                 <button
+                  data-share-button
                   onClick={onShare}
                   className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-normal transition-opacity hover:opacity-90"
                   style={{
@@ -110,8 +115,27 @@ export const HeritagePortfolioHeader = ({
                   {content.shareFile}
                 </button>
 
+                {/* Download as Image Button */}
+                {onDownloadAsImage && content.downloadAsImage && (
+                  <button
+                    data-download-image-button
+                    onClick={onDownloadAsImage}
+                    disabled={isDownloading}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-normal transition-opacity hover:opacity-90 border-2 border-[#F5E6E8]"
+                    style={{
+                      backgroundColor: "transparent",
+                      color: "#F5E6E8",
+                      opacity: isDownloading ? 0.7 : 1,
+                    }}
+                  >
+                    <ImageIcon className="w-6 h-6 shrink-0 text-white" />
+                    {content.downloadAsImage}
+                  </button>
+                )}
+
                 {/* Download Button - Dark */}
                 <button
+                  data-download-button
                   onClick={onDownload}
                   disabled={isDownloading}
                   className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-normal transition-opacity hover:opacity-90"
@@ -146,6 +170,7 @@ const HeritageHeaderBar = ({
   <div className="flex items-center justify-between mb-6 md:mb-10 lg:mb-12">
     {/* Back Arrow */}
     <button
+      data-back-button
       aria-label="رجوع"
       onClick={onBack}
       className="text-white hover:opacity-80 transition-opacity"
@@ -172,6 +197,7 @@ const HeritageHeaderBar = ({
 
     {/* Publish Button */}
     <button
+      data-share-button
       onClick={onPublish}
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base transition-opacity hover:opacity-90"
       style={{ backgroundColor: "#F5E6E8", color: "#52161E" }}

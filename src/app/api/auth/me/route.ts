@@ -83,7 +83,7 @@ export async function GET() {
             status: true,
             message: "تم تحديث الجلسة",
             data: {
-              userId: data.userId,
+              userId: String(data.userId),
               phone: data.phone,
               fullName: data.fullName,
               userName: data.userName,

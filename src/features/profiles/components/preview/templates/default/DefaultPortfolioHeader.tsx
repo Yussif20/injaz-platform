@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Image as ImageIcon } from "lucide-react";
 import type { ThemeColors } from "@/features/profiles/types/theme.types";
 
 interface DefaultHeaderBarProps {
@@ -16,11 +17,13 @@ interface DefaultPortfolioHeaderProps {
   teacherRank: string;
   academicYear: string;
   onDownload: () => void;
+  onDownloadAsImage?: () => void;
   onShare: () => void;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
     downloadFile: string;
+    downloadAsImage?: string;
     shareFile: string;
     fileTitle: string;
     publishFile?: string;
@@ -33,6 +36,7 @@ export const DefaultPortfolioHeader = ({
   teacherRank,
   // academicYear,
   onDownload,
+  onDownloadAsImage,
   onShare,
   onBack,
   isDownloading = false,
@@ -75,6 +79,7 @@ export const DefaultPortfolioHeader = ({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <button
+                data-download-button
                 onClick={onDownload}
                 disabled={isDownloading}
                 className="flex bg-primary-500 text-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
@@ -91,7 +96,23 @@ export const DefaultPortfolioHeader = ({
                 {isDownloading ? "جاري التحميل..." : content.downloadFile}
               </button>
 
+              {onDownloadAsImage && content.downloadAsImage && (
+                <button
+                  data-download-image-button
+                  onClick={onDownloadAsImage}
+                  disabled={isDownloading}
+                  className="flex bg-grey-100 text-primary-500 border border-primary-500 items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
+                  style={{
+                    opacity: isDownloading ? 0.8 : 1,
+                  }}
+                >
+                  <ImageIcon className="w-6 h-6 shrink-0 text-primary-500" />
+                  {content.downloadAsImage}
+                </button>
+              )}
+
               <button
+                data-share-button
                 onClick={onShare}
                 className="bg-white text-primary-500 flex outline outline-primary-500 items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
               >
@@ -139,6 +160,7 @@ const DefaultHeaderBar = ({
 }: DefaultHeaderBarProps) => (
   <div className="flex items-center justify-between mb-6 md:mb-8">
     <button
+      data-back-button
       aria-label="رجوع"
       onClick={onBack}
       className="text-text-dark"
@@ -167,6 +189,7 @@ const DefaultHeaderBar = ({
     </p>
 
     <button
+      data-share-button
       onClick={onPublish}
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base"
       style={{ backgroundColor: primaryColor, color: "#ffffff" }}

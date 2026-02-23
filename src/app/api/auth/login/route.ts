@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     // Set HTTP-only cookies with tokens
     await setAuthCookies(data.token, data.refreshToken);
 
-    // Return user data without tokens
+    // Return user data without tokens (backend may return userId as number)
     const user: User = {
-      userId: data.userId,
+      userId: String(data.userId),
       phone: data.phone,
       fullName: data.fullName,
       userName: data.userName,

@@ -276,6 +276,8 @@ export const dashboardContent = {
   // Create file page (انشاء ملف انجاز)
   createFile: {
     pageTitle: "انشاء ملف انجاز",
+    errorAlreadyHasProfileForYear:
+      "لديك بالفعل ملف لهذه السنة الدراسية. يمكنك العودة للوحة التحكم لتعديله أو إنشاء ملف لسنة أخرى.",
     imageLabel: "صورة الملف",
     imageHint: "(صورة شخصية او عادية)",
     imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
@@ -319,6 +321,7 @@ export const dashboardContent = {
   previewPage: {
     pageTitle: "معاينة الملف",
     downloadFile: "تحميل الملف",
+    downloadAsImage: "تحميل كصورة",
     shareFile: "مشاركة الملف",
     fileTitle: "ملف إنجاز",
     publishFile: "نشر الملف",

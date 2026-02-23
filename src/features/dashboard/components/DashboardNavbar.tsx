@@ -130,7 +130,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
                   width={54}
                   height={54}
                   className="object-cover w-full h-full"
-                  fallbackSrc="/icons/ui/user.svg"
+                  fallbackSrc="/logo/logo-cyan.svg"
                 />
               </div>
               <div className="leading-snug text-right">

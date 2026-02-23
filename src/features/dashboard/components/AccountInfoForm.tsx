@@ -293,7 +293,7 @@ export const AccountInfoForm: React.FC = () => {
                   width={70}
                   height={70}
                   className="w-full h-full object-cover"
-                  fallbackSrc="/images/dashboard/account-info/avatar.svg"
+                  fallbackSrc="/logo/logo-cyan.svg"
                 />
               </div>
               <input

@@ -8,12 +8,34 @@ import Image from "next/image";
 
 export const FAQSection: React.FC = () => {
   const { faqSection } = landingContent;
+  const whatsappUrl = `https://wa.me/${faqSection.whatsappNumber}`;
 
-  const accordionItems = faqSection.questions.map((q) => ({
-    id: q.id,
-    title: q.question,
-    content: q.answer,
-  }));
+  const accordionItems = faqSection.questions.map((q) => {
+    const questionWithLink = q as typeof q & { answerWhatsappLabel?: string };
+    const content =
+      questionWithLink.answerWhatsappLabel && faqSection.whatsappNumber
+        ? (
+            <>
+              {questionWithLink.answer.split(". ")[0]} على{" "}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-500 underline hover:text-primary-600"
+                dir="ltr"
+              >
+                +{faqSection.whatsappNumber}
+              </a>
+              . {questionWithLink.answer.split(". ").slice(1).join(". ")}
+            </>
+          )
+        : q.answer;
+    return {
+      id: q.id,
+      title: q.question,
+      content,
+    };
+  });
 
   return (
     <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-0">
@@ -32,10 +54,10 @@ export const FAQSection: React.FC = () => {
                 {faqSection.contactDescription}
               </p>
               <Link
-                href="https://wa.me/966548635554"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full  justify-center items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-3xl hover:bg-primary-700 transition-colors"
+                className="inline-flex w-full  justify-center items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-3xl hover:bg-primary-600 transition-colors"
               >
                 <Image
                   src="/icons/ui/support-white.svg"
@@ -60,7 +82,7 @@ export const FAQSection: React.FC = () => {
               {faqSection.contactDescription}
             </p>
             <Link
-              href="https://wa.me/966548635554"
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex w-full md:w-1/3 justify-center items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-3xl hover:bg-primary-600 transition-colors"

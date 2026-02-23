@@ -1,14 +1,10 @@
 /**
  * Refresh Token API route
- * POST /api/auth/refresh
+ * POST /api/auth/refresh (Next.js route; reads refreshToken from cookies)
  *
- * Backend response format:
- * {
- *   status: "Success",
- *   message: "Token refreshed successfully",
- *   data: { userId, phone, fullName, userName, role, token, refreshToken },
- *   errors: []
- * }
+ * Calls backend: POST /api/Auth/refresh-token
+ * Request body: { refreshToken: "..." }
+ * Response: { status, message, data: { userId, phone, fullName, userName, role, token, refreshToken }, errors }
  */
 
 import { NextResponse } from "next/server";
@@ -46,9 +42,9 @@ export async function POST() {
     // Set new tokens
     await setAuthCookies(data.token, data.refreshToken);
 
-    // Return user data
+    // Return user data (backend may return userId as number)
     const user: User = {
-      userId: data.userId,
+      userId: String(data.userId),
       phone: data.phone,
       fullName: data.fullName,
       userName: data.userName,

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Image as ImageIcon } from "lucide-react";
 import type { ThemeColors } from "@/features/profiles/types/theme.types";
 
 interface ArabicHeaderBarProps {
@@ -16,11 +17,13 @@ interface ArabicPortfolioHeaderProps {
   teacherRank: string;
   academicYear: string;
   onDownload: () => void;
+  onDownloadAsImage?: () => void;
   onShare: () => void;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
     downloadFile: string;
+    downloadAsImage?: string;
     shareFile: string;
     fileTitle: string;
     publishFile?: string;
@@ -37,6 +40,7 @@ const ArabicHeaderBar = ({
 }: ArabicHeaderBarProps) => (
   <div className="flex items-center justify-between mb-6 md:mb-8">
     <button
+      data-back-button
       onClick={onBack}
       className="text-text-dark hover:text-text-muted transition-colors"
       aria-label="Back"
@@ -58,6 +62,7 @@ const ArabicHeaderBar = ({
     </h3>
 
     <button
+      data-share-button
       onClick={onPublish}
       className="bg-white text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl hover:bg-gray-100 transition-colors"
       style={{ color: primaryColor, border: `2px solid ${primaryColor}` }}
@@ -71,6 +76,7 @@ export const ArabicPortfolioHeader = ({
   teacherName,
   teacherRank,
   onDownload,
+  onDownloadAsImage,
   onShare,
   onBack,
   isDownloading = false,
@@ -110,6 +116,7 @@ export const ArabicPortfolioHeader = ({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <button
+                data-download-button
                 onClick={onDownload}
                 disabled={isDownloading}
                 className="flex bg-[#543A31] text-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
@@ -126,7 +133,23 @@ export const ArabicPortfolioHeader = ({
                 {isDownloading ? "جاري التحميل..." : content.downloadFile}
               </button>
 
+              {onDownloadAsImage && content.downloadAsImage && (
+                <button
+                  data-download-image-button
+                  onClick={onDownloadAsImage}
+                  disabled={isDownloading}
+                  className="flex bg-white text-[#543A31] border-2 border-[#543A31] items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
+                  style={{
+                    opacity: isDownloading ? 0.8 : 1,
+                  }}
+                >
+                  <ImageIcon className="w-6 h-6 shrink-0 text-[#543A31]" />
+                  {content.downloadAsImage}
+                </button>
+              )}
+
               <button
+                data-share-button
                 onClick={onShare}
                 className="bg-white text-[#543A31] flex outline outline-[#543A31] items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
               >

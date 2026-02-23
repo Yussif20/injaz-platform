@@ -42,9 +42,9 @@ export function isApiSuccess(status: string | boolean): boolean {
   return status === "Success" || status === "success";
 }
 
-// Auth response with tokens
+// Auth response with tokens (backend may return userId as number)
 export interface AuthData {
-  userId: string;
+  userId: string | number;
   phone: string;
   fullName: string;
   userName: string;
