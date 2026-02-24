@@ -201,11 +201,10 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     setEditingJob(null);
     reset({
       school: "",
-      rank: "",
+      jobTitle: "",
       educationalStage: "",
       startYear: "",
       endYear: "",
-      isCurrent: false,
     });
     setIsModalOpen(true);
   };
