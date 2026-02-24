@@ -204,7 +204,7 @@ export default function ImagesPage() {
                   <button
                     onClick={handleUpload}
                     disabled={!uploadFile || uploadLoading}
-                    className="w-full bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {uploadLoading ? "جاري الرفع..." : "رفع الصورة"}
                   </button>

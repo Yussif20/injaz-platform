@@ -167,7 +167,7 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
           type="submit"
           isLoading={isLoading}
           disabled={isLoading}
-          className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
+          className="w-full bg-primary-500 hover:bg-primary-800 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
         >
           {signIn.submitButton}
         </Button>

@@ -142,7 +142,7 @@ export const CreateFileForm: React.FC<CreateFileFormProps> = ({
               <button
                 type="button"
                 onClick={handleImageClick}
-                className="flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-full hover:bg-primary-600 transition-colors"
+                className="flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-full hover:bg-primary-800 transition-colors"
               >
                 <svg
                   width="20"

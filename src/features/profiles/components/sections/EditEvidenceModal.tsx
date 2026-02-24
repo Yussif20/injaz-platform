@@ -303,7 +303,7 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
           type="button"
           onClick={handleSubmit}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white py-4 px-4 rounded-xl transition-colors duration-200 disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-800 text-white py-4 px-4 rounded-xl transition-colors duration-200 disabled:opacity-50"
         >
           {isLoading ? (
             <svg

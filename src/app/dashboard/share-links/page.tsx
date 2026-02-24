@@ -182,7 +182,7 @@ export default function ShareLinksPage() {
               <button
                 onClick={handleCreateLink}
                 disabled={createLoading}
-                className="w-full bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createLoading ? "جاري الإنشاء..." : "إنشاء رابط مشاركة"}
               </button>

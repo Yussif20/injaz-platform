@@ -43,7 +43,7 @@ export const TermCard: React.FC<TermCardProps> = ({
       <button
         type="button"
         onClick={onAddEvidence}
-        className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white py-3 px-4 rounded-xl transition-colors duration-200"
+        className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-800 text-white py-3 px-4 rounded-xl transition-colors duration-200"
       >
         <svg
           className="w-5 h-5"

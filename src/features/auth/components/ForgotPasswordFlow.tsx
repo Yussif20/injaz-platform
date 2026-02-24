@@ -239,7 +239,7 @@ export function ForgotPasswordFlow() {
               type="submit"
               isLoading={isSendingOtp}
               disabled={isSendingOtp}
-              className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
+              className="w-full bg-primary-500 hover:bg-primary-800 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
             >
               {forgotPassword.submitButton}
             </Button>
@@ -321,7 +321,7 @@ export function ForgotPasswordFlow() {
               onClick={handleOtpVerify}
               isLoading={isVerifyingOtp}
               disabled={otpCode.length !== 6 || isVerifyingOtp}
-              className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 sm:py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-primary-500 hover:bg-primary-800 text-white py-3 sm:py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {buttons.next}
             </Button>
@@ -454,7 +454,7 @@ export function ForgotPasswordFlow() {
               type="submit"
               isLoading={isResetting}
               disabled={!isDirty || !isValid || isResetting}
-              className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 sm:py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-primary-500 hover:bg-primary-800 text-white py-3 sm:py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {signIn.submitButton}
             </Button>

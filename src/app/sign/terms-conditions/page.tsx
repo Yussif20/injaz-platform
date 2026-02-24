@@ -16,7 +16,7 @@ export default function TermsConditionsPage() {
         {/* Back Link */}
         <Link
           href={ROUTES.HOME}
-          className="inline-block px-8 py-3 bg-primary-500 text-white font-normal rounded-xl hover:bg-primary-600 transition-colors"
+          className="inline-block px-8 py-3 bg-primary-500 text-white font-normal rounded-xl hover:bg-primary-800 transition-colors"
         >
           العودة للصفحة الرئيسية
         </Link>

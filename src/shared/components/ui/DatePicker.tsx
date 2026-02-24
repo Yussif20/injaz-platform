@@ -648,7 +648,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               transition-colors duration-200
               ${
                 tempSelectedDate
-                  ? "bg-primary-500 hover:bg-primary-600 cursor-pointer"
+                  ? "bg-primary-500 hover:bg-primary-800 cursor-pointer"
                   : "bg-grey-300 cursor-not-allowed"
               }
             `}

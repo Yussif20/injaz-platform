@@ -73,8 +73,8 @@ export const HowToSection = () => {
             </div>
           </div>
 
-          {/* Video - Right Side */}
-          <div className="flex-1 min-h-96">
+          {/* Video - Right Side - aligned to bottom */}
+          <div className="flex-1 min-h-96 self-end">
             <div className="bg-card-bg rounded-3xl relative w-full min-h-96 overflow-hidden">
               {/* Thumbnail Image */}
               <Image

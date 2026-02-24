@@ -395,7 +395,7 @@ export function RegisterForm() {
             type="submit"
             isLoading={isRegistering}
             disabled={isRegistering || !isTermsAccepted}
-            className="w-full bg-primary-500 hover:bg-primary-600 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
+            className="w-full bg-primary-500 hover:bg-primary-800 text-white text-base sm:text-lg font-medium py-3 sm:py-3.5 rounded-xl transition-colors"
           >
             {signUp.submitButton}
           </Button>

@@ -123,7 +123,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleMenu(image.id)}
-                  className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-primary-500 text-white hover:bg-primary-600 transition-colors z-10"
+                  className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-primary-500 text-white hover:bg-primary-800 transition-colors z-10"
                 >
                   <svg
                     className="w-4 h-4"
