@@ -68,7 +68,7 @@ export const DefaultCareerSection = ({
                   {/* Text Content */}
                   <div className="text-right border-r md:border-r-[3px] border-primary-500 flex flex-col gap-1 md:gap-6 pr-1 md:pr-6">
                     <h3 className="text-text-dark text-sm md:text-2xl lg:text-[28px] font-normal ">
-                      {job.rank || job.title}
+                      {job.jobTitle ?? job.title ?? job.rank ?? ""}
                     </h3>
                     <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
                       {job.school}

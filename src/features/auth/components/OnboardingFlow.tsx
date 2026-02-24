@@ -16,6 +16,19 @@ import { Button, DatePicker, Input, Select } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
 import {
+  updatePersonalInfo,
+} from "@/features/dashboard/services/me.service";
+import {
+  addQualification,
+} from "@/features/dashboard/services/qualifications.service";
+import {
+  addCareerJob,
+} from "@/features/dashboard/services/career.service";
+import type {
+  CreateQualificationRequest,
+  CreateCareerJobRequest,
+} from "@/features/dashboard/types/me.types";
+import {
   OnboardingProgressStepper,
   type OnboardingStep,
 } from "./OnboardingProgressStepper";
@@ -55,11 +68,10 @@ interface QualificationData {
 interface CareerJobData {
   id: string;
   school: string;
-  rank: string;
+  jobTitle: string;
   stage: string;
   startYear: number;
-  endYear: number | null;
-  isCurrent: boolean;
+  endYear: number;
 }
 
 // Qualification form schema
@@ -72,14 +84,13 @@ const qualificationSchema = z.object({
 
 type QualificationFormData = z.infer<typeof qualificationSchema>;
 
-// Career job form schema
+// Career job form schema (سنوات العمل من - الي)
 const careerJobSchema = z.object({
   school: z.string().min(1, "اسم المدرسة مطلوب"),
-  rank: z.string().min(1, "الدرجة الوظيفية مطلوبة"),
+  jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
   stage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
   startYear: z.string().min(1, "سنة البداية مطلوبة"),
-  endYear: z.string().optional(),
-  isCurrent: z.boolean(),
+  endYear: z.string().min(1, "سنة النهاية مطلوبة"),
 });
 
 type CareerJobFormData = z.infer<typeof careerJobSchema>;
@@ -142,6 +153,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
     const [showJobDeleteConfirm, setShowJobDeleteConfirm] = useState(false);
     const [jobToDelete, setJobToDelete] = useState<string | null>(null);
     const [showDeleteToast, setShowDeleteToast] = useState(false);
+    const [basicInfoError, setBasicInfoError] = useState<string | null>(null);
+    const [isSavingBasicInfo, setIsSavingBasicInfo] = useState(false);
+    const [isSavingAndLeaving, setIsSavingAndLeaving] = useState(false);
+    const [leaveError, setLeaveError] = useState<string | null>(null);
 
     // Basic info form
     const basicInfoForm = useForm<BasicInfoFormData>({
@@ -172,24 +187,38 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       resolver: zodResolver(careerJobSchema),
       defaultValues: {
         school: "",
-        rank: "",
+        jobTitle: "",
         stage: "",
         startYear: "",
         endYear: "",
-        isCurrent: false,
       },
     });
-
-    const isCurrent = careerJobForm.watch("isCurrent");
 
     // Generate unique ID
     const generateId = () => Math.random().toString(36).substr(2, 9);
 
-    // Handle basic info submit
-    const handleBasicInfoSubmit = (data: BasicInfoFormData) => {
-      // TODO: Save to backend
-      console.log("Basic info:", data);
-      setCurrentStep("qualifications");
+    // Handle basic info submit – save to backend then move to next step
+    const handleBasicInfoSubmit = async (data: BasicInfoFormData) => {
+      setBasicInfoError(null);
+      setIsSavingBasicInfo(true);
+      try {
+        const res = await updatePersonalInfo({
+          nationalId: data.nationalId,
+          birthDate: data.birthDate,
+          address: data.address,
+          email: data.email?.trim() || undefined,
+        });
+        if (res.status) {
+          setCurrentStep("qualifications");
+        } else {
+          setBasicInfoError(res.message || "فشل في حفظ البيانات");
+        }
+      } catch (err) {
+        console.error("Basic info save error:", err);
+        setBasicInfoError("فشل في حفظ البيانات. حاول مرة أخرى.");
+      } finally {
+        setIsSavingBasicInfo(false);
+      }
     };
 
     // Handle add/edit qualification
@@ -211,15 +240,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       const jobData: CareerJobData = {
         id: editingCareerJob?.id || generateId(),
         school: data.school,
-        rank: data.rank,
+        jobTitle: data.jobTitle,
         stage: data.stage,
         startYear: parseInt(data.startYear),
-        endYear: data.isCurrent
-          ? null
-          : data.endYear
-            ? parseInt(data.endYear)
-            : null,
-        isCurrent: data.isCurrent,
+        endYear: parseInt(data.endYear),
       };
 
       if (editingCareerJob) {
@@ -282,11 +306,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       setEditingCareerJob(job);
       careerJobForm.reset({
         school: job.school,
-        rank: job.rank,
+        jobTitle: job.jobTitle,
         stage: job.stage,
         startYear: job.startYear.toString(),
-        endYear: job.endYear?.toString() || "",
-        isCurrent: job.isCurrent,
+        endYear: job.endYear.toString(),
       });
       setIsCareerModalOpen(true);
     };
@@ -312,21 +335,70 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       }
     };
 
-    // Navigation
-    const handleNext = () => {
-      if (currentStep === "qualifications") {
-        setCurrentStep("careerJobs");
-      } else if (currentStep === "careerJobs") {
-        // TODO: Save to backend and navigate
-        router.push(ROUTES.DASHBOARD);
+    // Save qualifications and career jobs to backend (used when leaving onboarding)
+    const saveQualificationsAndCareerJobs = async (): Promise<void> => {
+      const qualPayloads: CreateQualificationRequest[] = qualifications.map(
+        (q) => ({
+          degreeType: q.degree,
+          institution: q.institution || undefined,
+          major: q.specialization,
+          graduationDate: `${q.graduationYear}-06-15`,
+        }),
+      );
+      const jobPayloads: CreateCareerJobRequest[] = careerJobs.map((j) => ({
+        jobTitle: j.jobTitle,
+        school: j.school,
+        educationalStage: j.stage,
+        startYear: j.startYear,
+        endYear: j.endYear,
+      }));
+
+      const qualResults = await Promise.all(
+        qualPayloads.map((p) => addQualification(p)),
+      );
+      const jobResults = await Promise.all(
+        jobPayloads.map((p) => addCareerJob(p)),
+      );
+      const failed = [...qualResults, ...jobResults].find((r) => !r.status);
+      if (failed) {
+        throw new Error(failed.message || "فشل في الحفظ");
       }
     };
 
-    const handleSkip = () => {
+    // Navigation
+    const handleNext = async () => {
       if (currentStep === "qualifications") {
         setCurrentStep("careerJobs");
       } else if (currentStep === "careerJobs") {
-        router.push(ROUTES.DASHBOARD);
+        setLeaveError(null);
+        setIsSavingAndLeaving(true);
+        try {
+          await saveQualificationsAndCareerJobs();
+          router.push(ROUTES.DASHBOARD);
+        } catch (err) {
+          console.error("Save qualifications/career jobs error:", err);
+          setLeaveError("فشل في حفظ بعض البيانات. حاول مرة أخرى.");
+        } finally {
+          setIsSavingAndLeaving(false);
+        }
+      }
+    };
+
+    const handleSkip = async () => {
+      if (currentStep === "qualifications") {
+        setCurrentStep("careerJobs");
+      } else if (currentStep === "careerJobs") {
+        setLeaveError(null);
+        setIsSavingAndLeaving(true);
+        try {
+          await saveQualificationsAndCareerJobs();
+          router.push(ROUTES.DASHBOARD);
+        } catch (err) {
+          console.error("Save qualifications/career jobs error:", err);
+          setLeaveError("فشل في حفظ بعض البيانات. حاول مرة أخرى.");
+        } finally {
+          setIsSavingAndLeaving(false);
+        }
       }
     };
 
@@ -461,14 +533,21 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         </div>
                       </div>
 
+                      {basicInfoError && (
+                        <p className="text-sm text-red-600 text-right">
+                          {basicInfoError}
+                        </p>
+                      )}
                       {/* Submit Button */}
                       <div className="mt-2">
                         <Button
                           type="submit"
-                          disabled={!basicInfoForm.formState.isValid}
+                          disabled={
+                            !basicInfoForm.formState.isValid || isSavingBasicInfo
+                          }
                           className="w-full rounded-full! h-14"
                         >
-                          {buttons.next}
+                          {isSavingBasicInfo ? "جاري الحفظ..." : buttons.next}
                         </Button>
                       </div>
                     </form>
@@ -528,13 +607,9 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         {careerJobs.map((job) => (
                           <QualificationCard
                             key={job.id}
-                            degree={job.rank}
+                            degree={job.jobTitle}
                             institution={job.school}
-                            year={
-                              job.isCurrent
-                                ? `${job.startYear} - حتى الآن`
-                                : `${job.startYear} - ${job.endYear}`
-                            }
+                            year={`${job.startYear} - ${job.endYear}`}
                             onEdit={() => openEditCareerModal(job)}
                             onDelete={() => deleteCareerJob(job.id)}
                           />
@@ -565,20 +640,27 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                   {/* Navigation Buttons (only for steps 2 and 3) */}
                   {currentStep !== "basicInfo" && (
                     <div className="mt-2">
+                      {leaveError && (
+                        <p className="text-sm text-red-600 text-right mb-2">
+                          {leaveError}
+                        </p>
+                      )}
                       <div className="flex gap-3 sm:gap-3 md:gap-4">
                         <button
                           type="button"
                           onClick={handleSkip}
-                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 border-2 bg-white border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100 font-light text-base lg:text-lg transition-colors duration-200"
+                          disabled={isSavingAndLeaving}
+                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 border-2 bg-white border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100 font-light text-base lg:text-lg transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {buttons.skip}
+                          {isSavingAndLeaving ? "جاري الحفظ..." : buttons.skip}
                         </button>
                         <button
                           type="button"
                           onClick={handleNext}
-                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 font-light text-base lg:text-lg transition-colors duration-200"
+                          disabled={isSavingAndLeaving}
+                          className="flex-1 rounded-full h-10 sm:h-10 md:h-14 bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 font-light text-base lg:text-lg transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {buttons.next}
+                          {isSavingAndLeaving ? "جاري الحفظ..." : buttons.next}
                         </button>
                       </div>
                     </div>
@@ -670,10 +752,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
             {...careerJobForm.register("school")}
           />
           <Input
-            label={onboarding.careerJobs.rankLabel}
-            placeholder="الدرجة الوظيفية"
-            error={careerJobForm.formState.errors.rank?.message}
-            {...careerJobForm.register("rank")}
+            label={onboarding.careerJobs.positionLabel}
+            placeholder="مثال: معلم لغة عربية"
+            error={careerJobForm.formState.errors.jobTitle?.message}
+            {...careerJobForm.register("jobTitle")}
           />
           <Select
             label={onboarding.careerJobs.stageLabel}
@@ -689,26 +771,13 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
             error={careerJobForm.formState.errors.startYear?.message}
             {...careerJobForm.register("startYear")}
           />
-          {!isCurrent && (
-            <Select
-              label={onboarding.careerJobs.endYearLabel}
-              placeholder="سنة النهاية"
-              options={YEARS}
-              error={careerJobForm.formState.errors.endYear?.message}
-              {...careerJobForm.register("endYear")}
-            />
-          )}
-          <div className="flex items-center gap-2 justify-end">
-            <label htmlFor="is-current" className="text-sm text-grey-600">
-              {onboarding.careerJobs.currentJobLabel}
-            </label>
-            <input
-              type="checkbox"
-              id="is-current"
-              {...careerJobForm.register("isCurrent")}
-              className="w-4 h-4 text-primary-500 rounded border-grey-300 focus:ring-primary-500"
-            />
-          </div>
+          <Select
+            label={onboarding.careerJobs.endYearLabel}
+            placeholder="سنة النهاية"
+            options={YEARS}
+            error={careerJobForm.formState.errors.endYear?.message}
+            {...careerJobForm.register("endYear")}
+          />
         </OnboardingDataModal>
 
         {/* Delete Toast */}

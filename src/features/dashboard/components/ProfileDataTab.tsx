@@ -178,6 +178,7 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
               <DataCard
                 label={profileData.fields.whatsappNumber}
                 value={profile.phone}
+                valueDir="ltr"
               />
             </div>
           </div>
@@ -251,6 +252,7 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
             <DataCard
               label={profileData.fields.whatsappNumber}
               value={profile?.phone || "-"}
+              valueDir="ltr"
             />
           </div>
         </div>

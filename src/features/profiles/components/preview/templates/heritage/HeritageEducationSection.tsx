@@ -67,7 +67,7 @@ export const HeritageEducationSection = ({
               {/* Text Content */}
               <div className="text-right flex flex-col gap-1 md:gap-4.5">
                 <h3 className="text-text-dark text-sm md:text-2xl lg:text-[28px] font-normal">
-                  {qual.degreeType} {qual.title}
+                  {qual.degreeType} {qual.major ?? qual.title ?? ""}
                 </h3>
                 <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
                   {qual.institution || qual.grade || "—"}

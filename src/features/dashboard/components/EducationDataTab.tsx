@@ -105,7 +105,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     if (editingQualification) {
       reset({
         degreeType: editingQualification.degreeType || "",
-        title: editingQualification.title || "",
+        title: editingQualification.major ?? editingQualification.title ?? "",
         institution: editingQualification.institution || editingQualification.grade || "",
         grade: editingQualification.grade || "",
         graduationDate: editingQualification.graduationDate
@@ -130,10 +130,10 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     try {
       const requestData: CreateQualificationRequest = {
         degreeType: data.degreeType,
-        title: data.title,
         institution: data.institution || undefined,
+        major: data.title,
         grade: data.grade || undefined,
-        graduationDate: `${data.graduationDate}-01-01`,
+        graduationDate: `${data.graduationDate}-06-15`,
       };
 
       if (editingQualification) {
@@ -273,7 +273,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
             <div className="flex-1 text-right border-r-2 border-primary-500 pr-3">
               <p className="font-normal text-[#333] text-sm md:text-lg">
                 {getDegreeLabel(qualification.degreeType)}{" "}
-                {qualification.title || ""}
+                {(qualification.major ?? qualification.title) || ""}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
                 {qualification.institution || qualification.grade || "-"}

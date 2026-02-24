@@ -16,14 +16,13 @@ import {
 } from "../hooks";
 import type { CareerJob, CreateCareerJobRequest } from "../types/me.types";
 
-// Validation schema for single job form
+// Validation schema for single job form (سنوات العمل من - الي)
 const jobSchema = z.object({
   school: z.string().min(1, "اسم المدرسة مطلوب"),
-  rank: z.string().min(1, "الدرجة الوظيفية مطلوبة"),
+  jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
   educationalStage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
   startYear: z.string().min(1, "سنة البداية مطلوبة"),
-  endYear: z.string().optional(),
-  isCurrent: z.boolean(),
+  endYear: z.string().min(1, "سنة النهاية مطلوبة"),
 });
 
 type JobFormData = z.infer<typeof jobSchema>;
@@ -75,23 +74,19 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors, isValid },
   } = useForm<JobFormData>({
     resolver: zodResolver(jobSchema),
     mode: "onChange",
     defaultValues: {
       school: "",
-      rank: "",
+      jobTitle: "",
       educationalStage: "",
       startYear: "",
       endYear: "",
-      isCurrent: false,
     },
   });
 
-  const isCurrent = watch("isCurrent");
   const isSaving = isAdding || isUpdating;
 
   useEffect(() => {
@@ -112,23 +107,29 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
 
   // Reset form when editing job changes
   useEffect(() => {
+    const jobTitle =
+      editingJob?.jobTitle ??
+      editingJob?.title ??
+      editingJob?.rank ??
+      "";
     if (editingJob) {
       reset({
         school: editingJob.school || "",
-        rank: editingJob.rank || "",
+        jobTitle,
         educationalStage: editingJob.educationalStage || "",
         startYear: editingJob.startYear?.toString() || "",
-        endYear: editingJob.endYear?.toString() || "",
-        isCurrent: editingJob.endYear === null,
+        endYear:
+          editingJob.endYear != null
+            ? editingJob.endYear.toString()
+            : new Date().getFullYear().toString(),
       });
     } else {
       reset({
         school: "",
-        rank: "",
+        jobTitle: "",
         educationalStage: "",
         startYear: "",
         endYear: "",
-        isCurrent: false,
       });
     }
   }, [editingJob, reset]);
@@ -137,15 +138,11 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
     setError(null);
     try {
       const requestData: CreateCareerJobRequest = {
+        jobTitle: data.jobTitle,
         school: data.school,
-        rank: data.rank,
         educationalStage: data.educationalStage,
         startYear: parseInt(data.startYear),
-        endYear: data.isCurrent
-          ? null
-          : data.endYear
-            ? parseInt(data.endYear)
-            : null,
+        endYear: data.endYear ? parseInt(data.endYear) : null,
       };
 
       if (editingJob) {
@@ -251,13 +248,13 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           >
             <div className="flex-1 text-right border-r-2 border-primary-500 pr-3">
               <p className="font-normal text-[#333] text-sm md:text-lg">
-                {job.rank || "وظيفة"}
+                {(job.jobTitle ?? job.title ?? job.rank) || "وظيفة"}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
                 {job.school || "-"} - {job.educationalStage || ""}
               </p>
               <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {job.endYear || "حتى الآن"} - {job.startYear}
+                {job.startYear} - {job.endYear ?? "-"}
               </p>
             </div>
             <div className="relative" data-job-menu>
@@ -438,10 +435,10 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           {...register("school")}
         />
         <Input
-          label={onboarding.careerJobs.rankLabel}
-          placeholder="الدرجة الوظيفية"
-          error={errors.rank?.message}
-          {...register("rank")}
+          label={onboarding.careerJobs.positionLabel}
+          placeholder="مثال: معلم لغة عربية"
+          error={errors.jobTitle?.message}
+          {...register("jobTitle")}
         />
         <Select
           label={onboarding.careerJobs.stageLabel}
@@ -457,26 +454,13 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
           error={errors.startYear?.message}
           {...register("startYear")}
         />
-        {!isCurrent && (
-          <Select
-            label={onboarding.careerJobs.endYearLabel}
-            placeholder="سنة النهاية"
-            options={YEARS}
-            error={errors.endYear?.message}
-            {...register("endYear")}
-          />
-        )}
-        <div className="flex items-center gap-2 justify-end">
-          <label htmlFor="is-current-modal" className="text-sm text-grey-600">
-            {onboarding.careerJobs.currentJobLabel}
-          </label>
-          <input
-            type="checkbox"
-            id="is-current-modal"
-            {...register("isCurrent")}
-            className="w-4 h-4 text-primary-500 rounded border-grey-300 focus:ring-primary-500"
-          />
-        </div>
+        <Select
+          label={onboarding.careerJobs.endYearLabel}
+          placeholder="سنة النهاية"
+          options={YEARS}
+          error={errors.endYear?.message}
+          {...register("endYear")}
+        />
       </OnboardingDataModal>
     </div>
   );

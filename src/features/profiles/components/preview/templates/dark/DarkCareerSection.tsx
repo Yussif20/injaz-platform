@@ -75,7 +75,7 @@ export const DarkCareerSection = ({
               {/* Text Content */}
               <div className="text-right flex flex-col gap-2 md:gap-4.5 pr-2">
                 <h3 className="text-[#F8F8F8] text-[14px] md:text-[24px] lg:text-[28px] font-normal">
-                  {job.rank || job.title}
+                  {job.jobTitle ?? job.title ?? job.rank ?? ""}
                 </h3>
                 <p className="text-[#BABABA] text-[12px] md:text-[20px] lg:text-[24px] font-light md:font-normal">
                   {job.school}

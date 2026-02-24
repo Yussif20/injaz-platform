@@ -29,8 +29,9 @@ export interface PersonalInfo {
 export interface Qualification {
   id: number;
   degreeType: string | null;
-  title: string | null;
-  institution?: string | null; // University/institution name
+  title?: string | null; // deprecated, use major
+  major?: string | null; // التخصص
+  institution?: string | null;
   grade: string | null;
   graduationDate: string;
 }
@@ -38,8 +39,9 @@ export interface Qualification {
 // Career Job (embedded in profile)
 export interface CareerJob {
   id: number;
-  title: string | null;
-  rank: string | null;
+  title?: string | null;
+  jobTitle?: string | null;
+  rank?: string | null;
   school: string | null;
   educationalStage: string | null;
   startYear: number;

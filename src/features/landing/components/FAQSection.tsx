@@ -88,7 +88,7 @@ export const FAQSection: React.FC = () => {
               className="flex w-full justify-center items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-3xl hover:bg-primary-700 transition-colors"
             >
               <Image
-                src="/icons/support-white.svg"
+                src="/icons/ui/support-white.svg"
                 alt="Support Icon"
                 width={24}
                 height={24}

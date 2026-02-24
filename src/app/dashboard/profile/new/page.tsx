@@ -265,8 +265,15 @@ function CreateFileContent() {
                 }}
                 className="w-full bg-white border border-grey-200 rounded-2xl px-4 py-3 text-right flex items-center justify-between hover:border-primary-500 transition-colors"
               >
+                <span
+                  className={
+                    selectedYearName ? "text-secondary-800" : "text-grey-400"
+                  }
+                >
+                  {selectedYearName || createFile.yearPlaceholder}
+                </span>
                 <svg
-                  className={`w-5 h-5 text-grey-400 transition-transform ${
+                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${
                     yearDropdownOpen ? "rotate-180" : ""
                   }`}
                   fill="none"
@@ -280,13 +287,6 @@ function CreateFileContent() {
                     d="M19 9l-7 7-7-7"
                   />
                 </svg>
-                <span
-                  className={
-                    selectedYearName ? "text-secondary-800" : "text-grey-400"
-                  }
-                >
-                  {selectedYearName || createFile.yearPlaceholder}
-                </span>
               </button>
 
               {yearDropdownOpen && (
@@ -352,8 +352,15 @@ function CreateFileContent() {
                 }}
                 className="w-full bg-white border border-grey-200 rounded-2xl px-4 py-3 text-right flex items-center justify-between hover:border-primary-500 transition-colors"
               >
+                <span
+                  className={
+                    selectedRankName ? "text-secondary-800" : "text-grey-400"
+                  }
+                >
+                  {selectedRankName || createFile.jobRankPlaceholder}
+                </span>
                 <svg
-                  className={`w-5 h-5 text-grey-400 transition-transform ${
+                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${
                     rankDropdownOpen ? "rotate-180" : ""
                   }`}
                   fill="none"
@@ -367,13 +374,6 @@ function CreateFileContent() {
                     d="M19 9l-7 7-7-7"
                   />
                 </svg>
-                <span
-                  className={
-                    selectedRankName ? "text-secondary-800" : "text-grey-400"
-                  }
-                >
-                  {selectedRankName || createFile.jobRankPlaceholder}
-                </span>
               </button>
 
               {rankDropdownOpen && (

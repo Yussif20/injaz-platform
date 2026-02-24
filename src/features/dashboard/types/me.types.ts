@@ -49,8 +49,9 @@ export interface UpdatePersonalInfoRequest {
 export interface Qualification {
   id: number;
   degreeType: string | null;
-  title: string | null;
-  institution?: string | null; // University/institution name (optional for backward compat)
+  title?: string | null; // deprecated, use major
+  major?: string | null; // التخصص
+  institution?: string | null;
   grade: string | null;
   graduationDate: string; // ISO date
 }
@@ -60,8 +61,8 @@ export interface Qualification {
  */
 export interface CreateQualificationRequest {
   degreeType?: string;
-  title?: string;
   institution?: string;
+  major?: string;
   grade?: string;
   graduationDate: string; // ISO date - Required
 }
@@ -71,8 +72,8 @@ export interface CreateQualificationRequest {
  */
 export interface UpdateQualificationRequest {
   degreeType?: string;
-  title?: string;
   institution?: string;
+  major?: string;
   grade?: string;
   graduationDate: string; // ISO date - Required
 }
@@ -86,8 +87,9 @@ export interface UpdateQualificationRequest {
  */
 export interface CareerJob {
   id: number;
-  title: string | null;
-  rank: string | null;
+  title?: string | null; // job title (backend may return as jobTitle or title)
+  jobTitle?: string | null;
+  rank?: string | null; // deprecated, use title/jobTitle
   school: string | null;
   educationalStage: string | null;
   startYear: number;
@@ -98,22 +100,22 @@ export interface CareerJob {
  * Request body for POST /api/my-career-jobs
  */
 export interface CreateCareerJobRequest {
-  rank: string; // 1-100 chars
-  school: string; // 1-200 chars
-  educationalStage: string; // 1-100 chars
+  jobTitle: string;
+  school: string;
+  educationalStage: string;
   startYear: number; // 1900-2100
-  endYear?: number | null; // 1900-2100, null if current
+  endYear?: number | null; // 1900-2100
 }
 
 /**
  * Request body for PUT /api/my-career-jobs/{id}
  */
 export interface UpdateCareerJobRequest {
-  rank: string; // 1-100 chars
-  school: string; // 1-200 chars
-  educationalStage: string; // 1-100 chars
+  jobTitle: string;
+  school: string;
+  educationalStage: string;
   startYear: number; // 1900-2100
-  endYear?: number | null; // 1900-2100, null if current
+  endYear?: number | null; // 1900-2100
 }
 
 // ============================================
