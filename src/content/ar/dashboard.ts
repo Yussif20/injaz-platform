@@ -25,6 +25,10 @@ export const dashboardContent = {
     previewFile: "معاينة الملف",
     noFiles: "لا توجد ملفات حتى الآن",
     createFirstFile: "أنشئ ملفك الأول",
+    // Empty state (no files yet)
+    emptyStateTitle: "ليس لديك ملفات انجاز بعد ",
+    emptyStateSubtitle: "انشئ اول ملف إنجاز لك الآن",
+    emptyStateButton: "إنشاء الملف",
   },
 
   // File status badges
