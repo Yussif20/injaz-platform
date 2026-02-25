@@ -57,10 +57,10 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
     >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-0">
+        <div className="flex items-center p-6 pb-0">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-grey-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-grey-100 rounded-lg transition-colors shrink-0"
             aria-label="إغلاق"
           >
             <svg
@@ -77,11 +77,14 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
               />
             </svg>
           </button>
-          <h2 className="text-lg font-semibold text-secondary-800">
-            {mode === "set"
-              ? filePasswordModal.setTitle
-              : filePasswordModal.changeTitle}
-          </h2>
+          <div className="flex-1 flex justify-center min-w-0">
+            <h2 className="text-lg font-semibold text-secondary-800 text-center">
+              {mode === "set"
+                ? filePasswordModal.setTitle
+                : filePasswordModal.changeTitle}
+            </h2>
+          </div>
+          <div className="w-9 shrink-0" aria-hidden />
         </div>
 
         {/* Description (only for set mode) */}

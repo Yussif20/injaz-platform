@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { CirclePlus } from "lucide-react";
 import { dashboardContent } from "@/content";
 
@@ -28,6 +29,8 @@ interface FileCardProps {
   onDelete?: (fileId: string) => void;
   /** When set, show a single primary button with this label instead of Add Evidence + Preview */
   singleActionLabel?: string;
+  /** Icon path for the single action button (e.g. /icons/ui/white-lock.svg) */
+  singleActionIcon?: string;
   onSingleAction?: (fileId: string) => void;
 }
 
@@ -42,6 +45,7 @@ export const FileCard: React.FC<FileCardProps> = ({
   onUnpublish,
   onDelete,
   singleActionLabel,
+  singleActionIcon,
   onSingleAction,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,7 +97,8 @@ export const FileCard: React.FC<FileCardProps> = ({
 
   return (
     <div className="bg-[#E3EFEF] rounded-xl sm:rounded-2xl border border-grey-200 p-4 sm:p-5 relative min-w-0">
-      {/* Row 1: Edit button (menu) on one end */}
+      {/* Row 1: Edit button (menu) on one end - hidden when single action mode */}
+      {!useSingleAction && (
       <div className="flex flex-row justify-between items-center mb-3 sm:mb-4">
         <span />
         <div className="relative" ref={menuRef}>
@@ -235,6 +240,7 @@ export const FileCard: React.FC<FileCardProps> = ({
         )}
         </div>
       </div>
+      )}
 
       {/* Row 2: rank/year — file state (justify-between) */}
       <div className="flex flex-row justify-between items-start gap-2 sm:gap-4 mb-2 min-w-0">
@@ -249,26 +255,46 @@ export const FileCard: React.FC<FileCardProps> = ({
         </div>
       </div>
 
-      {/* Row 3: owner name — creation date (justify-between) */}
+      {/* Row 3: owner name — creation date (justify-between); hide creation date when single-action row shows it below */}
       <div className="flex flex-row justify-between items-start gap-2 sm:gap-4 mb-3 sm:mb-4 min-w-0">
         <p className="text-[#333] font-normal text-sm md:text-xl min-w-0 break-words">
           {file.ownerName}
         </p>
-        <p className="text-[#4D4D4D] font-light text-xs md:text-lg flex-shrink-0">
-          {filesSection.creationDate} {file.creationDate}
-        </p>
+        {!useSingleAction && (
+          <p className="text-[#4D4D4D] font-light text-xs md:text-lg flex-shrink-0">
+            {filesSection.creationDate} {file.creationDate}
+          </p>
+        )}
       </div>
 
       {/* Action buttons: single primary or default Add Evidence + Preview */}
       <div className="flex flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
         {useSingleAction ? (
-          <button
-            type="button"
-            onClick={() => onSingleAction?.(file.id)}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
-          >
-            <span className="truncate">{singleActionLabel}</span>
-          </button>
+          <>
+            <div className="flex-1 min-w-0">
+              <button
+                type="button"
+                onClick={() => onSingleAction?.(file.id)}
+                className="w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
+              >
+                {singleActionIcon && (
+                  <Image
+                    src={singleActionIcon}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                  />
+                )}
+                <span className="truncate">{singleActionLabel}</span>
+              </button>
+            </div>
+            <div className="flex-1 min-w-0 flex items-center justify-end text-left">
+              <p className="text-[#4D4D4D] font-light text-xs md:text-lg">
+                {filesSection.creationDate} {file.creationDate}
+              </p>
+            </div>
+          </>
         ) : (
           <>
             <button

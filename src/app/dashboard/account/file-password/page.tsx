@@ -126,6 +126,11 @@ export default function FilePasswordPage() {
                     ? PASSWORD_BUTTON_LABELS.withPassword
                     : PASSWORD_BUTTON_LABELS.withoutPassword
                 }
+                singleActionIcon={
+                  file.hasPassword
+                    ? "/icons/ui/white-up-right-arrow.svg"
+                    : "/icons/ui/white-lock.svg"
+                }
                 onSingleAction={handlePasswordAction}
               />
             ))}
