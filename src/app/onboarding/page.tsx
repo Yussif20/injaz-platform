@@ -63,8 +63,8 @@ export default function OnboardingPage() {
         </Link>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-2 lg:px-12 pb-8">
+      {/* Main Content - no outer padding so onboarding container is edge-to-edge */}
+      <main className="flex-1 min-h-0">
         <OnboardingFlow ref={onboardingRef} />
       </main>
     </div>

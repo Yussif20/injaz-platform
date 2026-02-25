@@ -36,7 +36,7 @@ export function OnboardingProgressStepper({
       className={
         isHorizontal
           ? "mx-auto flex flex-row items-center justify-center w-full"
-          : "flex flex-col items-start h-full"
+          : "flex flex-col items-start"
       }
     >
       {stepOrder.map((step, index) => {
@@ -113,14 +113,14 @@ export function OnboardingProgressStepper({
           );
         }
 
-        // Vertical layout
+        // Vertical layout (fixed height per step so bar doesn't stretch)
         return (
           <div
             key={step}
-            className={`flex items-start gap-3 ${!isLast ? "flex-1" : ""}`}
+            className="flex items-start gap-3"
           >
             {/* Circle + connecting line column (right side in RTL) */}
-            <div className="flex flex-col items-center h-full">
+            <div className="flex flex-col items-center">
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center border-2 shrink-0 ${
                   status === "completed"
@@ -151,10 +151,10 @@ export function OnboardingProgressStepper({
                 )}
               </div>
 
-              {/* Connecting line - centered under circle */}
+              {/* Connecting line - fixed height (2× previous) so bar doesn't stretch */}
               {!isLast && (
                 <div
-                  className={`w-0.5 flex-1 min-h-4 ${
+                  className={`w-0.5 h-40 ${
                     status === "completed" ? "bg-primary-500" : "bg-grey-300"
                   }`}
                 />

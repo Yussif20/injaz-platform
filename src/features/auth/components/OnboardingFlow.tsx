@@ -422,13 +422,13 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
     }));
 
     return (
-      <div className="flex flex-col lg:flex-row h-full lg:min-h-[calc(100vh-120px)]">
-        {/* Right Side - Content + Stepper (2/3 width) */}
-        <div className="flex-1 lg:w-3/5 flex flex-col lg:min-h-[calc(100vh-120px)]">
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col px-4 lg:px-8">
-            {/* Mobile/Tablet Stepper - Full Width */}
-            <div className="lg:hidden w-full mb-6">
+      <div className="flex flex-col lg:flex-row h-full lg:min-h-[calc(100vh-120px)] bg-[#FAFAFA]">
+        {/* Right Side - Content + Stepper (slightly larger than image side) */}
+        <div className="flex-1 lg:w-2/3 flex flex-col lg:min-h-[calc(100vh-120px)]">
+          {/* Main Content Area - no horizontal padding so progress bar starts at screen edge */}
+          <div className="flex-1 flex flex-col">
+            {/* Mobile/Tablet Stepper */}
+            <div className="lg:hidden w-full bg-white px-4 py-3">
               <OnboardingProgressStepper
                 currentStep={currentStep}
                 steps={onboarding.steps}
@@ -436,11 +436,11 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
               />
             </div>
 
-            {/* Content with Stepper Row */}
-            <div className="flex-1 overflow-y-auto flex flex-col justify-center">
-              <div className="flex flex-row items-center">
-                {/* Progress Stepper (Right side on desktop) - Fixed height */}
-                <div className="hidden lg:flex w-48 shrink-0 justify-center h-105">
+            {/* Content with Stepper Row - row full height so white container can stretch */}
+            <div className="flex-1 overflow-y-auto flex flex-col justify-center min-h-0 px-4 lg:px-0">
+              <div className="flex flex-row items-center min-h-full">
+                {/* Progress bar: starts at screen edge (start in RTL), full height; inner padding so content not flush */}
+                <div className="hidden lg:flex w-48 shrink-0 justify-center items-center self-stretch bg-white pl-8">
                   <OnboardingProgressStepper
                     currentStep={currentStep}
                     steps={onboarding.steps}
@@ -448,7 +448,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                 </div>
 
                 {/* Step Content */}
-                <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-7">
+                <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-7 min-h-0 p-4 lg:p-6">
                   {/* Step 1: Basic Info Form */}
                   {currentStep === "basicInfo" && (
                     <form
@@ -676,8 +676,8 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
           </div>
         </div>
 
-        {/* Left Side - Image Collage (1/3 width, hidden on mobile) */}
-        <div className="hidden lg:block w-2/5 p-4">
+        {/* Left Side - Image Collage (smaller % of container, hidden on mobile) */}
+        <div className="hidden lg:block w-1/3 p-4">
           <OnboardingImageCollage />
         </div>
 

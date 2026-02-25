@@ -9,6 +9,7 @@ import { ROUTES } from "@/config";
 import { Button, ConfirmModal, ProfileImage } from "@/shared/components/ui";
 import { useLogout } from "@/features/auth";
 import { useAuth } from "@/features/auth";
+import { useMyProfile } from "../hooks";
 
 interface DashboardNavbarProps {
   onMenuToggle?: () => void;
@@ -23,7 +24,11 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
   const router = useRouter();
   const { logout, isLoading: isLoggingOut } = useLogout();
   const { user } = useAuth();
+  const { profile } = useMyProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Use profile image from Me API (imageUrl) when available, else auth user
+  const profileImageSrc = profile?.imageUrl ?? user?.profileImage ?? undefined;
 
   const { navbar, breadcrumb, modals } = dashboardContent;
 
@@ -125,7 +130,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
             <div className="hidden md:flex items-center gap-2 md:gap-3 pr-0 md:pr-2">
               <div className="w-6 h-6 md:w-[54px] md:h-[54px] rounded-full bg-grey-100 border border-grey-200 overflow-hidden flex items-center justify-center">
                 <ProfileImage
-                  src={user?.profileImage}
+                  src={profileImageSrc}
                   alt="صورة الملف الشخصي"
                   width={54}
                   height={54}

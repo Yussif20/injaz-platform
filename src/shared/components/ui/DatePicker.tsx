@@ -89,6 +89,20 @@ function getHijriMonthDays(hijriYear: number, hijriMonth: number): number {
   return Math.round((end.getTime() - start.getTime()) / 86400000);
 }
 
+/** Convert Hijri YYYY-MM-DD to Gregorian Date (for internal calendar state). */
+function hijriStringToGregorianDate(hijriYMD: string): Date {
+  const [y, m, d] = hijriYMD.split("-").map((x) => parseInt(x, 10));
+  const day1 = findGregorianForHijriDay1(y, m);
+/** Format Hijri YYYY-MM-DD for display (e.g. "15 جمادي الآخرة 1445 هـ"). */
+function formatHijriDisplay(hijriYMD: string): string {
+  const [y, m, d] = hijriYMD.split("-").map((x) => parseInt(x, 10));
+  const monthName = HIJRI_MONTHS[m - 1] ?? hijriYMD;
+  return `${d} ${monthName} ${y} هـ`;
+}
+
+  return new Date(day1.getTime() + (d - 1) * 86400000);
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const GREGORIAN_MONTHS = [
@@ -120,6 +134,15 @@ const HIJRI_MONTHS = [
   "ذو القعدة",
   "ذو الحجة",
 ];
+
+/** Format Hijri YYYY-MM-DD for display (e.g. "15 جمادي الآخرة 1445 هـ"). */
+function formatHijriDisplay(hijriYMD: string): string {
+  const parts = hijriYMD.split("-").map((x) => parseInt(x, 10));
+  if (parts.length !== 3) return hijriYMD;
+  const [y, m, d] = parts;
+  const monthName = HIJRI_MONTHS[m - 1] ?? hijriYMD;
+  return `${d} ${monthName} ${y} هـ`;
+}
 
 // Arabic day names - in RTL grid, index 0 = rightmost column = Friday
 const DAY_NAMES = ["جمعة", "سبت", "أحد", "اثنين", "ثلاثاء", "اربعاء", "خميس"];
@@ -171,9 +194,22 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize from value
+  // Initialize from value (Gregorian "YYYY-MM-DD" or Hijri "HYYYY-MM-DD")
   useEffect(() => {
-    if (value) {
+    if (!value) return;
+    if (value.startsWith("H")) {
+      const hijriYMD = value.slice(1);
+      const d = hijriStringToGregorianDate(hijriYMD);
+      if (!isNaN(d.getTime())) {
+        setSelectedDate(d);
+        setMode("hijri");
+        const [y, m] = hijriYMD.split("-").map((x) => parseInt(x, 10));
+        setHijriViewYear(y);
+        setHijriViewMonth(m);
+        setViewYear(d.getFullYear());
+        setViewMonth(d.getMonth());
+      }
+    } else {
       const d = new Date(value);
       if (!isNaN(d.getTime())) {
         setSelectedDate(d);
@@ -225,10 +261,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const handleConfirm = () => {
     if (tempSelectedDate) {
       setSelectedDate(tempSelectedDate);
-      const y = tempSelectedDate.getFullYear();
-      const m = String(tempSelectedDate.getMonth() + 1).padStart(2, "0");
-      const d = String(tempSelectedDate.getDate()).padStart(2, "0");
-      onChange(`${y}-${m}-${d}`);
+      if (mode === "hijri") {
+        const h = gregorianToHijri(tempSelectedDate);
+        const y = String(h.year);
+        const m = String(h.month).padStart(2, "0");
+        const d = String(h.day).padStart(2, "0");
+        onChange(`H${y}-${m}-${d}`);
+      } else {
+        const y = tempSelectedDate.getFullYear();
+        const m = String(tempSelectedDate.getMonth() + 1).padStart(2, "0");
+        const d = String(tempSelectedDate.getDate()).padStart(2, "0");
+        onChange(`${y}-${m}-${d}`);
+      }
     }
     setIsOpen(false);
   };
@@ -249,15 +293,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     }
   };
 
-  // Format display value
+  // Format display value: show in the same calendar as stored (Hijri or Gregorian)
   const displayValue = useMemo(() => {
-    if (!selectedDate) return "";
-    return selectedDate.toLocaleDateString("ar-SA", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }, [selectedDate]);
+    if (!value) return "";
+    if (value.startsWith("H")) {
+      return formatHijriDisplay(value.slice(1));
+    }
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return "";
+    return `${d.getDate()} ${GREGORIAN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  }, [value]);
 
   // ─── Gregorian Calendar Grid ──────────────────────────────────────────────
 

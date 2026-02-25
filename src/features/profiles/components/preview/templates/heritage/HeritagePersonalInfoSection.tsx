@@ -47,9 +47,14 @@ export const HeritagePersonalInfoSection = ({
 }: HeritagePersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
-  // Format date to Arabic format (e.g., "5/8/1988")
+  // Format date (Hijri "HYYYY-MM-DD" or Gregorian)
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "—";
+    if (dateStr.startsWith("H")) {
+      const parts = dateStr.slice(1).split("-");
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]} هـ`;
+      return dateStr;
+    }
     const date = new Date(dateStr);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
