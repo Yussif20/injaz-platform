@@ -51,11 +51,24 @@ function formatDate(dateString: string): string {
   }
 }
 
+// Job rank display: prefer personalInfo rank (الرتبة الوظيفية) over profile type name
+function getProfileJobRank(profile: Profile): string {
+  const info = profile.personalInfo;
+  if (!info) return profile.profileTypeName || "ملف";
+  return (
+    info.rankTitle ??
+    info.rankTitleMale ??
+    info.rankTitleFemale ??
+    profile.profileTypeName ??
+    "ملف"
+  );
+}
+
 // Helper function to map Profile to FileData
 function mapProfileToFileData(profile: Profile): FileData {
   return {
     id: String(profile.id),
-    title: profile.profileTypeName || "ملف",
+    title: getProfileJobRank(profile),
     ownerName: profile.userFullName || "",
     year: profile.academicYearName || "",
     creationDate: formatDate(profile.createdAt),
@@ -175,7 +188,7 @@ export default function DashboardPage() {
           edit: "true",
           fileId: String(profile.id),
           year: profile.academicYearName || "",
-          jobRank: profile.profileTypeName || "",
+          jobRank: getProfileJobRank(profile),
         });
         router.push(`${ROUTES.DASHBOARD_PROFILE_NEW}?${params.toString()}`);
       }

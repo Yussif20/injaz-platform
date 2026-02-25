@@ -240,9 +240,11 @@ export const AccountInfoForm: React.FC = () => {
   if (isLoadingProfile && !user) {
     return (
       <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8 animate-pulse">
-        <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
-          <div className="w-24 h-24 rounded-full bg-grey-200" />
-          <div className="h-6 w-32 bg-grey-200 rounded" />
+        <div className="flex justify-start sm:justify-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-grey-200" />
+            <div className="h-6 w-32 bg-grey-200 rounded" />
+          </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">
           {[1, 2, 3, 4].map((i) => (
@@ -283,42 +285,46 @@ export const AccountInfoForm: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Profile Image */}
+          {/* Profile Image: on mobile smaller, right-aligned, edit next to avatar */}
           <div className="flex flex-col items-center sm:flex-row sm:items-center gap-4 mb-8">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-grey-200">
-                <ProfileImage
-                  src={profileImage ?? displayData.profileImage}
-                  alt={accountInfo.profileImageAlt}
-                  width={70}
-                  height={70}
-                  className="w-full h-full object-cover"
-                  fallbackSrc="/logo/logo-cyan.svg"
-                />
+            <div className="w-full flex justify-start sm:justify-center sm:w-auto">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-shrink-0">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-grey-200">
+                    <ProfileImage
+                      src={profileImage ?? displayData.profileImage}
+                      alt={accountInfo.profileImageAlt}
+                      width={70}
+                      height={70}
+                      className="w-full h-full object-cover"
+                      fallbackSrc="/logo/logo-cyan.svg"
+                    />
+                  </div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleImageClick}
+                  className="flex items-center gap-2 transition-colors hover:opacity-80"
+                >
+                  <Image
+                    src="/icons/ui/edit.svg"
+                    alt="edit"
+                    width={24}
+                    height={24}
+                  />
+                  <span className="text-primary-500 font-light text-lg">
+                    {accountInfo.editImage}
+                  </span>
+                </button>
               </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                accept="image/*"
-                className="hidden"
-              />
             </div>
-            <button
-              type="button"
-              onClick={handleImageClick}
-              className="flex items-center gap-2 transition-colors hover:opacity-80"
-            >
-              <Image
-                src="/icons/ui/edit.svg"
-                alt="edit"
-                width={24}
-                height={24}
-              />
-              <span className="text-primary-500 font-light text-lg">
-                {accountInfo.editImage}
-              </span>
-            </button>
           </div>
           {/* Form Fields Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">

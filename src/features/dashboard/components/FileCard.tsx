@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { CirclePlus } from "lucide-react";
 import { dashboardContent } from "@/content";
 import { Button } from "@/shared/components/ui";
 
@@ -86,28 +87,30 @@ export const FileCard: React.FC<FileCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-grey-200 p-5 relative">
-      {/* Three dots menu button */}
-      <div className="absolute top-4 left-4" ref={menuRef}>
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 hover:bg-grey-100 rounded-lg transition-colors"
-          aria-label="خيارات الملف"
-        >
-          <svg
-            className="w-5 h-5 text-grey-500"
-            fill="currentColor"
-            viewBox="0 0 24 24"
+    <div className="bg-[#E3EFEF] rounded-2xl border border-grey-200 p-5 relative">
+      {/* Row 1: Edit button (menu) on one end */}
+      <div className="flex flex-row justify-between items-center mb-4">
+        <span />
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 hover:bg-grey-100 rounded-lg transition-colors"
+            aria-label="خيارات الملف"
           >
-            <circle cx="5" cy="12" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="19" cy="12" r="2" />
-          </svg>
-        </button>
+            <svg
+              className="w-5 h-5 text-grey-500"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+            </svg>
+          </button>
 
-        {/* Dropdown menu */}
-        {isMenuOpen && (
-          <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-grey-200 py-2 min-w-[220px] z-10">
+          {/* Dropdown menu */}
+          {isMenuOpen && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-grey-200 py-2 min-w-[220px] z-10">
             <button
               onClick={() => handleMenuOption(() => onEditBasicData?.(file.id))}
               className="w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-grey-50 transition-colors"
@@ -225,26 +228,28 @@ export const FileCard: React.FC<FileCardProps> = ({
             </button>
           </div>
         )}
+        </div>
       </div>
 
-      {/* File info */}
-      <div className="mb-4">
-        {/* Status badge */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${statusConfig.dotColor}`} />
-          <span className={`text-sm font-medium ${statusConfig.textColor}`}>
+      {/* Row 2: rank/year — file state (justify-between) */}
+      <div className="flex flex-row justify-between items-start gap-4 mb-2">
+        <p className="text-[#4D4D4D] font-light text-sm md:text-lg">
+          {file.title} - {file.year}
+        </p>
+        <div className="flex items-center gap-2">
+          <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusConfig.dotColor}`} />
+          <p className="text-[#B1363E] font-normal text-xs md:text-lg">
             {statusConfig.label}
-          </span>
+          </p>
         </div>
+      </div>
 
-        {/* Title and year */}
-        <p className="text-grey-500 text-sm mb-1">{file.title} - {file.year}</p>
-
-        {/* Owner name */}
-        <h3 className="text-lg font-semibold text-secondary-800">{file.ownerName}</h3>
-
-        {/* Creation date */}
-        <p className="text-grey-500 text-sm mt-2">
+      {/* Row 3: owner name — creation date (justify-between) */}
+      <div className="flex flex-row justify-between items-start gap-4 mb-4">
+        <p className="text-[#333] font-normal text-sm md:text-xl">
+          {file.ownerName}
+        </p>
+        <p className="text-[#4D4D4D] font-light text-xs md:text-lg">
           {filesSection.creationDate} {file.creationDate}
         </p>
       </div>
@@ -257,19 +262,7 @@ export const FileCard: React.FC<FileCardProps> = ({
           onClick={() => onAddEvidence?.(file.id)}
           className="flex-1 flex items-center justify-center gap-2"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
+          <CirclePlus className="w-5 h-5" />
           <span>{filesSection.addEvidence}</span>
         </Button>
 
@@ -277,7 +270,7 @@ export const FileCard: React.FC<FileCardProps> = ({
           variant="outline"
           size="md"
           onClick={() => onPreview?.(file.id)}
-          className="flex-1 flex items-center justify-center gap-2"
+          className="flex-1 flex items-center justify-center gap-2 !bg-transparent"
         >
           <svg
             className="w-5 h-5"
