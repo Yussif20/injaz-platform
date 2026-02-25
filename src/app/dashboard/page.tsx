@@ -216,19 +216,19 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="text-right" dir="rtl">
+    <div className="text-right min-w-0 overflow-x-hidden" dir="rtl">
       {/* Main content area */}
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
         {/* Files section - main content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Files header */}
-          <h2 className="text-xl font-semibold text-secondary-800 mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-secondary-800 mb-4 sm:mb-6">
             {filesSection.title}
           </h2>
 
           {/* Files grid */}
           {filteredFiles.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {filteredFiles.map((file) => (
                 <FileCard
                   key={file.id}

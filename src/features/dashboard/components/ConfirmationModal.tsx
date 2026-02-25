@@ -36,21 +36,22 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 sm:p-6"
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+        className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
         dir="rtl"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header with close button */}
-        <div className="flex items-start justify-between p-6 pb-4">
-          <h2 className="text-lg font-semibold text-secondary-800 flex-1 text-right">
+        <div className="flex items-start justify-between gap-3 p-4 sm:p-6 pb-2 sm:pb-4 flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-semibold text-secondary-800 flex-1 text-right min-w-0 break-words">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-grey-100 rounded-lg transition-colors mr-4 flex-shrink-0"
+            className="p-1.5 sm:p-1 hover:bg-grey-100 rounded-lg transition-colors flex-shrink-0 touch-manipulation"
             aria-label="إغلاق"
           >
             <svg
@@ -71,16 +72,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         {/* Message (optional) */}
         {message && (
-          <p className="text-grey-500 text-sm px-6 text-right">{message}</p>
+          <p className="text-grey-500 text-sm px-4 sm:px-6 pb-4 sm:pb-2 text-right min-w-0 break-words overflow-y-auto">
+            {message}
+          </p>
         )}
 
-        {/* Action buttons */}
-        <div className="flex gap-3 p-6 pt-6">
+        {/* Action buttons: stack on mobile, row on sm+ */}
+        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 p-4 sm:p-6 pt-2 sm:pt-4 flex-shrink-0">
           <Button
             type="button"
             variant="warning"
-            size="lg"
-            className={`flex-1 ${
+            size="md"
+            className={`w-full sm:flex-1 py-3 sm:py-2.5 ${
               variant === "danger"
                 ? "!bg-warning-600 hover:!bg-warning-700"
                 : ""
@@ -93,8 +96,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <Button
             type="button"
             variant="outline"
-            size="lg"
-            className="flex-1"
+            size="md"
+            className="w-full sm:flex-1 py-3 sm:py-2.5"
             onClick={onClose}
             disabled={isLoading}
           >

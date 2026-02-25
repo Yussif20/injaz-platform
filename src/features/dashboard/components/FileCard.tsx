@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { dashboardContent } from "@/content";
-import { Button } from "@/shared/components/ui";
 
 export type FileStatus = "incomplete" | "unpublished" | "published";
 
@@ -87,9 +86,9 @@ export const FileCard: React.FC<FileCardProps> = ({
   };
 
   return (
-    <div className="bg-[#E3EFEF] rounded-2xl border border-grey-200 p-5 relative">
+    <div className="bg-[#E3EFEF] rounded-xl sm:rounded-2xl border border-grey-200 p-4 sm:p-5 relative min-w-0">
       {/* Row 1: Edit button (menu) on one end */}
-      <div className="flex flex-row justify-between items-center mb-4">
+      <div className="flex flex-row justify-between items-center mb-3 sm:mb-4">
         <span />
         <div className="relative" ref={menuRef}>
           <button
@@ -232,48 +231,46 @@ export const FileCard: React.FC<FileCardProps> = ({
       </div>
 
       {/* Row 2: rank/year — file state (justify-between) */}
-      <div className="flex flex-row justify-between items-start gap-4 mb-2">
-        <p className="text-[#4D4D4D] font-light text-sm md:text-lg">
+      <div className="flex flex-row justify-between items-start gap-2 sm:gap-4 mb-2 min-w-0">
+        <p className="text-[#4D4D4D] font-light text-sm md:text-lg min-w-0 break-words">
           {file.title} - {file.year}
         </p>
-        <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusConfig.dotColor}`} />
-          <p className="text-[#B1363E] font-normal text-xs md:text-lg">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className={`w-2.5 h-2.5 rounded-full ${statusConfig.dotColor}`} />
+          <p className="text-[#B1363E] font-normal text-xs md:text-lg whitespace-nowrap">
             {statusConfig.label}
           </p>
         </div>
       </div>
 
       {/* Row 3: owner name — creation date (justify-between) */}
-      <div className="flex flex-row justify-between items-start gap-4 mb-4">
-        <p className="text-[#333] font-normal text-sm md:text-xl">
+      <div className="flex flex-row justify-between items-start gap-2 sm:gap-4 mb-3 sm:mb-4 min-w-0">
+        <p className="text-[#333] font-normal text-sm md:text-xl min-w-0 break-words">
           {file.ownerName}
         </p>
-        <p className="text-[#4D4D4D] font-light text-xs md:text-lg">
+        <p className="text-[#4D4D4D] font-light text-xs md:text-lg flex-shrink-0">
           {filesSection.creationDate} {file.creationDate}
         </p>
       </div>
 
-      {/* Action buttons */}
-      <div className="flex gap-3 mt-4">
-        <Button
-          variant="primary"
-          size="md"
+      {/* Action buttons: custom styled, side by side */}
+      <div className="flex flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
+        <button
+          type="button"
           onClick={() => onAddEvidence?.(file.id)}
-          className="flex-1 flex items-center justify-center gap-2"
+          className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
         >
-          <CirclePlus className="w-5 h-5" />
-          <span>{filesSection.addEvidence}</span>
-        </Button>
+          <CirclePlus className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+          <span className="truncate">{filesSection.addEvidence}</span>
+        </button>
 
-        <Button
-          variant="outline"
-          size="md"
+        <button
+          type="button"
           onClick={() => onPreview?.(file.id)}
-          className="flex-1 flex items-center justify-center gap-2 !bg-transparent"
+          className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl border-2 border-primary-500 bg-transparent text-primary-500 hover:bg-primary-50 active:bg-primary-100 transition-colors duration-200"
         >
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -285,8 +282,8 @@ export const FileCard: React.FC<FileCardProps> = ({
               d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
             />
           </svg>
-          <span>{filesSection.previewFile}</span>
-        </Button>
+          <span className="truncate">{filesSection.previewFile}</span>
+        </button>
       </div>
     </div>
   );
