@@ -3,32 +3,32 @@
 import React from "react";
 import Image from "next/image";
 import { dashboardContent } from "@/content";
+import { useSubscriptionHistory } from "@/features/dashboard/hooks/useSubscriptionHistory";
+
+function getStatusFromSubscription(isActive: boolean, paymentStatus: string) {
+  if (paymentStatus === "Refunded") return "cancelled";
+  if (isActive) return "active";
+  return "expired";
+}
 
 export default function SubscriptionHistoryPage() {
-  const { subscription } = dashboardContent;
+  const { subscription: content } = dashboardContent;
+  const { history, isLoading } = useSubscriptionHistory();
 
-  // TODO: Replace with real subscription history from API
-  const subscriptionHistory: Array<{
-    id: number;
-    plan: string;
-    startDate: string;
-    endDate: string;
-    status: "active" | "expired" | "cancelled";
-    amount: string;
-  }> = [];
-
-  const getStatusLabel = (status: "active" | "expired" | "cancelled") => {
+  const getStatusLabel = (isActive: boolean, paymentStatus: string) => {
+    const status = getStatusFromSubscription(isActive, paymentStatus);
     switch (status) {
       case "active":
-        return subscription.statusActive;
+        return content.statusActive;
       case "expired":
-        return subscription.statusExpired;
+        return content.statusExpired;
       case "cancelled":
-        return subscription.statusCancelled;
+        return content.statusCancelled;
     }
   };
 
-  const getStatusColor = (status: "active" | "expired" | "cancelled") => {
+  const getStatusColor = (isActive: boolean, paymentStatus: string) => {
+    const status = getStatusFromSubscription(isActive, paymentStatus);
     switch (status) {
       case "active":
         return "bg-success-100 text-success-600";
@@ -39,55 +39,62 @@ export default function SubscriptionHistoryPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-3 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-grey-100 rounded-xl h-12" />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {subscriptionHistory.length > 0 ? (
-        /* Subscription history table */
+      {history.length > 0 ? (
         <div className="bg-white rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-shade-50">
                 <tr>
                   <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {subscription.historyTableHeaders.plan}
+                    {content.historyTableHeaders.plan}
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {subscription.historyTableHeaders.startDate}
+                    {content.historyTableHeaders.startDate}
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {subscription.historyTableHeaders.endDate}
+                    {content.historyTableHeaders.endDate}
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {subscription.historyTableHeaders.status}
+                    {content.historyTableHeaders.status}
                   </th>
                   <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {subscription.historyTableHeaders.amount}
+                    {content.historyTableHeaders.amount}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-grey-100">
-                {subscriptionHistory.map((item) => (
+                {history.map((item) => (
                   <tr key={item.id}>
                     <td className="px-6 py-4 text-sm text-secondary-800">
-                      {item.plan}
+                      {content.planTitle}
                     </td>
                     <td className="px-6 py-4 text-sm text-grey-600">
-                      {item.startDate}
+                      {new Date(item.subscribedAt).toLocaleDateString("ar-SA")}
                     </td>
                     <td className="px-6 py-4 text-sm text-grey-600">
-                      {item.endDate}
+                      {new Date(item.expiresAt).toLocaleDateString("ar-SA")}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs ${getStatusColor(
-                          item.status
-                        )}`}
+                        className={`inline-block px-3 py-1 rounded-full text-xs ${getStatusColor(item.isActive, item.paymentStatus)}`}
                       >
-                        {getStatusLabel(item.status)}
+                        {getStatusLabel(item.isActive, item.paymentStatus)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-secondary-800">
-                      {item.amount}
+                      {item.finalAmount} {content.sar}
                     </td>
                   </tr>
                 ))}
@@ -96,7 +103,6 @@ export default function SubscriptionHistoryPage() {
           </div>
         </div>
       ) : (
-        /* Empty state */
         <div className="flex flex-col items-center justify-center py-16">
           <div className="relative w-64 h-48">
             <Image

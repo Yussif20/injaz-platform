@@ -436,6 +436,38 @@ export const dashboardContent = {
     statusExpired: "منتهي",
     statusCancelled: "ملغي",
 
+    // Active subscription card
+    activeSubscriptionTitle: "اشتراكك الحالي",
+    activeExpiryLabel: "تاريخ الانتهاء:",
+    activeDaysRemainingLabel: "الأيام المتبقية:",
+    activePaymentMethodLabel: "طريقة الدفع:",
+    activeAmountLabel: "المبلغ المدفوع:",
+    viewHistoryLink: "عرض السجل",
+    sar: "ر.س",
+    dayUnit: "يوم",
+
+    // Closed subscription message
+    closedTitle: "الاشتراكات مغلقة حالياً",
+    closedMessage: "لا تتوفر اشتراكات في الوقت الحالي، يرجى المحاولة لاحقاً.",
+
+    // Payment flow
+    processingPayment: "جاري معالجة الدفع...",
+    paymentSuccess: "تم الاشتراك بنجاح!",
+    paymentSuccessMessage: "تم تفعيل اشتراكك. يمكنك الآن إنشاء ملفات الإنجاز.",
+    paymentError: "فشلت عملية الدفع",
+    retryPayment: "إعادة المحاولة",
+    applePayComingSoon: "متاح قريباً",
+
+    // 3DS callback page
+    callbackVerifying: "جاري التحقق من الدفع...",
+    callbackVerifyingMessage: "يرجى الانتظار بينما نتحقق من حالة الدفع.",
+    callbackSuccess: "تم الاشتراك بنجاح!",
+    callbackSuccessMessage: "سيتم تحويلك إلى صفحة الاشتراك خلال ثوانٍ.",
+    callbackPending: "جاري التحقق من الدفع...",
+    callbackPendingMessage: "إذا اكتمل الدفع، سيظهر اشتراكك خلال دقائق.",
+    callbackRefresh: "تحديث الحالة",
+    callbackGoToSubscription: "الذهاب إلى الاشتراك",
+
     // Subscription form
     form: {
       title: "تأكيد الإشتراك",

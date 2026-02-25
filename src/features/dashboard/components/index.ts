@@ -21,8 +21,6 @@ export { JobDataTab } from "./JobDataTab";
 export { ProfileDataTabs } from "./ProfileDataTabs";
 
 // Create file page components
-export { CreateFileForm } from "./CreateFileForm";
-export type { EditFileData } from "./CreateFileForm";
 export { MobilePromoSidebar } from "./MobilePromoSidebar";
 
 // Dashboard home page components

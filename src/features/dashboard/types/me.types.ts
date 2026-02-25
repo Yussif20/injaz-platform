@@ -143,6 +143,7 @@ export interface SubscriptionDiscount {
 
 /**
  * User subscription details
+ * Note: paymentStatus from the API is a string ("Completed", "Failed", etc.), not a numeric enum.
  */
 export interface Subscription {
   id: number;
@@ -153,12 +154,31 @@ export interface Subscription {
   discountPercentage: number;
   discountAmount: number;
   finalAmount: number;
-  paymentStatus: PaymentStatus;
+  paymentStatus: string;
   paymentMethod: string | null;
   paymentTransactionId: string | null;
   isActive: boolean;
   daysRemaining: number;
   appliedDiscount: SubscriptionDiscount | null;
+  // 3D Secure fields
+  requires3DSecure: boolean;
+  threeDSecureUrl: string | null;
+  paymentGatewayId: string | null;
+  paymentFee: number | null;
+  paymentCompletedAt: string | null;
+}
+
+/**
+ * Subscription info from GET /api/Subscriptions/info
+ */
+export interface SubscriptionInfo {
+  subscriptionFee: number;
+  discountPercentage: number;
+  finalAmount: number;
+  daysRemaining: number;
+  endDate: string;
+  isSubscriptionOpen: boolean;
+  activeDiscount: SubscriptionDiscount | null;
 }
 
 // ============================================

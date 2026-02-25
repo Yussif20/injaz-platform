@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useRef } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -8,7 +8,12 @@ import {
   useRanks,
   useProfileTypes,
   useCreateProfile,
+  useUploadProfileImage,
 } from "@/features/profiles";
+import {
+  useMyProfile,
+  useUpdatePersonalInfo,
+} from "@/features/dashboard";
 import { Button } from "@/shared/components/ui";
 import { ROUTES } from "@/config";
 import { dashboardContent } from "@/content";
@@ -27,7 +32,10 @@ function CreateFileContent() {
   const { academicYears, isLoading: yearsLoading } = useAcademicYears();
   const { ranks, isLoading: ranksLoading } = useRanks();
   const { profileTypes, isLoading: profileTypesLoading } = useProfileTypes();
-  const { createProfileAsync, isLoading: creating } = useCreateProfile();
+  const { createProfileAsync } = useCreateProfile();
+  const { updatePersonalInfoAsync } = useUpdatePersonalInfo();
+  const { uploadImageAsync } = useUploadProfileImage();
+  const { profile } = useMyProfile();
 
   // Form state - IDs are numbers from the API
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -35,19 +43,68 @@ function CreateFileContent() {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const [rankDropdownOpen, setRankDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Image state
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const isLoading = yearsLoading || ranksLoading || profileTypesLoading;
-  
-  // Check if we have required data
+
+  // Pre-fill form when opening in edit mode with file info from URL
+  useEffect(() => {
+    if (!isEditMode || !fileId || isLoading) return;
+    const yearParam = searchParams.get("year");
+    const rankIdParam = searchParams.get("rankId");
+    const jobRankParam = searchParams.get("jobRank");
+    if (yearParam && academicYears.length > 0) {
+      const match = academicYears.find((y) => y.yearName === yearParam);
+      if (match) setSelectedYear(match.id);
+    }
+    if (ranks.length > 0) {
+      // Prefer rankId for reliable الرتبة الوظيفية pre-fill
+      const rankIdNum = rankIdParam ? Number(rankIdParam) : NaN;
+      const matchByRankId =
+        !Number.isNaN(rankIdNum) &&
+        ranks.find((r) => r.id === rankIdNum);
+      const matchByTitle =
+        !matchByRankId &&
+        jobRankParam &&
+        ranks.find(
+          (r) =>
+            r.titleFemale === jobRankParam ||
+            r.titleMale === jobRankParam ||
+            r.title === jobRankParam,
+        );
+      const match = matchByRankId || matchByTitle;
+      if (match) setSelectedRank(match.id);
+    }
+  }, [
+    isEditMode,
+    fileId,
+    isLoading,
+    searchParams,
+    academicYears,
+    ranks,
+  ]);
+
+  // Profile types are for templates; we use first available for create API only
   const hasProfileTypes = profileTypes.length > 0;
-  const isFormValid = selectedYear !== null && selectedRank !== null && hasProfileTypes;
-  
-  // Log available profile types for debugging
-  console.log("Available profile types:", profileTypes);
+  const defaultProfileTypeId = hasProfileTypes ? profileTypes[0].id : null;
+  const isFormValid =
+    selectedYear !== null &&
+    selectedRank !== null &&
+    hasProfileTypes;
+
+  // Get gender-aware rank title
+  const getRankTitle = (rank: {
+    titleMale?: string | null;
+    titleFemale?: string | null;
+  }) => {
+    return profile?.gender === 1
+      ? rank.titleMale || rank.titleFemale || ""
+      : rank.titleFemale || rank.titleMale || "";
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,23 +133,16 @@ function CreateFileContent() {
     if (!isFormValid) return;
 
     setError(null);
+    setIsSubmitting(true);
 
     try {
-      // Get the first available profile type ID (or default to 1)
-      const defaultProfileTypeId = profileTypes.length > 0 ? profileTypes[0].id : 1;
-      
-      // Create profile with academic year and profile type
-      // The rank will be stored separately via the /api/Me/personal-info endpoint
+      // Step 1: Create profile (profile type from first available; templates management elsewhere)
       const response = await createProfileAsync({
         academicYearId: selectedYear!,
-        profileTypeId: defaultProfileTypeId,
+        profileTypeId: defaultProfileTypeId!,
       });
-      
-      console.log("Create profile response:", response);
 
-      if (response.status) {
-        router.push(ROUTES.DASHBOARD);
-      } else {
+      if (!response.status) {
         const backendMsg =
           (response as { debug?: { backendMessage?: string } }).debug
             ?.backendMessage ?? (response as { message?: string }).message ?? "";
@@ -104,7 +154,36 @@ function CreateFileContent() {
           : (response.message || "فشل في إنشاء الملف");
         setError(errorInfo);
         if (!isAlreadyHasProfile) console.error("Create profile failed:", response);
+        return;
       }
+
+      const profileId = (response as { data?: { id?: number } }).data?.id;
+
+      // Step 2: Save rank (non-fatal)
+      try {
+        const currentInfo = profile?.personalInfo;
+        await updatePersonalInfoAsync({
+          rankId: selectedRank!,
+          nationalId: currentInfo?.nationalId ?? undefined,
+          birthDate: currentInfo?.birthDate ?? undefined,
+          address: currentInfo?.address ?? undefined,
+          email: currentInfo?.email ?? undefined,
+        });
+      } catch (rankErr) {
+        console.warn("Rank save failed (non-fatal):", rankErr);
+      }
+
+      // Step 3: Upload image (non-fatal)
+      if (selectedImage && profileId) {
+        try {
+          await uploadImageAsync({ profileId, file: selectedImage });
+        } catch (imgErr) {
+          console.warn("Image upload failed (non-fatal):", imgErr);
+        }
+      }
+
+      // Step 4: Navigate to dashboard
+      router.push(ROUTES.DASHBOARD);
     } catch (err: unknown) {
       const errorObj = err as {
         message?: string;
@@ -120,16 +199,16 @@ function CreateFileContent() {
         : data?.message || errorObj?.message || "حدث خطأ غير متوقع";
       setError(errorDetail);
       if (!isAlreadyHasProfile) console.error("Create profile error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const selectedYearName = academicYears.find(
     (y) => y.id === selectedYear,
   )?.yearName;
-  // Get rank name based on user gender (assuming female for now based on test user)
   const selectedRankData = ranks.find((r) => r.id === selectedRank);
-  const selectedRankName =
-    selectedRankData?.titleFemale || selectedRankData?.titleMale;
+  const selectedRankName = selectedRankData ? getRankTitle(selectedRankData) : undefined;
 
   if (isLoading) {
     return (
@@ -158,7 +237,7 @@ function CreateFileContent() {
               {error}
             </div>
           )}
-          
+
           {/* Warning if no profile types available */}
           {!isLoading && !hasProfileTypes && (
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
@@ -410,9 +489,8 @@ function CreateFileContent() {
                               />
                             </svg>
                           )}
-                          {/* Show female title for female users, male title for male users */}
                           <span className="text-secondary-800">
-                            {rank.titleFemale || rank.titleMale}
+                            {getRankTitle(rank)}
                           </span>
                         </button>
                       ))
@@ -428,8 +506,8 @@ function CreateFileContent() {
             <Button
               type="submit"
               variant="primary"
-              disabled={!isFormValid || creating}
-              isLoading={creating}
+              disabled={!isFormValid || isSubmitting}
+              isLoading={isSubmitting}
               className={`w-full p-2 rounded-3xl flex items-center justify-center gap-2 ${
                 !isFormValid ? "bg-grey-200! text-grey-400!" : ""
               }`}

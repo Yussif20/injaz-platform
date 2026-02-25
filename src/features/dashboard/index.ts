@@ -17,7 +17,6 @@ export {
   EducationDataTab,
   JobDataTab,
   ProfileDataTabs,
-  CreateFileForm,
   MobilePromoSidebar,
   FileCard,
   FileFilters,
@@ -25,7 +24,7 @@ export {
   ConfirmationModal,
 } from "./components";
 
-export type { FileData, FileStatus, EditFileData } from "./components";
+export type { FileData, FileStatus } from "./components";
 
 // Hooks
 export * from "./hooks";

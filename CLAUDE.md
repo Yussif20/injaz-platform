@@ -128,8 +128,8 @@ interface ApiResponse<T> {
 ## Key Enums
 
 ```typescript
-enum Gender { Female = 0, Male = 1 }
-enum ProfileStatus { Draft = 0, Unpublished = 1, Published = 2 }
+enum Gender { Male = 1, Female = 2 }
+enum ProfileStatus { Draft = 0, Unpublished = 1, Published = 2, PendingSubscription = 3 }
 ```
 
 ## Quick Links

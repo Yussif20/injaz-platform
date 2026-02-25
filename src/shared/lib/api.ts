@@ -88,4 +88,10 @@ export const API_ENDPOINTS = {
 
   // Share Links endpoints (backend)
   SHARE_LINKS: "/api/ShareLinks",
+
+  // Subscriptions endpoints (backend)
+  SUBSCRIPTION_INFO: "/api/Subscriptions/info",
+  SUBSCRIBE: "/api/Subscriptions/subscribe",
+  MY_SUBSCRIPTION: "/api/Subscriptions/my-subscription",
+  MY_SUBSCRIPTION_HISTORY: "/api/Subscriptions/my-history",
 } as const;

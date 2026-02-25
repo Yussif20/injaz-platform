@@ -18,12 +18,14 @@ import {
 import {
   useMyProfiles,
   useAcademicYears,
+  useRanks,
   useUnpublishProfile,
   useDeleteProfile,
 } from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import type { Profile } from "@/features/profiles/types";
+import type { Rank } from "@/features/profiles/types/reference.types";
 
 // Helper function to map Profile status to FileStatus
 function mapProfileStatusToFileStatus(status: string | null): FileStatus {
@@ -65,11 +67,22 @@ function getProfileJobRank(profile: Profile): string {
   );
 }
 
+// Resolve card title from ranks when profile has rankId, so we show actual الرتبة الوظيفية not profile type name
+function getProfileTitle(profile: Profile, ranks: Rank[]): string {
+  const rankId = profile.personalInfo?.rankId;
+  if (rankId != null && ranks.length > 0) {
+    const rank = ranks.find((r) => r.id === rankId);
+    if (rank)
+      return rank.title || rank.titleFemale || rank.titleMale || getProfileJobRank(profile);
+  }
+  return getProfileJobRank(profile);
+}
+
 // Helper function to map Profile to FileData
-function mapProfileToFileData(profile: Profile): FileData {
+function mapProfileToFileData(profile: Profile, ranks: Rank[]): FileData {
   return {
     id: String(profile.id),
-    title: getProfileJobRank(profile),
+    title: getProfileTitle(profile, ranks),
     ownerName: profile.userFullName || "",
     year: profile.academicYearName || "",
     creationDate: formatDate(profile.createdAt),
@@ -86,6 +99,7 @@ export default function DashboardPage() {
     refetch: refetchProfiles,
   } = useMyProfiles();
   const { academicYears } = useAcademicYears();
+  const { ranks } = useRanks();
   const { unpublish } = useUnpublishProfile();
   const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
 
@@ -160,8 +174,8 @@ export default function DashboardPage() {
 
   // Map profiles to file data and filter
   const fileData = useMemo(() => {
-    return profiles.map(mapProfileToFileData);
-  }, [profiles]);
+    return profiles.map((p) => mapProfileToFileData(p, ranks));
+  }, [profiles, ranks]);
 
   const filteredFiles = useMemo(() => {
     return fileData.filter((file) => {
@@ -232,13 +246,15 @@ export default function DashboardPage() {
       // Find the profile to pass to the edit page
       const profile = profiles.find((p) => String(p.id) === fileToEdit);
       if (profile) {
-        // Build URL with profile data as search params
+        // Build URL with profile data as search params (rankId for reliable الرتبة الوظيفية pre-fill)
         const params = new URLSearchParams({
           edit: "true",
           fileId: String(profile.id),
           year: profile.academicYearName || "",
           jobRank: getProfileJobRank(profile),
         });
+        const rankId = profile.personalInfo?.rankId;
+        if (rankId != null) params.set("rankId", String(rankId));
         router.push(`${ROUTES.DASHBOARD_PROFILE_NEW}?${params.toString()}`);
       }
     }
@@ -440,7 +456,9 @@ export default function DashboardPage() {
                   }
                   onPreview={(id) => router.push(ROUTES.PROFILE_PREVIEW(id))}
                   onEditBasicData={handleEditBasicDataClick}
-                  onEditMyData={(id) => console.log("Edit my data:", id)}
+                  onEditMyData={() =>
+                    router.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL)
+                  }
                   onSetPassword={handleSetPassword}
                   onChangePassword={handleChangePassword}
                   onUnpublish={handleUnpublish}
