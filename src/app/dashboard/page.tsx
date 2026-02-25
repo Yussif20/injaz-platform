@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -90,11 +91,59 @@ export default function DashboardPage() {
 
   const isLoading = authLoading || profilesLoading;
   const router = useRouter();
-  const { welcomeHeader, filesSection } = dashboardContent;
+  const { welcomeHeader, filesSection, filters, fileStatus } = dashboardContent;
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
 
   // Filter states
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<FileStatus | null>(null);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const [yearSectionExpanded, setYearSectionExpanded] = useState(false);
+  const [statusSectionExpanded, setStatusSectionExpanded] = useState(false);
+
+  // Position dropdown when opened (fixed, so it's never cropped by parent overflow)
+  useEffect(() => {
+    if (!filterDropdownOpen || !filterButtonRef.current) {
+      setDropdownPosition(null);
+      return;
+    }
+    const updatePosition = () => {
+      if (!filterButtonRef.current) return;
+      const rect = filterButtonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: rect.left,
+      });
+    };
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [filterDropdownOpen]);
+
+  // Close mobile filter dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        filterDropdownOpen &&
+        filterButtonRef.current &&
+        !filterDropdownRef.current?.contains(e.target as Node) &&
+        !filterButtonRef.current.contains(e.target as Node)
+      ) {
+        setFilterDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [filterDropdownOpen]);
 
   // Password modal states
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -221,10 +270,163 @@ export default function DashboardPage() {
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
         {/* Files section - main content */}
         <div className="flex-1 min-w-0">
-          {/* Files header */}
-          <h2 className="text-lg sm:text-xl font-semibold text-secondary-800 mb-4 sm:mb-6">
-            {filesSection.title}
-          </h2>
+          {/* Files header + mobile/tablet filter button */}
+          <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-secondary-800">
+              {filesSection.title}
+            </h2>
+            {/* Filter button - visible only when sidebar is hidden (mobile/tablet) */}
+            <div className="lg:hidden">
+              <button
+                ref={filterButtonRef}
+                type="button"
+                onClick={() => setFilterDropdownOpen((o) => !o)}
+                className="flex items-center justify-center p-2 text-grey-600 hover:text-grey-800 transition-colors"
+                aria-label={filters.filterByYear}
+                aria-expanded={filterDropdownOpen}
+              >
+                <Image
+                  src="/images/dashboard/filter.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Filter dropdown - rendered in portal with fixed position so it's never cropped */}
+          {filterDropdownOpen &&
+            dropdownPosition &&
+            typeof window !== "undefined" &&
+            createPortal(
+              <div
+                ref={filterDropdownRef}
+                className="w-72 max-w-[calc(100vw-2rem)] overflow-y-auto bg-white rounded-xl border border-grey-200 shadow-lg z-[100]"
+                style={{
+                  position: "fixed",
+                  top: dropdownPosition.top,
+                  left: dropdownPosition.left,
+                  maxHeight: "min(70vh, 400px)",
+                }}
+              >
+                  {/* تصنيف حسب السنة */}
+                  <div className="border-b border-grey-100">
+                    <button
+                      type="button"
+                      onClick={() => setYearSectionExpanded((e) => !e)}
+                      className="w-full flex items-center justify-between gap-2 px-4 py-3 text-right hover:bg-grey-50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-secondary-800">
+                        {filters.filterByYear}
+                      </span>
+                      <svg
+                        className={`w-5 h-5 text-grey-500 transition-transform ${yearSectionExpanded ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {yearSectionExpanded && (
+                      <div className="px-4 pb-3 space-y-1.5">
+                        <label className="flex items-center gap-3 cursor-pointer py-2">
+                          <input
+                            type="radio"
+                            name="mobile-year"
+                            checked={selectedYear === null}
+                            onChange={() => setSelectedYear(null)}
+                            className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                          />
+                          <span className="text-sm text-grey-600">{filters.allYears}</span>
+                        </label>
+                        {academicYears.map((y) => (
+                          <label key={y.id} className="flex items-center gap-3 cursor-pointer py-2">
+                            <input
+                              type="radio"
+                              name="mobile-year"
+                              checked={selectedYear === y.yearName}
+                              onChange={() => setSelectedYear(y.yearName)}
+                              className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                            />
+                            <span className="text-sm text-grey-600">{y.yearName}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* تصنيف حسب حالة الملف */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setStatusSectionExpanded((e) => !e)}
+                      className="w-full flex items-center justify-between gap-2 px-4 py-3 text-right hover:bg-grey-50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-secondary-800">
+                        {filters.filterByStatus}
+                      </span>
+                      <svg
+                        className={`w-5 h-5 text-grey-500 transition-transform ${statusSectionExpanded ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {statusSectionExpanded && (
+                      <div className="px-4 pb-3 space-y-1.5">
+                        <label className="flex items-center gap-3 cursor-pointer py-2">
+                          <input
+                            type="radio"
+                            name="mobile-status"
+                            checked={selectedStatus === null}
+                            onChange={() => setSelectedStatus(null)}
+                            className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                          />
+                          <span className="text-sm text-grey-600">{filters.allStatuses}</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer py-2">
+                          <input
+                            type="radio"
+                            name="mobile-status"
+                            checked={selectedStatus === "incomplete"}
+                            onChange={() => setSelectedStatus("incomplete")}
+                            className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                          />
+                          <span className="w-2.5 h-2.5 rounded-full bg-warning-500" />
+                          <span className="text-sm text-warning-500">{fileStatus.incomplete}</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer py-2">
+                          <input
+                            type="radio"
+                            name="mobile-status"
+                            checked={selectedStatus === "unpublished"}
+                            onChange={() => setSelectedStatus("unpublished")}
+                            className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                          />
+                          <span className="w-2.5 h-2.5 rounded-full bg-grey-400" />
+                          <span className="text-sm text-grey-500">{fileStatus.unpublished}</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer py-2">
+                          <input
+                            type="radio"
+                            name="mobile-status"
+                            checked={selectedStatus === "published"}
+                            onChange={() => setSelectedStatus("published")}
+                            className="w-4 h-4 text-primary-500 border-grey-300 focus:ring-primary-500"
+                          />
+                          <span className="w-2.5 h-2.5 rounded-full bg-success-500" />
+                          <span className="text-sm text-success-500">{fileStatus.published}</span>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+              </div>,
+              document.body
+            )}
 
           {/* Files grid */}
           {filteredFiles.length > 0 ? (

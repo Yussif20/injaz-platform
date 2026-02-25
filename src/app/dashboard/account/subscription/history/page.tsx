@@ -98,7 +98,7 @@ export default function SubscriptionHistoryPage() {
       ) : (
         /* Empty state */
         <div className="flex flex-col items-center justify-center py-16">
-          <div className="relative w-64 h-48 mb-6">
+          <div className="relative w-64 h-48">
             <Image
               src="/images/dashboard/subscription.svg"
               alt="No subscription history"
@@ -106,7 +106,6 @@ export default function SubscriptionHistoryPage() {
               className="object-contain"
             />
           </div>
-          <p className="text-lg text-grey-500">{subscription.noHistory}</p>
         </div>
       )}
     </div>

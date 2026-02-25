@@ -285,6 +285,13 @@ export default function ManageSubscriptionPage() {
     }
   };
 
+  // Form is complete when all required card fields are filled
+  const isFormComplete =
+    cardName.trim() !== "" &&
+    cardNumber.replace(/\s/g, "").length >= 16 &&
+    cvv.length >= 3 &&
+    expiryDate.length === 5;
+
   // Subscription Form View
   if (showSubscriptionForm) {
     return (
@@ -346,7 +353,7 @@ export default function ManageSubscriptionPage() {
                     onSelect={setSelectedPaymentMethod}
                     logo={
                       <Image
-                        src="/images/landing/subscription/mada.svg"
+                        src="/images/dashboard/mada.svg"
                         alt="Mada"
                         width={50}
                         height={20}
@@ -361,7 +368,7 @@ export default function ManageSubscriptionPage() {
                     onSelect={setSelectedPaymentMethod}
                     logo={
                       <Image
-                        src="/images/landing/subscription/apple-pay.svg"
+                        src="/images/dashboard/apple-pay.svg"
                         alt="Apple Pay"
                         width={50}
                         height={20}
@@ -473,20 +480,12 @@ export default function ManageSubscriptionPage() {
           <Button
             variant="primary"
             size="lg"
-            className="w-full py-3 sm:py-2"
+            disabled={!isFormComplete}
+            className={`w-full py-3 sm:py-2.5 disabled:!bg-grey-200 disabled:!text-grey-500 disabled:cursor-not-allowed disabled:hover:!bg-grey-200`}
             onClick={handleConfirmPayment}
           >
             {subscription.form.confirmPayment}
           </Button>
-
-          {/* Cancel Button */}
-          <button
-            type="button"
-            onClick={handleCancelSubscription}
-            className="w-full text-sm sm:text-base text-grey-500 hover:text-grey-700 transition-colors py-3 sm:py-2 touch-manipulation"
-          >
-            {subscription.form.cancel}
-          </button>
         </div>
 
         {/* Confirmation Modal */}
