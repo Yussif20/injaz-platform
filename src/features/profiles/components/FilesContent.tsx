@@ -1,11 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Calendar, FileText, ExternalLink, Users } from "lucide-react";
-import { Button, Pagination } from "@/shared/components/ui";
-import { useFilteredProfiles } from "../hooks/useProfiles";
+import {
+  Search,
+  Calendar,
+  FileText,
+  ExternalLink,
+  Users,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import { Button, ConfirmDialog, Pagination } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { useTranslation } from "@/i18n/TranslationContext";
+import { useFilteredProfiles, useDeleteProfile } from "../hooks/useProfiles";
 import { ProfileStatus } from "../types/profiles.types";
-import type { ProfileFilterParams } from "../types/profiles.types";
+import type { AdminProfileDto, ProfileFilterParams } from "../types/profiles.types";
 
 const PAGE_SIZE = 10;
 
@@ -20,6 +30,13 @@ function getStatusColor(status: ProfileStatus): string {
 }
 
 export function FilesContent() {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const commonT = t("common") as Record<string, unknown>;
+  const toastT = commonT.toast as Record<string, string>;
+  const actionsT = commonT.actions as Record<string, string>;
+  const confirmT = (commonT.confirm ?? {}) as Record<string, string>;
+
   const [filters, setFilters] = useState<ProfileFilterParams>({
     PageNumber: 1,
     PageSize: PAGE_SIZE,
@@ -27,6 +44,17 @@ export function FilesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  // Action menu state
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+
+  // Delete confirm state
+  const [deleteTarget, setDeleteTarget] = useState<AdminProfileDto | null>(null);
+
+  const deleteProfile = useDeleteProfile();
 
   const {
     data: paginatedData,
@@ -59,6 +87,45 @@ export function FilesContent() {
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     setFilters((prev) => ({ ...prev, PageNumber: 1 }));
+  };
+
+  const handleMenuOpen = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    profileId: number,
+  ) => {
+    e.stopPropagation();
+    if (openMenuId === profileId) {
+      setOpenMenuId(null);
+      setMenuPos(null);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const menuWidth = 160;
+    const left = Math.max(
+      8,
+      Math.min(rect.left, window.innerWidth - menuWidth - 8),
+    );
+    setMenuPos({ top: rect.bottom + 4, left });
+    setOpenMenuId(profileId);
+  };
+
+  const handleDeleteClick = (profile: AdminProfileDto) => {
+    setDeleteTarget(profile);
+    setOpenMenuId(null);
+    setMenuPos(null);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteProfile.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        toast({ type: "delete", message: toastT.deleted ?? "تم الحذف بنجاح" });
+        setDeleteTarget(null);
+      },
+      onError: () => {
+        toast({ type: "error", message: toastT.error ?? "حدث خطأ" });
+      },
+    });
   };
 
   if (isLoading) {
@@ -200,8 +267,8 @@ export function FilesContent() {
                 </div>
               </div>
 
-              {/* Left: status + action */}
-              <div className="flex items-center gap-6">
+              {/* Left: status + view + menu */}
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <span
                     className={`h-2 w-2 rounded-full ${isPublished ? "bg-primary-500" : "bg-grey-400"}`}
@@ -231,6 +298,15 @@ export function FilesContent() {
                     عرض الملف
                   </button>
                 )}
+
+                {/* Three-dot menu trigger */}
+                <button
+                  onClick={(e) => handleMenuOpen(e, profile.id)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-grey-400 transition-colors hover:bg-grey-100 hover:text-grey-600"
+                  aria-label="خيارات"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
               </div>
             </div>
           );
@@ -245,6 +321,50 @@ export function FilesContent() {
           onPageChange={handlePageChange}
         />
       )}
+
+      {/* Action menu (fixed position) */}
+      {openMenuId !== null && menuPos && (
+        <>
+          <div
+            className="fixed inset-0 z-[9998]"
+            onClick={() => {
+              setOpenMenuId(null);
+              setMenuPos(null);
+            }}
+          />
+          <div
+            style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+            className="z-[9999] w-40 overflow-hidden rounded-xl border border-grey-200 bg-white shadow-lg"
+          >
+            <button
+              onClick={() => {
+                const profile = profiles.find((p) => p.id === openMenuId);
+                if (profile) handleDeleteClick(profile);
+              }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              {actionsT.delete ?? "حذف"}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Delete confirm dialog */}
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        title={confirmT.title ?? "حذف الملف"}
+        message={
+          deleteTarget
+            ? `هل أنت متأكد من حذف ملف "${deleteTarget.userName}"؟ لا يمكن التراجع عن هذا الإجراء.`
+            : ""
+        }
+        isLoading={deleteProfile.isPending}
+        confirmLabel={actionsT.delete ?? "حذف"}
+        cancelLabel={actionsT.cancel ?? "إلغاء"}
+      />
     </div>
   );
 }

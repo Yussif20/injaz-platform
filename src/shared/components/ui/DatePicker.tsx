@@ -549,7 +549,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             disabled={!tempSelectedDate}
             className={`mt-4 w-full rounded-full py-3 text-base font-medium text-white transition-colors duration-200 ${
               tempSelectedDate
-                ? "cursor-pointer bg-primary-500 hover:bg-primary-600"
+                ? "cursor-pointer bg-primary-500 hover:bg-primary-800"
                 : "cursor-not-allowed bg-grey-300"
             }`}
           >

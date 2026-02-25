@@ -8,9 +8,6 @@ import { Button, DatePicker } from "@/shared/components/ui";
 import {
   useCreateAcademicYear,
   useUpdateAcademicYear,
-  useActivateAcademicYear,
-  useDeactivateAcademicYear,
-  useCloseAcademicYear,
 } from "../hooks";
 import type { AcademicYearDto } from "../types/academic-years.types";
 import {
@@ -80,9 +77,6 @@ export function AddYearModal({
 
   const createYear = useCreateAcademicYear();
   const updateYear = useUpdateAcademicYear();
-  const activateYear = useActivateAcademicYear();
-  const deactivateYear = useDeactivateAcademicYear();
-  const closeYear = useCloseAcademicYear();
 
   const gregorianYears = useMemo(getGregorianYears, []);
   const hijriYears = useMemo(getHijriYears, []);
@@ -135,56 +129,28 @@ export function AddYearModal({
     }
   }, [isOpen, initialData, reset]);
 
-  const applyStatus = (id: number, status: string, cb: () => void) => {
-    if (status === "Active") {
-      activateYear.mutate(id, { onSuccess: cb, onError: cb });
-    } else if (status === "Closed") {
-      closeYear.mutate(id, { onSuccess: cb, onError: cb });
-    } else {
-      deactivateYear.mutate(id, { onSuccess: cb, onError: cb });
-    }
-  };
-
   const onSubmit = (data: AcademicYearFormData) => {
     const yearName = `${data.gregorianYear} م / ${data.hijriYear} هـ`;
     const payload = {
       yearName,
       startDate: new Date(data.startDate).toISOString(),
       endDate: new Date(data.endDate).toISOString(),
+      status: data.status,
     };
 
     if (isEditMode && initialData) {
       updateYear.mutate(
         { id: initialData.id, data: payload },
-        {
-          onSuccess: () => {
-            if (data.status !== initialData.status) {
-              applyStatus(initialData.id, data.status, () => onSuccess?.());
-            } else {
-              onSuccess?.();
-            }
-          },
-        },
+        { onSuccess: () => onSuccess?.() },
       );
     } else {
       createYear.mutate(payload, {
-        onSuccess: (created) => {
-          if (data.status !== "Inactive") {
-            applyStatus(created.id, data.status, () => onSuccess?.());
-          } else {
-            onSuccess?.();
-          }
-        },
+        onSuccess: () => onSuccess?.(),
       });
     }
   };
 
-  const isPending =
-    createYear.isPending ||
-    updateYear.isPending ||
-    activateYear.isPending ||
-    deactivateYear.isPending ||
-    closeYear.isPending;
+  const isPending = createYear.isPending || updateYear.isPending;
 
   if (!isOpen) return null;
 

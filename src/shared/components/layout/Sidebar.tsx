@@ -26,6 +26,11 @@ const navItems = [
     labelKey: "academicYears",
   },
   {
+    href: ROUTES.PROFILE_TYPES,
+    icon: "/icons/profile-types.svg",
+    labelKey: "profileTypes",
+  },
+  {
     href: ROUTES.ASSESSMENTS,
     icon: "/icons/assessments.svg",
     labelKey: "assessments",

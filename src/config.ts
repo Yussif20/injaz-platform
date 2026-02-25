@@ -22,6 +22,7 @@ export const ROUTES = {
   SUBSCRIPTIONS: "/dashboard/subscriptions",
   RANKS: "/dashboard/ranks",
   ACADEMIC_YEARS: "/dashboard/academic-years",
+  PROFILE_TYPES: "/dashboard/profile-types",
   ASSESSMENTS: "/dashboard/assessments",
   TERMS: "/dashboard/terms",
   SOCIALS: "/dashboard/socials",

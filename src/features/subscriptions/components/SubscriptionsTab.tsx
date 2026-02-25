@@ -89,27 +89,49 @@ export function SubscriptionsTab() {
     setFilters((prev) => ({ ...prev, PageNumber: 1 }));
   };
 
-  const getPaymentStatusLabel = (status: PaymentStatus): string => {
-    const labels: Record<number, string> = {
+  const getPaymentStatusLabel = (status: PaymentStatus | string): string => {
+    // API may return string values ("Completed") or numeric enum (1)
+    const normalized =
+      typeof status === "string" ? status.toLowerCase() : status;
+    const stringMap: Record<string, string> = {
+      pending: subsT.paymentStatus.pending,
+      processing: subsT.paymentStatus.pending,
+      initiated: subsT.paymentStatus.pending,
+      completed: subsT.paymentStatus.completed,
+      failed: subsT.paymentStatus.failed,
+      refunded: subsT.paymentStatus.refunded,
+    };
+    const numericMap: Record<number, string> = {
       0: subsT.paymentStatus.pending,
       1: subsT.paymentStatus.completed,
       2: subsT.paymentStatus.failed,
       3: subsT.paymentStatus.refunded,
     };
-    return labels[status] ?? "";
+    if (typeof normalized === "string") return stringMap[normalized] ?? normalized;
+    return numericMap[normalized] ?? "";
   };
 
   const getPaymentStatusVariant = (
-    status: PaymentStatus,
+    status: PaymentStatus | string,
   ): "success" | "warning" | "neutral" | "info" => {
-    const variants: Record<number, "success" | "warning" | "neutral" | "info"> =
-      {
-        0: "warning",
-        1: "success",
-        2: "neutral",
-        3: "info",
-      };
-    return variants[status] ?? "neutral";
+    const normalized =
+      typeof status === "string" ? status.toLowerCase() : status;
+    const stringMap: Record<string, "success" | "warning" | "neutral" | "info"> = {
+      pending: "warning",
+      processing: "warning",
+      initiated: "warning",
+      completed: "success",
+      failed: "neutral",
+      refunded: "info",
+    };
+    const numericMap: Record<number, "success" | "warning" | "neutral" | "info"> = {
+      0: "warning",
+      1: "success",
+      2: "neutral",
+      3: "info",
+    };
+    if (typeof normalized === "string") return stringMap[normalized] ?? "neutral";
+    return numericMap[normalized] ?? "neutral";
   };
 
   // Loading state

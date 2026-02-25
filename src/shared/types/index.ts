@@ -5,8 +5,5 @@ export {
   type PaginatedQueryParams,
   Gender,
   GenderAvailability,
-  UserRole,
-  PaymentStatus,
-  ProfileStatus,
   ApiError,
 } from "./api.types";

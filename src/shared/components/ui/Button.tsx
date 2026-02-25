@@ -22,7 +22,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   warning:
     "bg-warning-500 text-white hover:bg-warning-700 focus:ring-warning-300",
   danger:
-    "bg-error-500 text-white hover:bg-error-700 focus:ring-error-300",
+    "bg-warning-500 text-white hover:bg-warning-700 focus:ring-warning-300",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

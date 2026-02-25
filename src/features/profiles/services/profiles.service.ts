@@ -12,3 +12,10 @@ export async function getFilteredProfiles(
   );
   return unwrapResponse(response);
 }
+
+export async function deleteProfile(id: number): Promise<boolean> {
+  const response = await proxyApi.delete<ApiResponse<boolean>>(
+    API_ENDPOINTS.PROFILES.BY_ID(id),
+  );
+  return unwrapResponse(response);
+}

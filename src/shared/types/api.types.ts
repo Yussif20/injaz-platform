@@ -40,24 +40,6 @@ export enum GenderAvailability {
   Both = 3,
 }
 
-export enum UserRole {
-  Admin = "Admin",
-  User = "User",
-}
-
-export enum PaymentStatus {
-  Pending = 1,
-  Paid = 2,
-  Failed = 3,
-  Refunded = 4,
-}
-
-export enum ProfileStatus {
-  Draft = 1,
-  Published = 2,
-  Archived = 3,
-}
-
 // ── Error class ──────────────────────────────────────────────────
 
 export class ApiError extends Error {
