@@ -3,7 +3,6 @@
 import { Suspense, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { MobilePromoSidebar } from "@/features/dashboard";
 import {
   useAcademicYears,
   useRanks,
@@ -455,15 +454,15 @@ function CreateFileContent() {
         </form>
       </div>
 
-      {/* Illustration - Left side on desktop, above form on mobile */}
-      <div className="w-full lg:w-100 flex items-center justify-end order-2">
+      {/* Illustration - sm/md: above form; lg: left side only (one image per breakpoint) */}
+      <div className="w-full lg:w-100 flex-shrink-0 flex items-center justify-end order-2">
         {/* Small screens */}
         <Image
           src="/images/dashboard/create-file/create-file-sm.svg"
           alt="إنشاء ملف"
           width={400}
           height={464}
-          className="block md:hidden w-full h-auto max-h-116"
+          className="block md:hidden w-full h-auto max-h-116 object-left"
         />
         {/* Medium screens */}
         <Image
@@ -471,20 +470,17 @@ function CreateFileContent() {
           alt="إنشاء ملف"
           width={400}
           height={562}
-          className="hidden md:block lg:hidden w-full h-auto max-h-140"
+          className="hidden md:block lg:hidden w-full h-auto max-h-140 object-left"
         />
-        {/* Large screens */}
+        {/* Large screens only - no duplicate */}
         <Image
           src="/images/dashboard/create-file/create-file.svg"
           alt="إنشاء ملف"
           width={400}
           height={685}
-          className="hidden lg:block w-full h-auto max-h-170"
+          className="hidden lg:block w-full h-auto max-h-170 object-left"
         />
       </div>
-
-      {/* Promotional Sidebar - Desktop Only */}
-      <MobilePromoSidebar />
     </div>
   );
 }
