@@ -22,13 +22,13 @@ export default function SignLayout({
 
       {/* Small and medium screens: stacked layout with image at top, form below */}
       <div className="lg:hidden flex flex-col min-h-screen bg-primary-500">
-        {/* Background image at top */}
+        {/* Background image at top - register-cover-mobile for sm/md */}
         <div
           className="w-full bg-no-repeat bg-center bg-contain shrink-0"
           style={{
-            backgroundImage: "url('/images/auth/sign-bg.svg')",
-            height: "40vh",
-            minHeight: "150px",
+            backgroundImage: "url('/images/auth/register-cover-mobile.svg')",
+            height: "28vh",
+            minHeight: "120px",
           }}
         />
 

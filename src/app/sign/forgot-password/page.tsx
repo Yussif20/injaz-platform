@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen h-full flex items-stretch">
-      <div className="w-full h-full min-h-screen bg-white rounded-t-[60px] sm:rounded-t-[80px] lg:rounded-tr-none lg:rounded-bl-[100px] px-6 sm:px-10 lg:px-16 py-8 sm:py-10 lg:py-12 shadow-sm flex flex-col justify-center">
+      <div className="w-full h-full min-h-screen bg-white rounded-t-[30px] sm:rounded-t-[40px] lg:rounded-tr-none lg:rounded-bl-[100px] px-6 sm:px-10 lg:px-16 py-4 sm:py-5 lg:py-12 shadow-sm flex flex-col justify-center">
         {/* Logo */}
         <div className="flex justify-center lg:justify-end mb-6 sm:mb-8 lg:mb-10">
           <Link href="/">

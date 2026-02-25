@@ -7,7 +7,7 @@ export default function CustomerSupportPage() {
   const { support } = authContent;
 
   return (
-    <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8">
+    <div className="bg-[#FAFAFA] rounded-lg lg:rounded-xl p-4 sm:p-6 lg:p-8">
       {/* Content aligned right: title, description, number + icon */}
       <div className="text-right mb-6">
         <h1 className="mb-3 text-xl sm:text-2xl font-normal text-[#333]">

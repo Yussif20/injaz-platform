@@ -15,7 +15,7 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen h-full flex items-stretch p-0">
-      <div className="w-full h-full min-h-screen max-w-none bg-white rounded-tl-[100px] rounded-tr-[100px] lg:rounded-tr-none lg:rounded-bl-[100px] p-4 sm:p-6 lg:p-12 shadow-sm flex flex-col justify-center gap-4">
+      <div className="w-full h-full min-h-screen max-w-none bg-white rounded-tl-[30px] rounded-tr-[30px] lg:rounded-tr-none lg:rounded-bl-[100px] p-4 sm:p-6 lg:p-12 shadow-sm flex flex-col justify-center gap-4">
         {/* Logo and Back Button Row */}
         <div className="flex justify-between items-center pb-2 sm:pb-3">
           {/* Back Button */}
