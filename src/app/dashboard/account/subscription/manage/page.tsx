@@ -5,8 +5,8 @@ import Image from "next/image";
 import { dashboardContent } from "@/content";
 import { Button, Input } from "@/shared/components/ui";
 
-// Target date: February 10th, 2026 at 12:00 AM (defined outside component to avoid re-renders)
-const PROMO_END_TIMESTAMP = new Date(2026, 1, 10, 0, 0, 0).getTime();
+// Target date: April 1st, 2026 at 12:00 AM (defined outside component to avoid re-renders)
+const PROMO_END_TIMESTAMP = new Date(2026, 3, 1, 0, 0, 0).getTime();
 
 // Countdown timer hook - takes timestamp to avoid re-renders
 function useCountdown(targetTimestamp: number) {
@@ -45,9 +45,9 @@ function useCountdown(targetTimestamp: number) {
 // Countdown unit component
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center bg-white rounded-xl px-4 py-2 min-w-[70px]">
-      <span className="text-2xl font-bold text-secondary-800">{value}</span>
-      <span className="text-xs text-grey-500">{label}</span>
+    <div className="flex flex-col items-center bg-transparent border-2 border-primary-700 rounded-lg sm:rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 min-w-[56px] sm:min-w-[70px]">
+      <span className="text-xl sm:text-2xl font-bold text-primary-700 tabular-nums">{value}</span>
+      <span className="text-[10px] sm:text-xs text-grey-500">{label}</span>
     </div>
   );
 }
@@ -55,10 +55,10 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 // Feature list item component
 function FeatureItem({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
+    <div className="flex items-center gap-2 min-w-0">
+      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
         <svg
-          className="w-3 h-3 text-white"
+          className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ function FeatureItem({ text }: { text: string }) {
           />
         </svg>
       </div>
-      <span className="text-sm text-secondary-800">{text}</span>
+      <span className="text-xs sm:text-sm text-secondary-800 break-words">{text}</span>
     </div>
   );
 }
@@ -97,22 +97,22 @@ function PaymentMethodOption({
       type="button"
       onClick={() => onSelect(method)}
       className={`
-        w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-colors
+        w-full flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-colors min-w-0
         ${selected ? "border-primary-500 bg-shade-50" : "border-grey-200 bg-white hover:border-grey-300"}
       `}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <div
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
+          className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
           ${selected ? "border-primary-500" : "border-grey-300"}`}
         >
           {selected && (
-            <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
+            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary-500" />
           )}
         </div>
-        <span className="text-secondary-800">{label}</span>
+        <span className="text-sm sm:text-base text-secondary-800 truncate">{label}</span>
       </div>
-      {logo}
+      <span className="flex-shrink-0">{logo}</span>
     </button>
   );
 }
@@ -141,7 +141,7 @@ function ConfirmSubscriptionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
@@ -149,15 +149,16 @@ function ConfirmSubscriptionModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl p-6 mx-4 w-full max-w-md shadow-xl">
+      <div className="relative bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Close button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 left-4 text-grey-400 hover:text-grey-600 transition-colors"
+          className="absolute top-3 left-3 sm:top-4 sm:left-4 p-1 text-grey-400 hover:text-grey-600 transition-colors touch-manipulation"
+          aria-label="إغلاق"
         >
           <svg
-            className="w-6 h-6"
+            className="w-5 h-5 sm:w-6 sm:h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -172,21 +173,21 @@ function ConfirmSubscriptionModal({
         </button>
 
         {/* Content */}
-        <div className="text-center">
-          <h3 className="text-xl font-bold text-secondary-800 mb-6">
+        <div className="text-center pt-6 sm:pt-0">
+          <h3 className="text-lg sm:text-xl font-bold text-secondary-800 mb-4 sm:mb-6 break-words">
             {content.confirmModalTitle}
           </h3>
 
-          <p className="text-grey-600 mb-3">
+          <p className="text-sm sm:text-base text-grey-600 mb-3 break-words">
             {content.remainingText}
           </p>
 
           {/* Remaining time badge */}
-          <div className="inline-block bg-primary-500 text-white px-6 py-2 rounded-full mb-4">
-            <span className="font-medium">{remainingTime}</span>
+          <div className="inline-block bg-primary-500 text-white px-4 py-1.5 sm:px-6 sm:py-2 rounded-full mb-3 sm:mb-4">
+            <span className="text-sm sm:text-base font-medium">{remainingTime}</span>
           </div>
 
-          <p className="text-grey-600 mb-6">
+          <p className="text-sm sm:text-base text-grey-600 mb-4 sm:mb-6 break-words">
             {content.subscriptionEndsOn} {expiryDate}
           </p>
 
@@ -194,7 +195,7 @@ function ConfirmSubscriptionModal({
           <Button
             variant="primary"
             size="lg"
-            className="w-full"
+            className="w-full py-3 sm:py-2"
             onClick={onConfirm}
           >
             {content.confirm}
@@ -288,41 +289,41 @@ export default function ManageSubscriptionPage() {
   if (showSubscriptionForm) {
     return (
       <>
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Form Header */}
-          <div className="bg-white rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-secondary-800 mb-6 text-center">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 min-w-0 overflow-hidden">
+            <h2 className="text-lg sm:text-xl font-bold text-secondary-800 mb-4 sm:mb-6 text-center">
               {subscription.form.title}
             </h2>
 
             {/* Subscription Details */}
-            <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
-              <div className="flex items-center gap-2">
-                <span className="text-grey-600">
+            <div className="flex flex-col md:flex-row md:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm sm:text-base text-grey-600">
                   {subscription.form.subscriptionValue}
                 </span>
-                <span className="text-secondary-800 font-medium">
+                <span className="text-sm sm:text-base text-secondary-800 font-medium">
                   {subscription.form.priceText}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-grey-600">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm sm:text-base text-grey-600">
                   {subscription.form.expiryDate}
                 </span>
-                <span className="text-secondary-800 font-medium">
+                <span className="text-sm sm:text-base text-secondary-800 font-medium">
                   {formattedExpiryDate}
                 </span>
               </div>
             </div>
 
             {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Payment Methods - Right Side */}
-              <div className="order-1 lg:order-2">
-                <h3 className="text-lg font-medium text-secondary-800 mb-4 text-center">
+              <div className="order-1 lg:order-2 min-w-0">
+                <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-center">
                   {subscription.form.paymentMethodTitle}
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <PaymentMethodOption
                     method="visa"
                     label={subscription.form.visa}
@@ -372,11 +373,11 @@ export default function ManageSubscriptionPage() {
               </div>
 
               {/* Card Details - Left Side */}
-              <div className="order-2 lg:order-1">
-                <h3 className="text-lg font-medium text-secondary-800 mb-4 text-center">
+              <div className="order-2 lg:order-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-center">
                   {subscription.form.cardDetailsTitle}
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {/* Card Name */}
                   <div>
                     <label className="block text-sm text-secondary-800 mb-2">
@@ -409,7 +410,7 @@ export default function ManageSubscriptionPage() {
                   </div>
 
                   {/* CVV and Expiry Date */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm text-secondary-800 mb-2">
                         {subscription.form.cvvLabel}
@@ -472,7 +473,7 @@ export default function ManageSubscriptionPage() {
           <Button
             variant="primary"
             size="lg"
-            className="w-full"
+            className="w-full py-3 sm:py-2"
             onClick={handleConfirmPayment}
           >
             {subscription.form.confirmPayment}
@@ -482,7 +483,7 @@ export default function ManageSubscriptionPage() {
           <button
             type="button"
             onClick={handleCancelSubscription}
-            className="w-full text-grey-500 hover:text-grey-700 transition-colors py-2"
+            className="w-full text-sm sm:text-base text-grey-500 hover:text-grey-700 transition-colors py-3 sm:py-2 touch-manipulation"
           >
             {subscription.form.cancel}
           </button>
@@ -503,51 +504,51 @@ export default function ManageSubscriptionPage() {
 
   // Default Subscription Plan View
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 min-w-0">
       {/* Subscription Plan Card */}
-      <div className="bg-shade-100 rounded-2xl p-6 relative overflow-hidden">
+      <div className="bg-shade-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden min-w-0">
         {/* Promo badge */}
-        <div className="absolute top-4 right-4">
-          <span className="bg-primary-500 text-white text-sm px-4 py-1.5 rounded-full">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+          <span className="bg-primary-500 text-white text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-full whitespace-nowrap">
             {subscription.promoBadge}
           </span>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           {/* Plan header */}
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-            <h2 className="text-xl font-bold text-secondary-800">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-secondary-800 min-w-0 break-words pr-20 sm:pr-24">
               {subscription.planTitle}
             </h2>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-primary-500">
+            <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 min-w-0">
+              <span className="text-2xl sm:text-3xl font-bold text-primary-500">
                 {subscription.priceDiscounted}
               </span>
-              <span className="text-lg text-grey-500">
+              <span className="text-base sm:text-lg text-grey-500">
                 {subscription.priceCurrency}
               </span>
-              <span className="text-sm text-grey-400 line-through">
+              <span className="text-xs sm:text-sm text-grey-400 line-through">
                 {subscription.priceSuffix} {subscription.priceOriginal}
               </span>
-              <span className="text-sm text-grey-500">
+              <span className="text-xs sm:text-sm text-grey-500">
                 {subscription.priceCurrency}/{subscription.priceUnit}
               </span>
             </div>
           </div>
 
           {/* Features grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-6 sm:mb-8">
             {subscription.features.map((feature, index) => (
               <FeatureItem key={index} text={feature} />
             ))}
           </div>
 
           {/* Countdown section */}
-          <div className="text-center mb-6">
-            <p className="text-secondary-800 font-medium mb-4">
+          <div className="text-center mb-4 sm:mb-6">
+            <p className="text-sm sm:text-base text-secondary-800 font-medium mb-3 sm:mb-4">
               {subscription.countdownTitle}
             </p>
-            <div className="flex justify-center gap-3 flex-wrap">
+            <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
               <CountdownUnit value={timeLeft.days} label={subscription.days} />
               <CountdownUnit
                 value={timeLeft.hours}
@@ -568,7 +569,7 @@ export default function ManageSubscriptionPage() {
           <Button
             variant="primary"
             size="lg"
-            className="w-full"
+            className="w-full py-3 sm:py-2"
             onClick={handleSubscribeClick}
           >
             {subscription.subscribeNow}
@@ -578,8 +579,8 @@ export default function ManageSubscriptionPage() {
 
       {/* Empty state for unsubscribed users */}
       {!isSubscribed && (
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="relative w-64 h-48 mb-6">
+        <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+          <div className="relative w-48 h-36 sm:w-64 sm:h-48">
             <Image
               src="/images/dashboard/subscription.svg"
               alt="No subscriptions"
@@ -587,7 +588,6 @@ export default function ManageSubscriptionPage() {
               className="object-contain"
             />
           </div>
-          <p className="text-lg text-grey-500">{subscription.noSubscriptions}</p>
         </div>
       )}
     </div>
