@@ -26,6 +26,9 @@ interface FileCardProps {
   onChangePassword?: (fileId: string) => void;
   onUnpublish?: (fileId: string) => void;
   onDelete?: (fileId: string) => void;
+  /** When set, show a single primary button with this label instead of Add Evidence + Preview */
+  singleActionLabel?: string;
+  onSingleAction?: (fileId: string) => void;
 }
 
 export const FileCard: React.FC<FileCardProps> = ({
@@ -38,10 +41,13 @@ export const FileCard: React.FC<FileCardProps> = ({
   onChangePassword,
   onUnpublish,
   onDelete,
+  singleActionLabel,
+  onSingleAction,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { filesSection, fileStatus, fileOptions } = dashboardContent;
+  const useSingleAction = Boolean(singleActionLabel && onSingleAction);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -253,37 +259,49 @@ export const FileCard: React.FC<FileCardProps> = ({
         </p>
       </div>
 
-      {/* Action buttons: custom styled, side by side */}
+      {/* Action buttons: single primary or default Add Evidence + Preview */}
       <div className="flex flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
-        <button
-          type="button"
-          onClick={() => onAddEvidence?.(file.id)}
-          className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
-        >
-          <CirclePlus className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className="truncate">{filesSection.addEvidence}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onPreview?.(file.id)}
-          className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl border-2 border-primary-500 bg-transparent text-primary-500 hover:bg-primary-50 active:bg-primary-100 transition-colors duration-200"
-        >
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {useSingleAction ? (
+          <button
+            type="button"
+            onClick={() => onSingleAction?.(file.id)}
+            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-          <span className="truncate">{filesSection.previewFile}</span>
-        </button>
+            <span className="truncate">{singleActionLabel}</span>
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => onAddEvidence?.(file.id)}
+              className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
+            >
+              <CirclePlus className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="truncate">{filesSection.addEvidence}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onPreview?.(file.id)}
+              className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 text-sm sm:text-base font-normal rounded-4xl border-2 border-primary-500 bg-transparent text-primary-500 hover:bg-primary-50 active:bg-primary-100 transition-colors duration-200"
+            >
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              <span className="truncate">{filesSection.previewFile}</span>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PUBLIC_API_BASE_URL } from "@/shared/lib/api";
+import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
 
 interface ProfileImageProps {
   /** Profile image URL from API (e.g. data.imageUrl). Can be relative path (e.g. uploads/...) or absolute URL. */
@@ -18,15 +18,20 @@ interface ProfileImageProps {
  * Normalize image src: next/image requires "/" or "http(s):" or "data:". Backend may return
  * relative path (e.g. "uploads/users/..."), absolute URL, or data URL (base64). Do not prepend
  * base URL to data URLs.
+ * Upload paths (uploads/...) use PUBLIC_STORAGE_BASE_URL (e.g. Backblaze S3); other relative
+ * paths use PUBLIC_API_BASE_URL.
  */
 function normalizeImageSrc(raw: string): string {
   const s = raw.trim();
   if (s.startsWith("http://") || s.startsWith("https://")) return s;
   if (s.startsWith("/")) return s;
   if (s.startsWith("data:")) return s; // data URL (e.g. base64) — use as-is
-  // Backend-relative path → absolute URL
-  const base = PUBLIC_API_BASE_URL.replace(/\/$/, "");
-  return `${base}/${s.replace(/^\//, "")}`;
+  // Backend-relative path → absolute URL. Use storage URL for upload paths (e.g. S3/Backblaze).
+  const path = s.replace(/^\//, "");
+  const base = path.startsWith("uploads/")
+    ? PUBLIC_STORAGE_BASE_URL.replace(/\/$/, "")
+    : PUBLIC_API_BASE_URL.replace(/\/$/, "");
+  return `${base}/${path}`;
 }
 
 /**

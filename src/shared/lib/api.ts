@@ -13,6 +13,16 @@ export const PUBLIC_API_BASE_URL =
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
   "https://staging.enjazfile.com";
 
+/**
+ * Storage base URL for uploaded files (e.g. profile images on Backblaze S3).
+ * When the backend returns a relative path like "uploads/users/10/xxx.jpg",
+ * we prepend this URL so images load from the correct host.
+ * Set NEXT_PUBLIC_STORAGE_URL if your uploads are on a different domain (e.g. S3/Backblaze).
+ */
+export const PUBLIC_STORAGE_BASE_URL =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_STORAGE_URL) ||
+  "https://enjazmo3alem-staging.s3.us-east-005.backblazeb2.com";
+
 // Server-side axios instance (for API routes)
 export const serverApi = axios.create({
   baseURL: BACKEND_API_URL,
