@@ -12,8 +12,8 @@ export default function AccountLayout({
         <AccountSidebar />
       </div>
 
-      {/* Content area - left side */}
-      <div className="flex-1">{children}</div>
+      {/* Content area - left side; default grey bg for all account pages */}
+      <div className="flex-1 min-h-0 bg-[#FAFAFA]">{children}</div>
     </div>
   );
 }

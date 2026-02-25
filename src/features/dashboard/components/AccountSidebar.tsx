@@ -175,7 +175,7 @@ export const AccountSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-full lg:w-64 bg-white rounded-xl lg:rounded-2xl p-4">
+    <aside className="w-full lg:w-64 lg:h-[60vh] lg:overflow-y-auto bg-white rounded-xl lg:rounded-2xl p-4">
       <nav>
         <ul className="space-y-1">
           {navItems.map((item) => {

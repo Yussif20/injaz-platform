@@ -36,7 +36,7 @@ export const HowToUseContent: React.FC = () => {
   ];
 
   return (
-    <div className="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-8 space-y-8">
+    <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8 space-y-8">
       {/* Title - aligned right */}
       <h1 className="text-lg sm:text-xl font-medium text-secondary-700 text-right">
         {howToUse.pageTitle}

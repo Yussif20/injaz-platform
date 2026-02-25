@@ -110,7 +110,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
   return (
     <>
-      <header className="bg-white border-b border-grey-200 h-16 lg:h-20 flex items-center justify-between px-4 lg:px-8">
+      <header className="sticky top-0 z-50 bg-white border-b border-grey-200 h-16 lg:h-20 flex items-center justify-between px-4 lg:px-8">
         {/* Right side - Logo and breadcrumb (RTL: appears on right) */}
         <div className="flex items-center gap-4">
           {/* Logo */}

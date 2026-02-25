@@ -114,9 +114,10 @@ export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8">
-      {/* Tabs Header */}
-      <Tabs
+    <div>
+      <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8">
+        {/* Tabs Header */}
+        <Tabs
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -134,8 +135,9 @@ export const ProfileDataTabs: React.FC<ProfileDataTabsProps> = ({
         }
       />
 
-      {/* Tab Content */}
-      <div>{renderTabContent()}</div>
+        {/* Tab Content */}
+        <div>{renderTabContent()}</div>
+      </div>
     </div>
   );
 };

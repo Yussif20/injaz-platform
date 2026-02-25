@@ -18,7 +18,7 @@ export default function FilePasswordPage() {
   };
 
   return (
-    <div className="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-8">
+    <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8">
       {/* Password Input Section */}
       <div className="flex flex-col gap-2 mb-8">
         <label className="text-base font-normal text-[#333]">
