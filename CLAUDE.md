@@ -233,13 +233,7 @@ Status is changed via separate endpoints: `activate`, `deactivate`, `close` (not
 - **تاريخ عروض السنة** → `DiscountsTab` (discount CRUD)
 - **فواتير الإشتراكات** → `SubscriptionsTab` (paginated subscriptions list)
 
-## API Response Format
+## API Reference
 
-```typescript
-interface ApiResponse<T> {
-  status: "Success" | "Failure";  // String, NOT boolean
-  message: string;
-  data: T;
-  errors: string[] | null;
-}
-```
+> Full endpoint docs, DTOs, enums, and payment flow:
+> 👉 [../../API-REFERENCE.md](../../API-REFERENCE.md)
