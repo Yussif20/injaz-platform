@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { Button, Input } from "@/shared/components/ui";
 import { useSubscriptionInfo } from "@/features/dashboard/hooks/useSubscriptionInfo";
@@ -93,6 +94,8 @@ function PaymentMethodOption({
 
 export default function ManageSubscriptionPage() {
   const { subscription: content } = dashboardContent;
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // API hooks
   const { info, isLoading: infoLoading } = useSubscriptionInfo();
@@ -104,8 +107,73 @@ export default function ManageSubscriptionPage() {
   } = useMySubscription();
   const { subscribe, isLoading: subscribing } = useSubscribe();
 
-  // UI state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  // Compute countdown values (days / hours / minutes / seconds)
+  useEffect(() => {
+    if (!info) return;
+
+    // If backend only gives days, show them and keep smaller units at zero
+    if (!info.endDate) {
+      setTimeLeft({
+        days: info.daysRemaining ?? 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      });
+      return;
+    }
+
+    const targetTime = new Date(info.endDate).getTime();
+
+    const update = () => {
+      const now = Date.now();
+      let diff = targetTime - now;
+
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / (24 * 60 * 60));
+      const hours = Math.floor(
+        (totalSeconds % (24 * 60 * 60)) / (60 * 60),
+      );
+      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const seconds = totalSeconds % 60;
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [info]);
+
+  // UI state: sync payment form visibility with ?step=confirm for breadcrumb
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("step") === "confirm") {
+      setShowPaymentForm(true);
+    }
+  }, [searchParams]);
+
+  const setShowPaymentFormWithUrl = (show: boolean) => {
+    setShowPaymentForm(show);
+    const path = "/dashboard/account/subscription/manage";
+    if (show) {
+      router.replace(`${path}?step=confirm`, { scroll: false });
+    } else {
+      router.replace(path, { scroll: false });
+    }
+  };
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>("visa");
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -324,7 +392,7 @@ export default function ManageSubscriptionPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 animate-pulse">
+      <div className="min-h-[60vh] bg-[#FAFAFA] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-4 animate-pulse">
         <div className="bg-grey-100 rounded-2xl h-64" />
         <div className="bg-grey-100 rounded-2xl h-32" />
       </div>
@@ -335,7 +403,7 @@ export default function ManageSubscriptionPage() {
 
   if (isSubscribed && subscription) {
     return (
-      <div className="space-y-6">
+      <div className="min-h-[60vh] bg-[#FAFAFA] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-6">
         <div className="bg-shade-100 rounded-xl sm:rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
@@ -410,7 +478,7 @@ export default function ManageSubscriptionPage() {
 
   if (info && !info.isSubscriptionOpen) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <div className="min-h-[60vh] bg-[#FAFAFA] flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl sm:rounded-2xl">
         <div className="relative w-48 h-36 sm:w-64 sm:h-48 mb-6">
           <Image
             src="/images/dashboard/subscription.svg"
@@ -431,7 +499,7 @@ export default function ManageSubscriptionPage() {
 
   if (paymentSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <div className="min-h-[60vh] bg-[#FAFAFA] flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl sm:rounded-2xl">
         <div className="w-16 h-16 rounded-full bg-success-100 flex items-center justify-center mb-4">
           <svg
             className="w-8 h-8 text-success-600"
@@ -471,44 +539,45 @@ export default function ManageSubscriptionPage() {
       : "—";
 
     return (
-      <div className="space-y-4 sm:space-y-6">
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 min-w-0 overflow-hidden">
-          <h2 className="text-lg sm:text-xl font-bold text-secondary-800 mb-4 sm:mb-6 text-center">
-            {content.form.title}
-          </h2>
+      <div className="min-h-[60vh] bg-[#FAFAFA] rounded-xl sm:rounded-2xl px-4 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10 space-y-6 sm:space-y-8">
+        <h2 className="text-lg sm:text-xl font-bold text-secondary-800 text-right">
+          {content.form.title}
+        </h2>
 
-          {/* Subscription summary */}
-          <div className="flex flex-col md:flex-row md:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm sm:text-base text-grey-600">
-                {content.form.subscriptionValue}
-              </span>
-              <span className="text-sm sm:text-base text-secondary-800 font-medium">
-                {finalAmount} {content.sar}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm sm:text-base text-grey-600">
-                {content.form.expiryDate}
-              </span>
-              <span className="text-sm sm:text-base text-secondary-800 font-medium">
-                {expiryFormatted}
-              </span>
-            </div>
+        {/* Subscription summary - white box */}
+        <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 text-right">
+          <div className="flex flex-row justify-between items-center gap-4 mb-3">
+            <span className="text-sm sm:text-base text-grey-600">
+              {content.form.subscriptionValue}
+            </span>
+            <span className="text-sm sm:text-base text-secondary-800 font-medium">
+              {finalAmount} {content.sar}
+            </span>
           </div>
+          <div className="flex flex-row justify-between items-center gap-4">
+            <span className="text-sm sm:text-base text-grey-600">
+              {content.form.expiryDate}
+            </span>
+            <span className="text-sm sm:text-base text-secondary-800 font-medium">
+              {expiryFormatted}
+            </span>
+          </div>
+        </div>
 
+        {/* Remaining content */}
+        <div className="min-w-0 overflow-hidden pt-2">
           {/* Error message */}
           {paymentError && (
-            <div className="mb-4 p-3 bg-warning-50 border border-warning-200 rounded-lg text-sm text-warning-700 text-center">
+            <div className="mb-5 p-3 bg-warning-50 border border-warning-200 rounded-lg text-sm text-warning-700 text-center">
               {paymentError}
             </div>
           )}
 
           {/* Two column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10">
             {/* Payment methods */}
-            <div className="order-1 lg:order-2 min-w-0">
-              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-center">
+            <div className="order-2 lg:order-1 min-w-0">
+              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-right">
                 {content.form.paymentMethodTitle}
               </h3>
               <div className="space-y-2 sm:space-y-3">
@@ -567,8 +636,8 @@ export default function ManageSubscriptionPage() {
             </div>
 
             {/* Card details / Apple Pay panel */}
-            <div className="order-2 lg:order-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-center">
+            <div className="order-1 lg:order-2 min-w-0">
+              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-right">
                 {content.form.cardDetailsTitle}
               </h3>
               {selectedPaymentMethod === "apple_pay" ? (
@@ -674,7 +743,7 @@ export default function ManageSubscriptionPage() {
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 mt-8 sm:mt-10">
           {selectedPaymentMethod === "apple_pay" ? (
             <Button
               variant="primary"
@@ -696,18 +765,6 @@ export default function ManageSubscriptionPage() {
               {subscribing ? content.processingPayment : content.form.confirmPayment}
             </Button>
           )}
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1 sm:flex-none py-3 sm:py-2.5"
-            onClick={() => {
-              resetForm();
-              setShowPaymentForm(false);
-            }}
-            disabled={subscribing}
-          >
-            {content.form.cancel}
-          </Button>
         </div>
       </div>
     );
@@ -721,24 +778,24 @@ export default function ManageSubscriptionPage() {
   const daysRemaining = info?.daysRemaining ?? null;
 
   return (
-    <div className="space-y-6 sm:space-y-8 min-w-0">
+    <div className="min-h-[60vh] bg-[#FAFAFA] rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-6 sm:space-y-8 min-w-0">
       <div className="bg-shade-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative overflow-hidden min-w-0">
-        {/* Promo badge */}
-        {discountPct > 0 && (
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-            <span className="bg-primary-500 text-white text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-full whitespace-nowrap">
-              {content.promoBadge}
-            </span>
-          </div>
-        )}
+        {/* Promo badge - top left */}
+        <div className="absolute top-0 left-0">
+          <span
+            className="inline-block bg-[#CF636A] text-white text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-tl-[24px] rounded-br-[24px] whitespace-nowrap"
+          >
+            {content.promoBadge}
+          </span>
+        </div>
 
         <div className="mt-6 sm:mt-8">
           {/* Plan header */}
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-secondary-800 min-w-0 break-words pr-20 sm:pr-24">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-secondary-800 text-right">
               {content.planTitle}
             </h2>
-            <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 min-w-0">
+            <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 min-w-0 sm:justify-end">
               {finalAmount !== null && (
                 <span className="text-2xl sm:text-3xl font-bold text-primary-500">
                   {finalAmount}
@@ -765,17 +822,31 @@ export default function ManageSubscriptionPage() {
             ))}
           </div>
 
-          {/* Days remaining badge */}
-          {daysRemaining !== null && (
+          {/* Countdown (أيام / ساعات / دقائق / ثواني) */}
+          {(info?.daysRemaining ?? null) !== null && (
             <div className="text-center mb-4 sm:mb-6">
-              <p className="text-sm sm:text-base text-secondary-800 font-medium mb-2">
+              <p className="text-sm sm:text-base font-medium mb-3 text-right text-[#B1363E]">
                 {content.countdownTitle}
               </p>
-              <div className="inline-flex items-center gap-1.5 bg-primary-500 text-white px-4 py-1.5 rounded-full">
-                <span className="text-lg font-bold tabular-nums">
-                  {daysRemaining}
-                </span>
-                <span className="text-sm">{content.dayUnit}</span>
+              <div className="inline-flex items-center justify-center gap-2 sm:gap-3">
+                {[
+                  { label: content.days, value: timeLeft.days },
+                  { label: content.hours, value: timeLeft.hours },
+                  { label: content.minutes, value: timeLeft.minutes },
+                  { label: content.seconds, value: timeLeft.seconds },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="min-w-[72px] sm:min-w-[88px] min-h-[50px] rounded-xl bg-transparent border-2 border-primary-500 px-1 py-2 flex items-center justify-center gap-1.5"
+                  >
+                    <span className="text-[12px] font-light md:text-base tabular-nums leading-none text-primary-500">
+                      {item.value.toString().padStart(2, "0")}
+                    </span>
+                    <span className="text-[12px] font-light md:text-base text-[#666] leading-none">
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -788,13 +859,26 @@ export default function ManageSubscriptionPage() {
             onClick={() => {
               idempotencyKeyRef.current = null;
               setPaymentError(null);
-              setShowPaymentForm(true);
+              setShowPaymentFormWithUrl(true);
             }}
           >
             {content.subscribeNow}
           </Button>
         </div>
       </div>
+
+      {/* Illustration when there is no active subscription */}
+      {!isSubscribed && (
+        <div className="flex justify-center">
+          <Image
+            src="/images/dashboard/subscription.svg"
+            alt="اشتراك إنجاز المعلم"
+            width={480}
+            height={320}
+            className="max-w-full h-auto"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { Button, ConfirmModal, ProfileImage } from "@/shared/components/ui";
@@ -22,6 +22,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { logout, isLoading: isLoggingOut } = useLogout();
   const { user } = useAuth();
   const { profile } = useMyProfile();
@@ -56,6 +57,102 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
     if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT)) {
       const segments = pathname.split("/").filter(Boolean);
       const lastSegment = segments[segments.length - 1];
+
+      // Subscription sub-routes: حسابي < اشتراكي < [إدارة الاشتراكات | تاريخ الاشتراكات] [< تأكيد الاشتراك]
+      if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION)) {
+        const isManage = pathname === ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE;
+        const isHistory = pathname === ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY;
+        const isConfirmStep =
+          isManage && searchParams.get("step") === "confirm";
+
+        const sep = () => (
+          <span className="text-grey-400 mx-2">&lt;</span>
+        );
+        const linkClass =
+          "text-[#666666] hover:text-primary-500 transition-colors text-sm md:text-lg font-light md:font-normal";
+        const currentClass =
+          "text-text-dark text-sm md:text-lg font-light md:font-normal";
+
+        if (isHistory) {
+          return (
+            <>
+              <Link href={ROUTES.DASHBOARD_ACCOUNT} className={linkClass}>
+                {breadcrumb.account}
+              </Link>
+              {sep()}
+              <Link
+                href={ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE}
+                className={linkClass}
+              >
+                {breadcrumb.subscription}
+              </Link>
+              {sep()}
+              <span className={currentClass}>
+                {breadcrumb.subscriptionHistory}
+              </span>
+            </>
+          );
+        }
+
+        if (isManage) {
+          if (isConfirmStep) {
+            return (
+              <>
+                <Link href={ROUTES.DASHBOARD_ACCOUNT} className={linkClass}>
+                  {breadcrumb.account}
+                </Link>
+                {sep()}
+                <Link
+                  href={ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE}
+                  className={linkClass}
+                >
+                  {breadcrumb.subscription}
+                </Link>
+                {sep()}
+                <Link
+                  href={ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE}
+                  className={linkClass}
+                >
+                  {breadcrumb.subscriptionManage}
+                </Link>
+                {sep()}
+                <span className={currentClass}>
+                  {breadcrumb.subscriptionConfirm}
+                </span>
+              </>
+            );
+          }
+          return (
+            <>
+              <Link href={ROUTES.DASHBOARD_ACCOUNT} className={linkClass}>
+                {breadcrumb.account}
+              </Link>
+              {sep()}
+              <Link
+                href={ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION_MANAGE}
+                className={linkClass}
+              >
+                {breadcrumb.subscription}
+              </Link>
+              {sep()}
+              <span className={currentClass}>
+                {breadcrumb.subscriptionManage}
+              </span>
+            </>
+          );
+        }
+
+        // /dashboard/account/subscription (redirects to manage)
+        return (
+          <>
+            <Link href={ROUTES.DASHBOARD_ACCOUNT} className={linkClass}>
+              {breadcrumb.account}
+            </Link>
+            {sep()}
+            <span className={currentClass}>{breadcrumb.subscription}</span>
+          </>
+        );
+      }
 
       const breadcrumbMap: Record<string, string> = {
         account: breadcrumb.account,

@@ -88,6 +88,7 @@ export const dashboardContent = {
     subscription: "اشتراكي",
     subscriptionManage: "إدارة الاشتراكات",
     subscriptionHistory: "تاريخ الاشتراكات",
+    subscriptionConfirm: "تأكيد الاشتراك",
     support: "الدعم الفني",
     terms: "الشروط والأحكام",
     howToUse: "كيفية الإستخدام",
