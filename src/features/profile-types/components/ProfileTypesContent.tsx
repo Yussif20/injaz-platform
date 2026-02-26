@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Plus,
   Search,
@@ -292,9 +292,8 @@ export function ProfileTypesContent() {
                 </tr>
               )}
               {paginated.map((pt) => (
-                <>
+                <React.Fragment key={pt.id}>
                   <tr
-                    key={pt.id}
                     className={`border-b border-grey-100 last:border-b-0 ${
                       expandedId === pt.id ? "bg-grey-50" : ""
                     }`}
@@ -404,7 +403,7 @@ export function ProfileTypesContent() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>

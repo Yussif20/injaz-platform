@@ -19,16 +19,15 @@ const navItems = [
     icon: "/icons/subscriptions.svg",
     labelKey: "subscriptions",
   },
-  { href: ROUTES.RANKS, icon: "/icons/ranks.svg", labelKey: "ranks" },
-  {
-    href: ROUTES.ACADEMIC_YEARS,
-    icon: "/icons/academic-years.svg",
-    labelKey: "academicYears",
-  },
   {
     href: ROUTES.PROFILE_TYPES,
     icon: "/icons/profile-types.svg",
     labelKey: "profileTypes",
+  },
+  {
+    href: ROUTES.ACADEMIC_YEARS,
+    icon: "/icons/academic-years.svg",
+    labelKey: "academicYears",
   },
   {
     href: ROUTES.ASSESSMENTS,
