@@ -236,8 +236,8 @@ export const AccountInfoForm: React.FC = () => {
     { value: "female", label: accountInfo.genderFemale },
   ];
 
-  // Show loading skeleton only if we don't have any user data yet
-  if (isLoadingProfile && !user) {
+  // Show loading skeleton until profile data has loaded (avoid showing empty form)
+  if (isLoadingProfile && !profile) {
     return (
       <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-6 lg:p-8 animate-pulse">
         <div className="flex justify-start sm:justify-center mb-8">

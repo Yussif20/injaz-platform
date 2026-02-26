@@ -2,7 +2,51 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { landingContent } from "@/content";
+import { useQuery } from "@tanstack/react-query";
+import { clientApi } from "@/shared/lib/api";
+import {
+  PUBLIC_STORAGE_BASE_URL,
+  PUBLIC_API_BASE_URL,
+} from "@/shared/lib/api";
+
+interface ReviewDto {
+  id: number;
+  content: string | null;
+  rating: number;
+  reviewerName: string | null;
+  reviewerJobTitle: string | null;
+  reviewerPhotoPath: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface TestimonialItem {
+  id: number;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+  avatar: string;
+}
+
+function normalizePhotoUrl(path: string | null): string {
+  if (!path) return "/logo/logo-cyan.svg";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (path.startsWith("uploads/")) return `${PUBLIC_STORAGE_BASE_URL}/${path}`;
+  return `${PUBLIC_API_BASE_URL}/${path}`;
+}
+
+function mapReviewToTestimonial(review: ReviewDto): TestimonialItem {
+  return {
+    id: review.id,
+    name: review.reviewerName ?? "",
+    role: review.reviewerJobTitle ?? "",
+    text: review.content ?? "",
+    rating: review.rating,
+    avatar: normalizePhotoUrl(review.reviewerPhotoPath),
+  };
+}
 
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
   return (
@@ -22,29 +66,28 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
 };
 
 export const TestimonialsSection: React.FC = () => {
-  const { testimonialsSection } = landingContent;
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Create duplicated array for infinite loop effect
-  const duplicatedTestimonials = [
-    ...testimonialsSection.testimonials,
-    ...testimonialsSection.testimonials,
-  ];
+  const { data: apiData } = useQuery({
+    queryKey: ["activeReviews"],
+    queryFn: async () => {
+      const response = await clientApi.get<{ data: ReviewDto[] }>("/api/reviews");
+      return response.data.data ?? [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const testimonials: TestimonialItem[] = (apiData ?? []).map(mapReviewToTestimonial);
 
   useEffect(() => {
+    if (testimonials.length === 0) return;
+
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        // When we reach the end of duplicated array, reset to start
-        if (nextIndex >= testimonialsSection.testimonials.length) {
-          return 0;
-        }
-        return nextIndex;
-      });
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [testimonialsSection.testimonials.length]);
+  }, [testimonials.length]);
 
   return (
     <section className="py-12 sm:py-16 lg:py-20">
@@ -57,7 +100,7 @@ export const TestimonialsSection: React.FC = () => {
               direction: "rtl",
             }}
           >
-            {duplicatedTestimonials.map((testimonial, index) => (
+            {testimonials.map((testimonial, index) => (
               <div
                 key={`${testimonial.id}-${index}`}
                 className="bg-primary-500 shadow-md rounded-2xl w-70 shrink-0 overflow-hidden flex flex-col"
@@ -77,8 +120,6 @@ export const TestimonialsSection: React.FC = () => {
 
                 {/* User Info Footer - Teal Background with Notch */}
                 <div className="relative px-4 py-3">
-                  {/* Notch effect - white curve on top right */}
-
                   {/* Footer content */}
                   <div className="flex items-center gap-3 relative z-10">
                     {/* Avatar on the right */}
@@ -87,11 +128,9 @@ export const TestimonialsSection: React.FC = () => {
                         !testimonial.avatar ? "bg-white" : ""
                       }`}
                     >
-                      <Image
-                        src={testimonial.avatar || "/logo/logo-cyan.svg"}
+                      <img
+                        src={testimonial.avatar}
                         alt={testimonial.name}
-                        width={48}
-                        height={48}
                         className="w-full h-full object-cover"
                       />
                     </div>
