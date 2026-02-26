@@ -114,24 +114,6 @@ Custom dual-mode calendar at `src/shared/components/ui/DatePicker.tsx`:
 - Returns ISO `YYYY-MM-DD` string via `onChange`
 - Also ported to `injaz-dashboard` for admin forms
 
-## API Response Format
-
-```typescript
-interface ApiResponse<T> {
-  status: "Success" | "Failure";  // String, NOT boolean
-  message: string;
-  data: T;
-  errors: string[] | null;
-}
-```
-
-## Key Enums
-
-```typescript
-enum Gender { Male = 1, Female = 2 }
-enum ProfileStatus { Draft = 0, Unpublished = 1, Published = 2, PendingSubscription = 3 }
-```
-
 ## Quick Links
 
 - Full documentation: `docs/PROJECT.md`
