@@ -33,12 +33,7 @@ export async function uploadImage(
 
   const response = await clientApi.post<ImageResponse>(
     `/api/images/upload?${params.toString()}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    formData
   );
   return response.data;
 }
@@ -81,12 +76,7 @@ export async function updateImage(
 
     const response = await clientApi.put<ImageResponse>(
       `/api/images/${imageId}?${params.toString()}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
     );
     return response.data;
   }

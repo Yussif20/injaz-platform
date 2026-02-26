@@ -5,18 +5,27 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   useAcademicYears,
-  useRanks,
   useProfileTypes,
   useCreateProfile,
   useUploadProfileImage,
+  useUpdateProfileAcademicYear,
+  useUpdateProfileType,
 } from "@/features/profiles";
-import {
-  useMyProfile,
-  useUpdatePersonalInfo,
-} from "@/features/dashboard";
 import { Button } from "@/shared/components/ui";
 import { ROUTES } from "@/config";
 import { dashboardContent } from "@/content";
+import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
+
+function normalizeImageUrl(raw: string): string {
+  const s = raw.trim();
+  if (!s) return "";
+  if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("data:") || s.startsWith("/")) return s;
+  const path = s.replace(/^\//, "");
+  const base = path.startsWith("uploads/")
+    ? PUBLIC_STORAGE_BASE_URL.replace(/\/$/, "")
+    : PUBLIC_API_BASE_URL.replace(/\/$/, "");
+  return `${base}/${path}`;
+}
 
 function CreateFileContent() {
   const searchParams = useSearchParams();
@@ -24,24 +33,24 @@ function CreateFileContent() {
   const { createFile } = dashboardContent;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check if we're in edit mode
   const isEditMode = searchParams.get("edit") === "true";
-  const fileId = searchParams.get("fileId");
+  const fileIdParam = searchParams.get("fileId");
 
-  // Fetch data from API
+  // Fetch reference data
   const { academicYears, isLoading: yearsLoading } = useAcademicYears();
-  const { ranks, isLoading: ranksLoading } = useRanks();
   const { profileTypes, isLoading: profileTypesLoading } = useProfileTypes();
-  const { createProfileAsync } = useCreateProfile();
-  const { updatePersonalInfoAsync } = useUpdatePersonalInfo();
-  const { uploadImageAsync } = useUploadProfileImage();
-  const { profile } = useMyProfile();
 
-  // Form state - IDs are numbers from the API
+  // Mutations
+  const { createProfileAsync } = useCreateProfile();
+  const { uploadImageAsync } = useUploadProfileImage();
+  const { updateAcademicYearAsync } = useUpdateProfileAcademicYear();
+  const { updateProfileTypeAsync } = useUpdateProfileType();
+
+  // Form state
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedRank, setSelectedRank] = useState<number | null>(null);
+  const [selectedProfileType, setSelectedProfileType] = useState<number | null>(null);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
-  const [rankDropdownOpen, setRankDropdownOpen] = useState(false);
+  const [profileTypeDropdownOpen, setProfileTypeDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,72 +58,42 @@ function CreateFileContent() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const isLoading = yearsLoading || ranksLoading || profileTypesLoading;
+  const isLoading = yearsLoading || profileTypesLoading;
 
-  // Pre-fill form when opening in edit mode with file info from URL
+  // Pre-fill fields in edit mode
   useEffect(() => {
-    if (!isEditMode || !fileId || isLoading) return;
+    if (!isEditMode) return;
+
+    // Show existing image immediately (doesn't depend on API data)
+    const imageUrlParam = searchParams.get("imageUrl");
+    if (imageUrlParam) {
+      setImagePreview(normalizeImageUrl(imageUrlParam));
+    }
+
+    if (isLoading) return;
+
     const yearParam = searchParams.get("year");
-    const rankIdParam = searchParams.get("rankId");
-    const jobRankParam = searchParams.get("jobRank");
     if (yearParam && academicYears.length > 0) {
       const match = academicYears.find((y) => y.yearName === yearParam);
       if (match) setSelectedYear(match.id);
     }
-    if (ranks.length > 0) {
-      // Prefer rankId for reliable الرتبة الوظيفية pre-fill
-      const rankIdNum = rankIdParam ? Number(rankIdParam) : NaN;
-      const matchByRankId =
-        !Number.isNaN(rankIdNum) &&
-        ranks.find((r) => r.id === rankIdNum);
-      const matchByTitle =
-        !matchByRankId &&
-        jobRankParam &&
-        ranks.find(
-          (r) =>
-            r.titleFemale === jobRankParam ||
-            r.titleMale === jobRankParam ||
-            r.title === jobRankParam,
-        );
-      const match = matchByRankId || matchByTitle;
-      if (match) setSelectedRank(match.id);
+
+    const profileTypeIdParam = searchParams.get("profileTypeId");
+    if (profileTypeIdParam) {
+      setSelectedProfileType(Number(profileTypeIdParam));
     }
-  }, [
-    isEditMode,
-    fileId,
-    isLoading,
-    searchParams,
-    academicYears,
-    ranks,
-  ]);
+  }, [isEditMode, isLoading, searchParams, academicYears]);
 
-  // Profile types are for templates; we use first available for create API only
   const hasProfileTypes = profileTypes.length > 0;
-  const defaultProfileTypeId = hasProfileTypes ? profileTypes[0].id : null;
-  const isFormValid =
-    selectedYear !== null &&
-    selectedRank !== null &&
-    hasProfileTypes;
-
-  // Get gender-aware rank title
-  const getRankTitle = (rank: {
-    titleMale?: string | null;
-    titleFemale?: string | null;
-  }) => {
-    return profile?.gender === 1
-      ? rank.titleMale || rank.titleFemale || ""
-      : rank.titleFemale || rank.titleMale || "";
-  };
+  const isFormValid = selectedYear !== null && selectedProfileType !== null && hasProfileTypes;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (1GB limit)
       if (file.size > 1024 * 1024 * 1024) {
         setError("يجب أن لا يزيد حجم الصورة عن 1 جيجا");
         return;
       }
-
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -136,79 +115,88 @@ function CreateFileContent() {
     setIsSubmitting(true);
 
     try {
-      // Step 1: Create profile (profile type from first available; templates management elsewhere)
-      const response = await createProfileAsync({
-        academicYearId: selectedYear!,
-        profileTypeId: defaultProfileTypeId!,
-      });
+      if (isEditMode && fileIdParam) {
+        // Edit mode: call update APIs for year and profile type
+        const profileId = Number(fileIdParam);
 
-      if (!response.status) {
-        const backendMsg =
-          (response as { debug?: { backendMessage?: string } }).debug
-            ?.backendMessage ?? (response as { message?: string }).message ?? "";
-        const isAlreadyHasProfile =
-          typeof backendMsg === "string" &&
-          backendMsg.includes("ملف لهذه السنة");
-        const errorInfo = isAlreadyHasProfile
-          ? createFile.errorAlreadyHasProfileForYear
-          : (response.message || "فشل في إنشاء الملف");
-        setError(errorInfo);
-        if (!isAlreadyHasProfile) console.error("Create profile failed:", response);
-        return;
-      }
+        const [yearRes, typeRes] = await Promise.all([
+          updateAcademicYearAsync({ profileId, academicYearId: selectedYear! }),
+          updateProfileTypeAsync({ profileId, profileTypeId: selectedProfileType! }),
+        ]);
 
-      const profileId = (response as { data?: { id?: number } }).data?.id;
-
-      // Step 2: Save rank (non-fatal)
-      try {
-        const currentInfo = profile?.personalInfo;
-        await updatePersonalInfoAsync({
-          rankId: selectedRank!,
-          nationalId: currentInfo?.nationalId ?? undefined,
-          birthDate: currentInfo?.birthDate ?? undefined,
-          address: currentInfo?.address ?? undefined,
-          email: currentInfo?.email ?? undefined,
-        });
-      } catch (rankErr) {
-        console.warn("Rank save failed (non-fatal):", rankErr);
-      }
-
-      // Step 3: Upload image (non-fatal)
-      if (selectedImage && profileId) {
-        try {
-          await uploadImageAsync({ profileId, file: selectedImage });
-        } catch (imgErr) {
-          console.warn("Image upload failed (non-fatal):", imgErr);
+        if (!yearRes.status) {
+          setError(yearRes.message || "فشل تحديث السنة الدراسية");
+          return;
         }
-      }
+        if (!typeRes.status) {
+          setError(typeRes.message || "فشل تحديث نوع الملف");
+          return;
+        }
 
-      // Step 4: Navigate to dashboard
-      router.push(ROUTES.DASHBOARD);
+        // Upload image if changed (non-fatal)
+        if (selectedImage) {
+          try {
+            await uploadImageAsync({ profileId, file: selectedImage });
+          } catch (imgErr) {
+            console.warn("Image upload failed (non-fatal):", imgErr);
+          }
+        }
+
+        router.push(ROUTES.DASHBOARD);
+      } else {
+        // Create mode
+        const response = await createProfileAsync({
+          academicYearId: selectedYear!,
+          profileTypeId: selectedProfileType!,
+          templateId: 1,
+        });
+
+        if (!response.status) {
+          const backendMsg =
+            (response as { debug?: { backendMessage?: string } }).debug
+              ?.backendMessage ?? (response as { message?: string }).message ?? "";
+          const isAlreadyHasProfile =
+            typeof backendMsg === "string" &&
+            backendMsg.includes("ملف لهذه السنة");
+          setError(
+            isAlreadyHasProfile
+              ? createFile.errorAlreadyHasProfileForYear
+              : response.message || "فشل في إنشاء الملف"
+          );
+          return;
+        }
+
+        const profileId = (response as { data?: { id?: number } }).data?.id;
+
+        // Upload image (non-fatal)
+        if (selectedImage && profileId) {
+          try {
+            await uploadImageAsync({ profileId, file: selectedImage });
+          } catch (imgErr) {
+            console.warn("Image upload failed (non-fatal):", imgErr);
+          }
+        }
+
+        router.push(ROUTES.DASHBOARD);
+      }
     } catch (err: unknown) {
       const errorObj = err as {
         message?: string;
-        response?: { data?: { message?: string; debug?: { backendMessage?: string } } };
+        response?: { data?: { message?: string } };
       };
-      const data = errorObj?.response?.data;
-      const backendMsg = data?.debug?.backendMessage ?? data?.message ?? "";
-      const isAlreadyHasProfile =
-        typeof backendMsg === "string" &&
-        backendMsg.includes("ملف لهذه السنة");
-      const errorDetail = isAlreadyHasProfile
-        ? createFile.errorAlreadyHasProfileForYear
-        : data?.message || errorObj?.message || "حدث خطأ غير متوقع";
-      setError(errorDetail);
-      if (!isAlreadyHasProfile) console.error("Create profile error:", err);
+      setError(
+        errorObj?.response?.data?.message ||
+          errorObj?.message ||
+          "حدث خطأ غير متوقع"
+      );
+      console.error("Submit error:", err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const selectedYearName = academicYears.find(
-    (y) => y.id === selectedYear,
-  )?.yearName;
-  const selectedRankData = ranks.find((r) => r.id === selectedRank);
-  const selectedRankName = selectedRankData ? getRankTitle(selectedRankData) : undefined;
+  const selectedYearName = academicYears.find((y) => y.id === selectedYear)?.yearName;
+  const selectedProfileTypeName = profileTypes.find((p) => p.id === selectedProfileType)?.typeName;
 
   if (isLoading) {
     return (
@@ -261,11 +249,11 @@ function CreateFileContent() {
             >
               {imagePreview ? (
                 <>
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={imagePreview}
                     alt="صورة الملف"
-                    fill
-                    className="object-contain"
+                    className="absolute inset-0 w-full h-full object-contain"
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
@@ -275,7 +263,6 @@ function CreateFileContent() {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  {/* Camera/Image Icon */}
                   <svg
                     className="w-10 h-10"
                     fill="none"
@@ -289,13 +276,9 @@ function CreateFileContent() {
                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-
-                  {/* Size limit text */}
                   <span className="text-sm" style={{ color: "#666666" }}>
                     يجب أن لا يزيد حجم الصورة عن 1 جيجا
                   </span>
-
-                  {/* Upload button with icon */}
                   <div className="flex items-center gap-2 text-primary-500">
                     <svg
                       className="w-5 h-5"
@@ -339,31 +322,20 @@ function CreateFileContent() {
                 type="button"
                 onClick={() => {
                   setYearDropdownOpen(!yearDropdownOpen);
-                  setRankDropdownOpen(false);
+                  setProfileTypeDropdownOpen(false);
                 }}
                 className="w-full bg-white border border-grey-200 rounded-2xl px-4 py-3 text-right flex items-center justify-between hover:border-primary-500 transition-colors"
               >
-                <span
-                  className={
-                    selectedYearName ? "text-secondary-800" : "text-grey-400"
-                  }
-                >
+                <span className={selectedYearName ? "text-secondary-800" : "text-grey-400"}>
                   {selectedYearName || createFile.yearPlaceholder}
                 </span>
                 <svg
-                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${
-                    yearDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${yearDropdownOpen ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
@@ -383,28 +355,14 @@ function CreateFileContent() {
                             setSelectedYear(year.id);
                             setYearDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${
-                            selectedYear === year.id ? "bg-grey-50" : ""
-                          }`}
+                          className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${selectedYear === year.id ? "bg-grey-50" : ""}`}
                         >
                           {selectedYear === year.id && (
-                            <svg
-                              className="w-5 h-5 text-primary-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
+                            <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
-                          <span className="text-secondary-800">
-                            {year.yearName}
-                          </span>
+                          <span className="text-secondary-800">{year.yearName}</span>
                         </button>
                       ))
                     )}
@@ -414,10 +372,10 @@ function CreateFileContent() {
             </div>
           </div>
 
-          {/* Rank Selector */}
+          {/* Profile Type Selector */}
           <div className="space-y-2 max-w-150">
             <label className="text-base font-normal text-secondary-800">
-              {createFile.jobRankLabel}
+              {createFile.profileTypeLabel}
               <span className="text-warning-500">*</span>
             </label>
 
@@ -425,73 +383,48 @@ function CreateFileContent() {
               <button
                 type="button"
                 onClick={() => {
-                  setRankDropdownOpen(!rankDropdownOpen);
+                  setProfileTypeDropdownOpen(!profileTypeDropdownOpen);
                   setYearDropdownOpen(false);
                 }}
                 className="w-full bg-white border border-grey-200 rounded-2xl px-4 py-3 text-right flex items-center justify-between hover:border-primary-500 transition-colors"
               >
-                <span
-                  className={
-                    selectedRankName ? "text-secondary-800" : "text-grey-400"
-                  }
-                >
-                  {selectedRankName || createFile.jobRankPlaceholder}
+                <span className={selectedProfileTypeName ? "text-secondary-800" : "text-grey-400"}>
+                  {selectedProfileTypeName || createFile.profileTypePlaceholder}
                 </span>
                 <svg
-                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${
-                    rankDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-5 h-5 text-grey-400 shrink-0 transition-transform ${profileTypeDropdownOpen ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
-              {rankDropdownOpen && (
+              {profileTypeDropdownOpen && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-grey-200 rounded-2xl shadow-lg z-10 overflow-hidden">
                   <div className="max-h-48 overflow-y-auto">
-                    {ranks.length === 0 ? (
+                    {profileTypes.length === 0 ? (
                       <div className="px-4 py-3 text-grey-500 text-center">
-                        لا توجد رتب وظيفية متاحة
+                        لا توجد أنواع ملفات متاحة
                       </div>
                     ) : (
-                      ranks.map((rank) => (
+                      profileTypes.map((pt) => (
                         <button
-                          key={rank.id}
+                          key={pt.id}
                           type="button"
                           onClick={() => {
-                            setSelectedRank(rank.id);
-                            setRankDropdownOpen(false);
+                            setSelectedProfileType(pt.id);
+                            setProfileTypeDropdownOpen(false);
                           }}
-                          className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${
-                            selectedRank === rank.id ? "bg-grey-50" : ""
-                          }`}
+                          className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${selectedProfileType === pt.id ? "bg-grey-50" : ""}`}
                         >
-                          {selectedRank === rank.id && (
-                            <svg
-                              className="w-5 h-5 text-primary-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
+                          {selectedProfileType === pt.id && (
+                            <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
-                          <span className="text-secondary-800">
-                            {getRankTitle(rank)}
-                          </span>
+                          <span className="text-secondary-800">{pt.typeName}</span>
                         </button>
                       ))
                     )}
@@ -526,15 +459,16 @@ function CreateFileContent() {
                 <line x1="12" y1="8" x2="12" y2="16" />
                 <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
-              <span>{createFile.createFileButton}</span>
+              <span>
+                {isEditMode ? createFile.saveChangesButton : createFile.createFileButton}
+              </span>
             </Button>
           </div>
         </form>
       </div>
 
-      {/* Illustration - sm/md: above form; lg: left side only (one image per breakpoint) */}
+      {/* Illustration */}
       <div className="w-full lg:w-100 flex-shrink-0 flex items-center justify-end order-2">
-        {/* Small screens */}
         <Image
           src="/images/dashboard/create-file/create-file-sm.svg"
           alt="إنشاء ملف"
@@ -542,7 +476,6 @@ function CreateFileContent() {
           height={464}
           className="block md:hidden w-full h-auto max-h-116 object-left"
         />
-        {/* Medium screens */}
         <Image
           src="/images/dashboard/create-file/create-file-md.svg"
           alt="إنشاء ملف"
@@ -550,7 +483,6 @@ function CreateFileContent() {
           height={562}
           className="hidden md:block lg:hidden w-full h-auto max-h-140 object-left"
         />
-        {/* Large screens only - no duplicate */}
         <Image
           src="/images/dashboard/create-file/create-file.svg"
           alt="إنشاء ملف"

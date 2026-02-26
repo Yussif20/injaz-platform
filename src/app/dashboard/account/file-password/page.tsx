@@ -7,7 +7,11 @@ import {
   FilePasswordModal,
   FileStatus,
 } from "@/features/dashboard";
-import { useMyProfiles } from "@/features/profiles";
+import {
+  useMyProfiles,
+  useSetProfilePassword,
+  useRemoveProfilePassword,
+} from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import type { Profile } from "@/features/profiles/types";
 
@@ -67,37 +71,88 @@ const PASSWORD_BUTTON_LABELS = {
 
 export default function FilePasswordPage() {
   const { profiles, isLoading } = useMyProfiles();
+  const { setPasswordAsync, isLoading: isSettingPassword } = useSetProfilePassword();
+  const { removePasswordAsync, isLoading: isRemovingPassword } = useRemoveProfilePassword();
+
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">(
-    "set"
-  );
+  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">("set");
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fileData = useMemo(() => profiles.map(mapProfileToFileData), [profiles]);
+
+  const closeModal = () => {
+    setPasswordModalOpen(false);
+    setSelectedFileId(null);
+    setPasswordError(null);
+  };
+
+  const showSuccess = (msg: string) => {
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
 
   const handlePasswordAction = (fileId: string) => {
     const file = fileData.find((f) => f.id === fileId);
     setSelectedFileId(fileId);
     setPasswordModalMode(file?.hasPassword ? "change" : "set");
+    setPasswordError(null);
     setPasswordModalOpen(true);
   };
 
-  const handleActivatePassword = (password: string) => {
-    console.log("Activating password for file:", selectedFileId, password);
-    setPasswordModalOpen(false);
-    setSelectedFileId(null);
+  const handleActivatePassword = async (password: string) => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await setPasswordAsync({
+        profileId: Number(selectedFileId),
+        data: { password, confirmPassword: password },
+      });
+      if (res.status) {
+        closeModal();
+        showSuccess("تم تعيين كلمة المرور بنجاح");
+      } else {
+        setPasswordError(res.message || "فشل تعيين كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
   };
 
-  const handleSavePasswordChanges = (password: string) => {
-    console.log("Saving password changes for file:", selectedFileId, password);
-    setPasswordModalOpen(false);
-    setSelectedFileId(null);
+  const handleSavePasswordChanges = async (password: string) => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await setPasswordAsync({
+        profileId: Number(selectedFileId),
+        data: { password, confirmPassword: password },
+      });
+      if (res.status) {
+        closeModal();
+        showSuccess("تم تحديث كلمة المرور بنجاح");
+      } else {
+        setPasswordError(res.message || "فشل تحديث كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
   };
 
-  const handleDeactivatePassword = () => {
-    console.log("Deactivating password for file:", selectedFileId);
-    setPasswordModalOpen(false);
-    setSelectedFileId(null);
+  const handleDeactivatePassword = async () => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await removePasswordAsync(Number(selectedFileId));
+      if (res.status) {
+        closeModal();
+        showSuccess("تم إلغاء كلمة المرور بنجاح");
+      } else {
+        setPasswordError(res.message || "فشل إلغاء كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
   };
 
   if (isLoading) {
@@ -140,15 +195,20 @@ export default function FilePasswordPage() {
 
       <FilePasswordModal
         isOpen={passwordModalOpen}
-        onClose={() => {
-          setPasswordModalOpen(false);
-          setSelectedFileId(null);
-        }}
+        onClose={closeModal}
         mode={passwordModalMode}
         onActivate={handleActivatePassword}
         onSaveChanges={handleSavePasswordChanges}
         onDeactivate={handleDeactivatePassword}
+        isLoading={isSettingPassword || isRemovingPassword}
+        error={passwordError}
       />
+
+      {successMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+          {successMessage}
+        </div>
+      )}
     </>
   );
 }

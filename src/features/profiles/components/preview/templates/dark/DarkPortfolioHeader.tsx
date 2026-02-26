@@ -16,6 +16,7 @@ interface DarkPortfolioHeaderProps {
   teacherName: string;
   teacherRank: string;
   academicYear: string;
+  profileImageUrl?: string | null;
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
@@ -75,6 +76,7 @@ const DarkHeaderBar = ({
 export const DarkPortfolioHeader = ({
   teacherName,
   teacherRank,
+  profileImageUrl,
   onDownload,
   onDownloadAsImage,
   onShare,
@@ -114,11 +116,12 @@ export const DarkPortfolioHeader = ({
           <div className="flex justify-center">
             <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden">
               <div className="relative w-full h-full overflow-hidden">
-                <Image
-                  src="/images/profiles/avatar.png"
-                  alt={teacherName}
-                  fill
-                />
+                {profileImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profileImageUrl} alt={teacherName} className="w-full h-full object-cover" />
+                ) : (
+                  <Image src="/images/profiles/dark/fallback-header-image.svg" alt={teacherName} fill className="object-cover" />
+                )}
               </div>
             </div>
           </div>

@@ -12,6 +12,7 @@ interface FilePasswordModalProps {
   onSaveChanges?: (password: string) => void;
   onDeactivate?: () => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
 export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
@@ -22,11 +23,18 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
   onSaveChanges,
   onDeactivate,
   isLoading = false,
+  error,
 }) => {
   const [password, setPassword] = useState("");
-  const { filePasswordModal } = dashboardContent;
+  const { filePasswordModal, passwordRequirements } = dashboardContent;
 
-  // Reset password when modal opens/closes
+  const rules = {
+    minLength: password.length >= 6,
+    uppercase: /[A-Z]/.test(password),
+    specialChar: /[!@#$%^&*]/.test(password),
+  };
+  const isPasswordValid = rules.minLength && rules.uppercase && rules.specialChar;
+
   useEffect(() => {
     if (!isOpen) {
       setPassword("");
@@ -37,6 +45,7 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isPasswordValid) return;
     if (mode === "set") {
       onActivate?.(password);
     } else {
@@ -49,6 +58,11 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
       onClose();
     }
   };
+
+  const fieldLabel =
+    mode === "set"
+      ? filePasswordModal.passwordLabel
+      : filePasswordModal.newPasswordLabel;
 
   return (
     <div
@@ -97,17 +111,17 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           {/* Password field */}
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-grey-700 mb-2 text-right">
-              {mode === "set"
-                ? filePasswordModal.passwordLabel
-                : filePasswordModal.currentPasswordLabel}
+              {fieldLabel}
             </label>
             <div className="relative">
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
                 placeholder={filePasswordModal.passwordPlaceholder}
                 className="w-full px-4 py-3 pr-10 text-right bg-grey-100 border border-grey-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 dir="rtl"
@@ -128,6 +142,37 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
             </div>
           </div>
 
+          {/* Password requirements */}
+          <div className="mb-6 rounded-xl bg-grey-50 p-3 text-right" dir="rtl">
+            <p className="mb-2 text-xs font-medium text-grey-600">
+              {passwordRequirements.title}
+            </p>
+            <ul className="space-y-1">
+              {(
+                [
+                  ["minLength", passwordRequirements.minLength],
+                  ["uppercase", passwordRequirements.uppercase],
+                  ["specialChar", passwordRequirements.specialChar],
+                ] as const
+              ).map(([key, label]) => (
+                <li
+                  key={key}
+                  className={`flex items-center gap-2 text-xs transition-colors ${
+                    rules[key] ? "text-green-600" : "text-grey-400"
+                  }`}
+                >
+                  <span className="shrink-0">{rules[key] ? "✓" : "○"}</span>
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="mb-4 text-sm text-center text-red-600">{error}</p>
+          )}
+
           {/* Action buttons */}
           {mode === "set" ? (
             <Button
@@ -136,7 +181,7 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
               size="lg"
               className="w-full"
               isLoading={isLoading}
-              disabled={!password.trim()}
+              disabled={!isPasswordValid}
             >
               {filePasswordModal.activateButton}
             </Button>
@@ -158,7 +203,7 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
                 size="lg"
                 className="flex-1 !bg-grey-200 !text-grey-600 hover:!bg-grey-300"
                 isLoading={isLoading}
-                disabled={!password.trim()}
+                disabled={!isPasswordValid}
               >
                 {filePasswordModal.saveChangesButton}
               </Button>

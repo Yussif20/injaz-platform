@@ -16,6 +16,7 @@ interface DefaultPortfolioHeaderProps {
   teacherName: string;
   teacherRank: string;
   academicYear: string;
+  profileImageUrl?: string | null;
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
@@ -34,6 +35,7 @@ interface DefaultPortfolioHeaderProps {
 export const DefaultPortfolioHeader = ({
   teacherName,
   teacherRank,
+  profileImageUrl,
   // academicYear,
   onDownload,
   onDownloadAsImage,
@@ -130,19 +132,15 @@ export const DefaultPortfolioHeader = ({
           {/* Avatar */}
           <div className="flex justify-center md:justify-start">
             <div
-              className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 rounded-full overflow-hidden p-3 border-2"
+              className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 rounded-full overflow-hidden border-2"
               style={{ borderColor: theme.primary }}
             >
-              <div
-                className="relative w-full h-full rounded-full overflow-hidden border-2"
-                style={{ borderColor: theme.primary }}
-              >
-                <Image
-                  src="/images/profiles/avatar.png"
-                  alt={teacherName}
-                  fill
-                />
-              </div>
+              {profileImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profileImageUrl} alt={teacherName} className="w-full h-full object-cover" />
+              ) : (
+                <Image src="/images/profiles/default/fallback-header-image.svg" alt={teacherName} fill className="object-cover" />
+              )}
             </div>
           </div>
         </div>

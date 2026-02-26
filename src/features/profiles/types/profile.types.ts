@@ -104,6 +104,7 @@ export interface ProfileDetails {
   profileTypeName: string | null;
   academicYearName: string | null;
   templateId: number;
+  imageUrl: string | null;
   personalInfo: PersonalInfo | null;
   qualifications: Qualification[] | null;
   careerJobs: CareerJob[] | null;

@@ -73,12 +73,7 @@ export async function uploadProfileImage(profileId: number, file: File): Promise
 
   const response = await clientApi.post<ProfileResponse>(
     `/api/profiles/${profileId}/image`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    formData
   );
   return response.data;
 }

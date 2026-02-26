@@ -4,8 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 import { getAccessToken } from "@/shared/lib/cookies";
-import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
+import { BACKEND_API_URL, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
 import type { Profile } from "@/features/profiles/types";
 
@@ -29,14 +30,16 @@ export async function POST(
 
     const formData = await request.formData();
 
-    const response = await serverApi.post<ApiResponse<Profile>>(
-      `${API_ENDPOINTS.MY_PROFILES}/${id}/image`,
+    // Use axios directly (not serverApi) — serverApi defaults to Content-Type: application/json
+    // which breaks multipart/form-data uploads. axios auto-sets the correct boundary.
+    const response = await axios.post<ApiResponse<Profile>>(
+      `${BACKEND_API_URL}${API_ENDPOINTS.MY_PROFILES}/${id}/image`,
       formData,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
         },
+        timeout: 30000,
       }
     );
 

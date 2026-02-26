@@ -18,14 +18,14 @@ import {
 import {
   useMyProfiles,
   useAcademicYears,
-  useRanks,
   useUnpublishProfile,
   useDeleteProfile,
+  useSetProfilePassword,
+  useRemoveProfilePassword,
 } from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import type { Profile } from "@/features/profiles/types";
-import type { Rank } from "@/features/profiles/types/reference.types";
 
 // Helper function to map Profile status to FileStatus
 function mapProfileStatusToFileStatus(status: string | null): FileStatus {
@@ -54,35 +54,11 @@ function formatDate(dateString: string): string {
   }
 }
 
-// Job rank display: prefer personalInfo rank (الرتبة الوظيفية) over profile type name
-function getProfileJobRank(profile: Profile): string {
-  const info = profile.personalInfo;
-  if (!info) return profile.profileTypeName || "ملف";
-  return (
-    info.rankTitle ??
-    info.rankTitleMale ??
-    info.rankTitleFemale ??
-    profile.profileTypeName ??
-    "ملف"
-  );
-}
-
-// Resolve card title from ranks when profile has rankId, so we show actual الرتبة الوظيفية not profile type name
-function getProfileTitle(profile: Profile, ranks: Rank[]): string {
-  const rankId = profile.personalInfo?.rankId;
-  if (rankId != null && ranks.length > 0) {
-    const rank = ranks.find((r) => r.id === rankId);
-    if (rank)
-      return rank.title || rank.titleFemale || rank.titleMale || getProfileJobRank(profile);
-  }
-  return getProfileJobRank(profile);
-}
-
 // Helper function to map Profile to FileData
-function mapProfileToFileData(profile: Profile, ranks: Rank[]): FileData {
+function mapProfileToFileData(profile: Profile): FileData {
   return {
     id: String(profile.id),
-    title: getProfileTitle(profile, ranks),
+    title: profile.profileTypeName || "ملف",
     ownerName: profile.userFullName || "",
     year: profile.academicYearName || "",
     creationDate: formatDate(profile.createdAt),
@@ -99,9 +75,10 @@ export default function DashboardPage() {
     refetch: refetchProfiles,
   } = useMyProfiles();
   const { academicYears } = useAcademicYears();
-  const { ranks } = useRanks();
   const { unpublish } = useUnpublishProfile();
   const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
+  const { setPasswordAsync, isLoading: isSettingPassword } = useSetProfilePassword();
+  const { removePasswordAsync, isLoading: isRemovingPassword } = useRemoveProfilePassword();
 
   const isLoading = authLoading || profilesLoading;
   const router = useRouter();
@@ -161,10 +138,10 @@ export default function DashboardPage() {
 
   // Password modal states
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">(
-    "set",
-  );
+  const [passwordModalMode, setPasswordModalMode] = useState<"set" | "change">("set");
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [showPasswordToast, setShowPasswordToast] = useState<string | null>(null);
 
   // Confirmation modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -174,8 +151,8 @@ export default function DashboardPage() {
 
   // Map profiles to file data and filter
   const fileData = useMemo(() => {
-    return profiles.map((p) => mapProfileToFileData(p, ranks));
-  }, [profiles, ranks]);
+    return profiles.map((p) => mapProfileToFileData(p));
+  }, [profiles]);
 
   const filteredFiles = useMemo(() => {
     return fileData.filter((file) => {
@@ -197,19 +174,67 @@ export default function DashboardPage() {
     setPasswordModalOpen(true);
   };
 
-  const handleActivatePassword = (password: string) => {
-    console.log("Activating password for file:", selectedFileId, password);
+  const closePasswordModal = () => {
     setPasswordModalOpen(false);
+    setSelectedFileId(null);
+    setPasswordError(null);
   };
 
-  const handleSavePasswordChanges = (password: string) => {
-    console.log("Saving password changes for file:", selectedFileId, password);
-    setPasswordModalOpen(false);
+  const handleActivatePassword = async (password: string) => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await setPasswordAsync({
+        profileId: Number(selectedFileId),
+        data: { password, confirmPassword: password },
+      });
+      if (res.status) {
+        closePasswordModal();
+        setShowPasswordToast("تم تعيين كلمة المرور بنجاح");
+        setTimeout(() => setShowPasswordToast(null), 3000);
+      } else {
+        setPasswordError(res.message || "فشل تعيين كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
   };
 
-  const handleDeactivatePassword = () => {
-    console.log("Deactivating password for file:", selectedFileId);
-    setPasswordModalOpen(false);
+  const handleSavePasswordChanges = async (password: string) => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await setPasswordAsync({
+        profileId: Number(selectedFileId),
+        data: { password, confirmPassword: password },
+      });
+      if (res.status) {
+        closePasswordModal();
+        setShowPasswordToast("تم تحديث كلمة المرور بنجاح");
+        setTimeout(() => setShowPasswordToast(null), 3000);
+      } else {
+        setPasswordError(res.message || "فشل تحديث كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
+  };
+
+  const handleDeactivatePassword = async () => {
+    if (!selectedFileId) return;
+    setPasswordError(null);
+    try {
+      const res = await removePasswordAsync(Number(selectedFileId));
+      if (res.status) {
+        closePasswordModal();
+        setShowPasswordToast("تم إلغاء كلمة المرور بنجاح");
+        setTimeout(() => setShowPasswordToast(null), 3000);
+      } else {
+        setPasswordError(res.message || "فشل إلغاء كلمة المرور");
+      }
+    } catch {
+      setPasswordError("حدث خطأ، يرجى المحاولة مجدداً");
+    }
   };
 
   // Delete file handlers
@@ -246,15 +271,13 @@ export default function DashboardPage() {
       // Find the profile to pass to the edit page
       const profile = profiles.find((p) => String(p.id) === fileToEdit);
       if (profile) {
-        // Build URL with profile data as search params (rankId for reliable الرتبة الوظيفية pre-fill)
         const params = new URLSearchParams({
           edit: "true",
           fileId: String(profile.id),
           year: profile.academicYearName || "",
-          jobRank: getProfileJobRank(profile),
+          profileTypeId: String(profile.profileTypeId),
+          imageUrl: profile.imageUrl || "",
         });
-        const rankId = profile.personalInfo?.rankId;
-        if (rankId != null) params.set("rankId", String(rankId));
         router.push(`${ROUTES.DASHBOARD_PROFILE_NEW}?${params.toString()}`);
       }
     }
@@ -513,11 +536,13 @@ export default function DashboardPage() {
       {/* File Password Modal */}
       <FilePasswordModal
         isOpen={passwordModalOpen}
-        onClose={() => setPasswordModalOpen(false)}
+        onClose={closePasswordModal}
         mode={passwordModalMode}
         onActivate={handleActivatePassword}
         onSaveChanges={handleSavePasswordChanges}
         onDeactivate={handleDeactivatePassword}
+        isLoading={isSettingPassword || isRemovingPassword}
+        error={passwordError}
       />
 
       {/* Delete File Confirmation Modal */}
@@ -551,6 +576,13 @@ export default function DashboardPage() {
         onConfirm={handleConfirmEditBasicData}
         variant="warning"
       />
+
+      {/* Password success toast */}
+      {showPasswordToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+          {showPasswordToast}
+        </div>
+      )}
     </div>
   );
 }

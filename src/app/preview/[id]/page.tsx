@@ -31,11 +31,24 @@ import {
   ArabicAchievementsSection,
   ArabicContactSection,
 } from "@/features/profiles";
-import { useProfileDetails } from "@/features/profiles/hooks";
+import { useProfileDetails, useMyProfiles } from "@/features/profiles/hooks";
 import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
+import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
+
+function normalizeImageUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const s = raw.trim();
+  if (!s) return null;
+  if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/") || s.startsWith("data:")) return s;
+  const path = s.replace(/^\//, "");
+  const base = path.startsWith("uploads/")
+    ? PUBLIC_STORAGE_BASE_URL.replace(/\/$/, "")
+    : PUBLIC_API_BASE_URL.replace(/\/$/, "");
+  return `${base}/${path}`;
+}
 
 /**
  * Convert a CSS color string that may use oklab/oklch to rgb/rgba.
@@ -140,6 +153,10 @@ export default function ProfilePreviewPage() {
 
   // Fetch profile details
   const { profileDetails, isLoading } = useProfileDetails(Number(profileId));
+
+  // Fetch profile list to get imageUrl (the /details endpoint doesn't return it)
+  const { profiles } = useMyProfiles();
+  const profileFromList = profiles.find((p) => String(p.id) === profileId);
 
   // Selected template state - initialized from profile data
   const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId>(
@@ -582,83 +599,32 @@ export default function ProfilePreviewPage() {
         style={{ backgroundColor: theme.background }}
       >
         {/* Header Section - Template-aware */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultPortfolioHeader
-            teacherName={profileDetails.userName || "المعلم"}
-            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-            academicYear={profileDetails.academicYearName || ""}
-            onDownload={handleDownload}
-            onDownloadAsImage={handleDownloadAsImage}
-            onShare={handleShare}
-            onBack={handleGoBack}
-            isDownloading={isDownloading}
-            content={{
+        {(() => {
+          const profileImageUrl = normalizeImageUrl(profileFromList?.imageUrl ?? profileDetails.imageUrl);
+          const commonHeaderProps = {
+            teacherName: profileDetails.userName || "المعلم",
+            teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
+            academicYear: profileDetails.academicYearName || "",
+            profileImageUrl,
+            onDownload: handleDownload,
+            onDownloadAsImage: handleDownloadAsImage,
+            onShare: handleShare,
+            onBack: handleGoBack,
+            isDownloading,
+            content: {
               downloadFile: previewPage.downloadFile,
               downloadAsImage: previewPage.downloadAsImage,
               shareFile: previewPage.shareFile,
               fileTitle: previewPage.fileTitle,
               publishFile: previewPage.publishFile ?? "نشر الملف",
-            }}
-            theme={theme}
-          />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritagePortfolioHeader
-            teacherName={profileDetails.userName || "المعلم"}
-            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-            academicYear={profileDetails.academicYearName || ""}
-            onDownload={handleDownload}
-            onDownloadAsImage={handleDownloadAsImage}
-            onShare={handleShare}
-            onBack={handleGoBack}
-            isDownloading={isDownloading}
-            content={{
-              downloadFile: previewPage.downloadFile,
-              downloadAsImage: previewPage.downloadAsImage,
-              shareFile: previewPage.shareFile,
-              fileTitle: previewPage.fileTitle,
-              publishFile: previewPage.publishFile ?? "نشر الملف",
-            }}
-            theme={theme}
-          />
-        ) : selectedTemplateId === TemplateId.Arabic ? (
-          <ArabicPortfolioHeader
-            teacherName={profileDetails.userName || "المعلم"}
-            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-            academicYear={profileDetails.academicYearName || ""}
-            onDownload={handleDownload}
-            onDownloadAsImage={handleDownloadAsImage}
-            onShare={handleShare}
-            onBack={handleGoBack}
-            isDownloading={isDownloading}
-            content={{
-              downloadFile: previewPage.downloadFile,
-              downloadAsImage: previewPage.downloadAsImage,
-              shareFile: previewPage.shareFile,
-              fileTitle: previewPage.fileTitle,
-              publishFile: previewPage.publishFile ?? "نشر الملف",
-            }}
-            theme={theme}
-          />
-        ) : (
-          <DarkPortfolioHeader
-            teacherName={profileDetails.userName || "المعلم"}
-            teacherRank={profileDetails.personalInfo?.rankTitle || "معلم"}
-            academicYear={profileDetails.academicYearName || ""}
-            onDownload={handleDownload}
-            onDownloadAsImage={handleDownloadAsImage}
-            onShare={handleShare}
-            onBack={handleGoBack}
-            isDownloading={isDownloading}
-            content={{
-              downloadFile: previewPage.downloadFile,
-              downloadAsImage: previewPage.downloadAsImage,
-              shareFile: previewPage.shareFile,
-              fileTitle: previewPage.fileTitle,
-              publishFile: previewPage.publishFile ?? "نشر الملف",
-            }}
-            theme={theme}
-          />
-        )}
+            },
+            theme,
+          };
+          if (selectedTemplateId === TemplateId.Default) return <DefaultPortfolioHeader {...commonHeaderProps} />;
+          if (selectedTemplateId === TemplateId.Heritage) return <HeritagePortfolioHeader {...commonHeaderProps} />;
+          if (selectedTemplateId === TemplateId.Arabic) return <ArabicPortfolioHeader {...commonHeaderProps} />;
+          return <DarkPortfolioHeader {...commonHeaderProps} />;
+        })()}
 
         {/* Main content constrained to max width */}
         <div className="max-w-300 mx-auto">

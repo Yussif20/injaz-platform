@@ -15,6 +15,7 @@ export * from "./useUpdateProfileTemplate";
 // Profile hooks
 export * from "./useMyProfiles";
 export * from "./useCreateProfile";
+export * from "./useUpdateProfileBasicData";
 export * from "./useProfileDetails";
 export * from "./useUploadProfileImage";
 export * from "./useProfilePassword";

@@ -14,6 +14,7 @@ interface HeritagePortfolioHeaderProps {
   teacherName: string;
   teacherRank: string;
   academicYear: string;
+  profileImageUrl?: string | null;
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
@@ -33,6 +34,7 @@ export const HeritagePortfolioHeader = ({
   teacherName,
   teacherRank,
   academicYear,
+  profileImageUrl,
   onDownload,
   onDownloadAsImage,
   onShare,
@@ -67,13 +69,12 @@ export const HeritagePortfolioHeader = ({
             {/* Profile Image - Left on desktop, centered on mobile */}
             <div className="flex justify-center md:justify-end mb-6 md:mb-0">
               <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden">
-                <Image
-                  src="/images/profiles/avatar.png"
-                  alt={teacherName}
-                  fill
-                  sizes="(max-width: 768px) 256px, (max-width: 1024px) 288px, 320px"
-                  className="object-cover"
-                />
+                {profileImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profileImageUrl} alt={teacherName} className="w-full h-full object-cover" />
+                ) : (
+                  <Image src="/images/profiles/heritage/fallback-header-image.svg" alt={teacherName} fill sizes="(max-width: 768px) 256px, (max-width: 1024px) 288px, 320px" className="object-cover" />
+                )}
               </div>
             </div>
 
