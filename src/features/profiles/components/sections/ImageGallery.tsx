@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import type { SubsectionImage } from "../../types/profile.types";
 import { dashboardContent } from "@/content";
 
@@ -112,12 +111,15 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             {image ? (
               <>
                 {/* Image */}
-                <Image
-                  src={image.publicUrl || "/placeholder-image.jpg"}
-                  alt={image.description || "صورة الشاهد"}
-                  fill
-                  className="object-cover"
-                />
+                {image.publicUrl ? (
+                  <img
+                    src={image.publicUrl}
+                    alt={image.description || "صورة الشاهد"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-grey-200" />
+                )}
 
                 {/* Three-dot Menu Button */}
                 <button

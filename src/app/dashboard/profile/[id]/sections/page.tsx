@@ -35,11 +35,13 @@ export default function ProfileSectionsPage() {
   // Add Evidence Modal state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedSubsectionId, setSelectedSubsectionId] = useState<number | null>(null);
+  const [addEvidenceError, setAddEvidenceError] = useState<string | null>(null);
 
   // Edit Evidence Modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [imageToEdit, setImageToEdit] = useState<SubsectionImage | null>(null);
   const [editSubsectionId, setEditSubsectionId] = useState<number | null>(null);
+  const [editEvidenceError, setEditEvidenceError] = useState<string | null>(null);
 
   // Delete Confirmation Modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -48,12 +50,14 @@ export default function ProfileSectionsPage() {
   // Add Evidence Handlers
   const handleAddEvidence = (subsectionId: number) => {
     setSelectedSubsectionId(subsectionId);
+    setAddEvidenceError(null);
     setIsAddModalOpen(true);
   };
 
   const handleAddModalClose = () => {
     setIsAddModalOpen(false);
     setSelectedSubsectionId(null);
+    setAddEvidenceError(null);
   };
 
   const handleSubmitEvidence = async (data: { title: string; image: File }) => {
@@ -70,7 +74,10 @@ export default function ProfileSectionsPage() {
       refetch();
       handleAddModalClose();
     } catch (error) {
-      console.error("Error adding evidence:", error);
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "حدث خطأ أثناء رفع الصورة";
+      setAddEvidenceError(msg);
     }
   };
 
@@ -78,6 +85,7 @@ export default function ProfileSectionsPage() {
   const handleEditImage = (subsectionId: number, image: SubsectionImage) => {
     setImageToEdit(image);
     setEditSubsectionId(subsectionId);
+    setEditEvidenceError(null);
     setIsEditModalOpen(true);
   };
 
@@ -85,6 +93,7 @@ export default function ProfileSectionsPage() {
     setIsEditModalOpen(false);
     setImageToEdit(null);
     setEditSubsectionId(null);
+    setEditEvidenceError(null);
   };
 
   const handleSubmitEditEvidence = async (data: { title: string; image?: File }) => {
@@ -102,7 +111,10 @@ export default function ProfileSectionsPage() {
       refetch();
       handleEditModalClose();
     } catch (error) {
-      console.error("Error updating evidence:", error);
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "حدث خطأ أثناء تحديث الصورة";
+      setEditEvidenceError(msg);
     }
   };
 
@@ -231,6 +243,7 @@ export default function ProfileSectionsPage() {
         onClose={handleAddModalClose}
         onSubmit={handleSubmitEvidence}
         isLoading={isAddingImage}
+        apiError={addEvidenceError}
       />
 
       {/* Edit Evidence Modal */}
@@ -240,6 +253,7 @@ export default function ProfileSectionsPage() {
         onSubmit={handleSubmitEditEvidence}
         isLoading={isUpdatingImage}
         image={imageToEdit}
+        apiError={editEvidenceError}
       />
 
       {/* Delete Confirmation Modal */}

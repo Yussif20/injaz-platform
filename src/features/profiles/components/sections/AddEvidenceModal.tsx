@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { dashboardContent } from "@/content";
 
 interface AddEvidenceModalProps {
@@ -10,6 +9,7 @@ interface AddEvidenceModalProps {
   onClose: () => void;
   onSubmit: (data: { title: string; image: File }) => void;
   isLoading?: boolean;
+  apiError?: string | null;
 }
 
 export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
@@ -17,6 +17,7 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
   onClose,
   onSubmit,
   isLoading = false,
+  apiError,
 }) => {
   const { addEvidenceModal } = dashboardContent;
   const modalRef = useRef<HTMLDivElement>(null);
@@ -209,14 +210,11 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
           >
             {imagePreview ? (
               // Image Preview
-              <div className="relative w-full h-full bg-[#666666]">
-                <Image
-                  src={imagePreview}
-                  alt="معاينة الصورة"
-                  fill
-                  className="object-contain"
-                />
-              </div>
+              <img
+                src={imagePreview}
+                alt="معاينة الصورة"
+                className="w-full h-full object-contain bg-[#666666]"
+              />
             ) : (
               // Upload Placeholder
               <div className="w-full h-full bg-[#EBEBEB] flex flex-col items-center justify-center gap-3">
@@ -328,6 +326,9 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
             addEvidenceModal.submitButton
           )}
         </button>
+        {apiError && (
+          <p className="mt-2 text-sm text-warning-500 text-center">{apiError}</p>
+        )}
       </div>
     </div>
   );

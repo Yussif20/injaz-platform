@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { dashboardContent } from "@/content";
 import type { SubsectionImage } from "../../types/profile.types";
 
@@ -12,6 +11,7 @@ interface EditEvidenceModalProps {
   onSubmit: (data: { title: string; image?: File }) => void;
   isLoading?: boolean;
   image: SubsectionImage | null;
+  apiError?: string | null;
 }
 
 export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
@@ -20,6 +20,7 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
   onSubmit,
   isLoading = false,
   image,
+  apiError,
 }) => {
   const { addEvidenceModal, editEvidenceModal } = dashboardContent;
   const modalRef = useRef<HTMLDivElement>(null);
@@ -34,7 +35,7 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
   useEffect(() => {
     if (isOpen && image) {
       setImageTitle(image.description || "");
-      setImagePreview(image.publicUrl);
+      setImagePreview(image.publicUrl ?? null);
       setSelectedImage(null);
       setErrors({});
     }
@@ -215,14 +216,11 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
           <div className="w-full h-[200px] rounded-[20px] border-2 border-solid border-grey-200 overflow-hidden">
             {imagePreview ? (
               // Image Preview
-              <div className="relative w-full h-full bg-[#666666]">
-                <Image
-                  src={imagePreview}
-                  alt="معاينة الصورة"
-                  fill
-                  className="object-contain"
-                />
-              </div>
+              <img
+                src={imagePreview}
+                alt="معاينة الصورة"
+                className="w-full h-full object-contain bg-[#666666]"
+              />
             ) : (
               // Upload Placeholder
               <div className="w-full h-full bg-[#EBEBEB] flex flex-col items-center justify-center gap-3">
@@ -330,6 +328,9 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
             editEvidenceModal.submitButton
           )}
         </button>
+        {apiError && (
+          <p className="mt-2 text-sm text-warning-500 text-center">{apiError}</p>
+        )}
       </div>
     </div>
   );
