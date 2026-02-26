@@ -457,6 +457,9 @@ export const dashboardContent = {
     paymentError: "فشلت عملية الدفع",
     retryPayment: "إعادة المحاولة",
     applePayComingSoon: "متاح قريباً",
+    applePayUnavailable: "يتطلب Safari",
+    applePayHint: "ستظهر نافذة Apple Pay لإتمام الدفع",
+    applePayPayButton: "الدفع بـ Apple Pay",
 
     // 3DS callback page
     callbackVerifying: "جاري التحقق من الدفع...",

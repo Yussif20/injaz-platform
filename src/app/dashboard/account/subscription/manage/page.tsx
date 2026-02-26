@@ -110,6 +110,13 @@ export default function ManageSubscriptionPage() {
     useState<PaymentMethod>("visa");
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [applePayAvailable, setApplePayAvailable] = useState(false);
+
+  useEffect(() => {
+    setApplePayAvailable(
+      "ApplePaySession" in window && ApplePaySession.canMakePayments(),
+    );
+  }, []);
 
   // Card form state
   const [cardName, setCardName] = useState("");
@@ -238,6 +245,79 @@ export default function ManageSubscriptionPage() {
 
     // Unexpected state — show generic message
     setPaymentError(result.message || "الدفع قيد المعالجة، يرجى الانتظار.");
+  };
+
+  // ── Apple Pay submit ──────────────────────────────────────────────────────
+
+  const handleApplePaySubmit = () => {
+    setPaymentError(null);
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
+
+    const request: ApplePayPaymentRequest = {
+      countryCode: "SA",
+      currencyCode: "SAR",
+      supportedNetworks: ["visa", "masterCard", "mada"],
+      merchantCapabilities: ["supports3DS"],
+      total: { label: "إنجاز المعلم", amount: String(info?.finalAmount ?? 0) },
+    };
+
+    const session = new ApplePaySession(3, request);
+
+    session.onvalidatemerchant = async (
+      event: ApplePayValidateMerchantEvent,
+    ) => {
+      try {
+        const res = await fetch("/api/subscriptions/apple-pay-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ validationURL: event.validationURL }),
+        });
+        const merchantSession = await res.json();
+        session.completeMerchantValidation(merchantSession);
+      } catch {
+        session.abort();
+        setPaymentError("تعذر التحقق من بوابة Apple Pay");
+      }
+    };
+
+    session.onpaymentauthorized = async (
+      event: ApplePayPaymentAuthorizedEvent,
+    ) => {
+      try {
+        const result = await subscribe({
+          token: JSON.stringify(event.payment.token),
+          paymentMethod: "applepay",
+          idempotencyKey: idempotencyKeyRef.current!,
+        });
+
+        if (!result.status) {
+          session.completePayment({ status: ApplePaySession.STATUS_FAILURE });
+          setPaymentError(result.message || "فشلت عملية الدفع");
+          return;
+        }
+
+        session.completePayment({ status: ApplePaySession.STATUS_SUCCESS });
+
+        const sub = result.data;
+        if (sub?.requires3DSecure && sub.threeDSecureUrl) {
+          window.location.href = sub.threeDSecureUrl;
+          return;
+        }
+        if (sub?.isActive) {
+          setPaymentSuccess(true);
+          refetchSubscription();
+        } else {
+          setPaymentError(result.message || "الدفع قيد المعالجة، يرجى الانتظار.");
+        }
+      } catch {
+        session.completePayment({ status: ApplePaySession.STATUS_FAILURE });
+        setPaymentError("تعذر الاتصال ببوابة الدفع");
+      }
+    };
+
+    session.begin();
   };
 
   // ─── Loading skeleton ─────────────────────────────────────────────────────
@@ -466,9 +546,13 @@ export default function ManageSubscriptionPage() {
                   method="apple_pay"
                   label={content.form.applePay}
                   selected={selectedPaymentMethod === "apple_pay"}
-                  onSelect={() => {}}
-                  disabled
-                  badge={content.applePayComingSoon}
+                  onSelect={setSelectedPaymentMethod}
+                  disabled={!applePayAvailable}
+                  badge={
+                    !applePayAvailable
+                      ? content.applePayUnavailable
+                      : undefined
+                  }
                   logo={
                     <Image
                       src="/images/dashboard/apple-pay.svg"
@@ -482,111 +566,136 @@ export default function ManageSubscriptionPage() {
               </div>
             </div>
 
-            {/* Card details */}
+            {/* Card details / Apple Pay panel */}
             <div className="order-2 lg:order-1 min-w-0">
               <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-center">
                 {content.form.cardDetailsTitle}
               </h3>
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <label className="block text-sm text-secondary-800 mb-2">
-                    {content.form.cardNameLabel}
-                    <span className="text-warning-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    value={cardName}
-                    onChange={(e) => setCardName(e.target.value)}
-                    placeholder={content.form.cardNamePlaceholder}
-                    className="w-full"
+              {selectedPaymentMethod === "apple_pay" ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
+                  <Image
+                    src="/images/dashboard/apple-pay.svg"
+                    width={80}
+                    height={50}
+                    alt="Apple Pay"
+                    className="object-contain"
                   />
+                  <p className="text-sm text-grey-500">{content.applePayHint}</p>
                 </div>
-
-                <div>
-                  <label className="block text-sm text-secondary-800 mb-2">
-                    {content.form.cardNumberLabel}
-                    <span className="text-warning-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    value={cardNumber}
-                    onChange={handleCardNumberChange}
-                    placeholder={content.form.cardNumberPlaceholder}
-                    className="w-full"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              ) : (
+                <div className="space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-sm text-secondary-800 mb-2">
-                      {content.form.cvvLabel}
+                      {content.form.cardNameLabel}
                       <span className="text-warning-500">*</span>
                     </label>
                     <Input
                       type="text"
-                      value={cvv}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, "");
-                        if (value.length <= 4) setCvv(value);
-                      }}
-                      placeholder={content.form.cvvPlaceholder}
+                      value={cardName}
+                      onChange={(e) => setCardName(e.target.value)}
+                      placeholder={content.form.cardNamePlaceholder}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-secondary-800 mb-2">
+                      {content.form.cardNumberLabel}
+                      <span className="text-warning-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={cardNumber}
+                      onChange={handleCardNumberChange}
+                      placeholder={content.form.cardNumberPlaceholder}
                       className="w-full"
                       dir="ltr"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm text-secondary-800 mb-2">
-                      {content.form.expiryLabel}
-                      <span className="text-warning-500">*</span>
-                    </label>
-                    <div className="relative">
+
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <label className="block text-sm text-secondary-800 mb-2">
+                        {content.form.cvvLabel}
+                        <span className="text-warning-500">*</span>
+                      </label>
                       <Input
                         type="text"
-                        value={expiryDate}
+                        value={cvv}
                         onChange={(e) => {
-                          let value = e.target.value.replace(/[^\d/]/g, "");
-                          if (value.length === 2 && !value.includes("/")) {
-                            value += "/";
-                          }
-                          if (value.length <= 5) setExpiryDate(value);
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value.length <= 4) setCvv(value);
                         }}
-                        placeholder={content.form.expiryPlaceholder}
-                        className="w-full pr-10"
+                        placeholder={content.form.cvvPlaceholder}
+                        className="w-full"
                         dir="ltr"
                       />
-                      <svg
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-grey-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    </div>
+                    <div>
+                      <label className="block text-sm text-secondary-800 mb-2">
+                        {content.form.expiryLabel}
+                        <span className="text-warning-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          value={expiryDate}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/[^\d/]/g, "");
+                            if (value.length === 2 && !value.includes("/")) {
+                              value += "/";
+                            }
+                            if (value.length <= 5) setExpiryDate(value);
+                          }}
+                          placeholder={content.form.expiryPlaceholder}
+                          className="w-full pr-10"
+                          dir="ltr"
                         />
-                      </svg>
+                        <svg
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-grey-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={!isFormComplete || subscribing}
-            className="flex-1 py-3 sm:py-2.5 disabled:!bg-grey-200 disabled:!text-grey-500 disabled:cursor-not-allowed"
-            onClick={handlePaymentSubmit}
-          >
-            {subscribing ? content.processingPayment : content.form.confirmPayment}
-          </Button>
+          {selectedPaymentMethod === "apple_pay" ? (
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={!applePayAvailable || subscribing}
+              className="flex-1 py-3 sm:py-2.5 disabled:!bg-grey-200 disabled:!text-grey-500 disabled:cursor-not-allowed"
+              onClick={handleApplePaySubmit}
+            >
+              {subscribing ? content.processingPayment : content.applePayPayButton}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={!isFormComplete || subscribing}
+              className="flex-1 py-3 sm:py-2.5 disabled:!bg-grey-200 disabled:!text-grey-500 disabled:cursor-not-allowed"
+              onClick={handlePaymentSubmit}
+            >
+              {subscribing ? content.processingPayment : content.form.confirmPayment}
+            </Button>
+          )}
           <Button
             variant="outline"
             size="lg"

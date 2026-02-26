@@ -123,13 +123,16 @@ export interface UpdateCareerJobRequest {
 // ============================================
 
 /**
- * Payment status enum
+ * Payment status enum — matches backend API values
  */
 export enum PaymentStatus {
   Pending = 0,
-  Completed = 1,
-  Failed = 2,
-  Refunded = 3,
+  Processing = 1,
+  Initiated = 2,
+  Completed = 3,
+  Failed = 4,
+  Unknown = 5,
+  Cancelled = 6,
 }
 
 /**
@@ -137,8 +140,11 @@ export enum PaymentStatus {
  */
 export interface SubscriptionDiscount {
   id: number;
-  code: string | null;
+  title: string | null;
   discountPercentage: number;
+  endDate: string | null;
+  isActive: boolean;
+  createdAt: string | null;
 }
 
 /**
