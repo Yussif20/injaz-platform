@@ -42,9 +42,12 @@ export function SubscriptionsTab() {
     },
     paymentStatus: {
       pending: "قيد الانتظار",
+      processing: "جارٍ المعالجة",
+      initiated: "بدأ التحقق",
       completed: "مكتمل",
       failed: "فشل",
-      refunded: "مسترد",
+      unknown: "غير معروف",
+      cancelled: "ملغي",
     },
     days: "يوم",
     sar: "ر.س",
@@ -90,22 +93,26 @@ export function SubscriptionsTab() {
   };
 
   const getPaymentStatusLabel = (status: PaymentStatus | string): string => {
-    // API may return string values ("Completed") or numeric enum (1)
+    // API may return string values ("Completed") or numeric enum (3)
     const normalized =
       typeof status === "string" ? status.toLowerCase() : status;
     const stringMap: Record<string, string> = {
       pending: subsT.paymentStatus.pending,
-      processing: subsT.paymentStatus.pending,
-      initiated: subsT.paymentStatus.pending,
+      processing: subsT.paymentStatus.processing,
+      initiated: subsT.paymentStatus.initiated,
       completed: subsT.paymentStatus.completed,
       failed: subsT.paymentStatus.failed,
-      refunded: subsT.paymentStatus.refunded,
+      unknown: subsT.paymentStatus.unknown,
+      cancelled: subsT.paymentStatus.cancelled,
     };
     const numericMap: Record<number, string> = {
       0: subsT.paymentStatus.pending,
-      1: subsT.paymentStatus.completed,
-      2: subsT.paymentStatus.failed,
-      3: subsT.paymentStatus.refunded,
+      1: subsT.paymentStatus.processing,
+      2: subsT.paymentStatus.initiated,
+      3: subsT.paymentStatus.completed,
+      4: subsT.paymentStatus.failed,
+      5: subsT.paymentStatus.unknown,
+      6: subsT.paymentStatus.cancelled,
     };
     if (typeof normalized === "string") return stringMap[normalized] ?? normalized;
     return numericMap[normalized] ?? "";
@@ -122,13 +129,17 @@ export function SubscriptionsTab() {
       initiated: "warning",
       completed: "success",
       failed: "neutral",
-      refunded: "info",
+      unknown: "neutral",
+      cancelled: "neutral",
     };
     const numericMap: Record<number, "success" | "warning" | "neutral" | "info"> = {
       0: "warning",
-      1: "success",
-      2: "neutral",
-      3: "info",
+      1: "warning",
+      2: "warning",
+      3: "success",
+      4: "neutral",
+      5: "neutral",
+      6: "neutral",
     };
     if (typeof normalized === "string") return stringMap[normalized] ?? "neutral";
     return numericMap[normalized] ?? "neutral";

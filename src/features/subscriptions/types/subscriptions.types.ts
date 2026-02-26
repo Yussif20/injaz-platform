@@ -1,14 +1,18 @@
 import type { PaginatedQueryParams, PaginatedResponse } from "@/shared/types";
 
 /**
- * Payment Status Enum
- * 0 = Pending, 1 = Completed, 2 = Failed, 3 = Refunded
+ * Payment Status Enum — matches backend API values
+ * 0 = Pending, 1 = Processing, 2 = Initiated, 3 = Completed,
+ * 4 = Failed, 5 = Unknown, 6 = Cancelled
  */
 export enum PaymentStatus {
   Pending = 0,
-  Completed = 1,
-  Failed = 2,
-  Refunded = 3,
+  Processing = 1,
+  Initiated = 2,
+  Completed = 3,
+  Failed = 4,
+  Unknown = 5,
+  Cancelled = 6,
 }
 
 /**
@@ -59,6 +63,10 @@ export interface SubscriptionDto {
   isActive: boolean;
   daysRemaining: number;
   appliedDiscount: SubscriptionDiscountDto | null;
+  requires3DSecure: boolean;
+  threeDSecureUrl: string | null;
+  paymentGatewayId: string | null;
+  paymentFee: number | null;
   // Joined user info (for display)
   userName?: string;
   userPhone?: string;
@@ -86,6 +94,8 @@ export interface SubscriptionSettingsDto {
   subscriptionFee: number;
   subscriptionEndDate: string; // date-time
   activeDiscountId: number | null;
+  maxPaymentRetries: number;
+  retryLockoutMinutes: number;
   updatedAt: string; // date-time
   activeDiscount: SubscriptionDiscountDto | null;
 }
