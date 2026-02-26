@@ -20,9 +20,9 @@ const navItems = [
     labelKey: "subscriptions",
   },
   {
-    href: ROUTES.PROFILE_TYPES,
+    href: ROUTES.RANKS,
     icon: "/icons/profile-types.svg",
-    labelKey: "profileTypes",
+    labelKey: "ranks",
   },
   {
     href: ROUTES.ACADEMIC_YEARS,
