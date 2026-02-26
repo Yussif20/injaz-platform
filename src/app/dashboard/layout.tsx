@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { DashboardNavbar, DashboardSidebar } from "@/features/dashboard";
 
 export default function DashboardLayout({
@@ -15,11 +15,17 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-grey-50" dir="rtl">
-      {/* Top navbar */}
-      <DashboardNavbar
-        onMenuToggle={toggleSidebar}
-        isSidebarOpen={isSidebarOpen}
-      />
+      {/* Top navbar — wrapped in Suspense for useSearchParams() during static generation */}
+      <Suspense
+        fallback={
+          <header className="h-16 lg:h-20 border-b border-grey-200 bg-white shrink-0" />
+        }
+      >
+        <DashboardNavbar
+          onMenuToggle={toggleSidebar}
+          isSidebarOpen={isSidebarOpen}
+        />
+      </Suspense>
 
       {/* Main content area with sidebar */}
       <div className="flex">

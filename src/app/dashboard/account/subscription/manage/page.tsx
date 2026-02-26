@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -92,7 +92,7 @@ function PaymentMethodOption({
 
 // ─── Main page component ────────────────────────────────────────────────────
 
-export default function ManageSubscriptionPage() {
+function ManageSubscriptionContent() {
   const { subscription: content } = dashboardContent;
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -880,5 +880,21 @@ export default function ManageSubscriptionPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ManageSubscriptionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-3 animate-pulse">
+          <div className="bg-grey-100 rounded-xl h-12" />
+          <div className="bg-grey-100 rounded-xl h-32" />
+          <div className="bg-grey-100 rounded-xl h-24" />
+        </div>
+      }
+    >
+      <ManageSubscriptionContent />
+    </Suspense>
   );
 }

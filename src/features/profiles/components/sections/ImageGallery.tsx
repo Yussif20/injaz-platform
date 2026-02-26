@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import type { SubsectionImage } from "../../types/profile.types";
 import { dashboardContent } from "@/content";
 
