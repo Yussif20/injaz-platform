@@ -1,42 +1,74 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useForm } from "react-hook-form";
-import { Instagram, Facebook, Youtube, Phone, Mail, Copy } from "lucide-react";
+import { Instagram, Facebook, Youtube, Phone, Mail } from "lucide-react";
 import { SnapchatIcon, TikTokIcon, XIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
+import { useSocialsData, useSaveSocials } from "../hooks/useSocials";
+import type { SocialsFormData, SocialKey } from "../types/socials.types";
 
-interface SocialsFormData {
-  instagram: string;
-  snapchat: string;
-  tiktok: string;
-  x: string;
-  facebook: string;
-  phone: string;
-  email: string;
-  youtube: string;
-}
+const EMPTY_DEFAULTS: SocialsFormData = {
+  instagram: "",
+  snapchat: "",
+  tiktok: "",
+  x: "",
+  facebook: "",
+  phone: "",
+  email: "",
+  youtube: "",
+};
 
 export function SocialsForm() {
   const { t } = useTranslation();
   const socialsT = t("socials");
+  const { toast } = useToast();
 
-  const { register, handleSubmit } = useForm<SocialsFormData>({
-    defaultValues: {
-      instagram: "",
-      snapchat: "",
-      tiktok: "",
-      x: "",
-      facebook: "",
-      phone: "",
-      email: "",
-      youtube: "",
-    },
+  const { data: socialsData, isLoading } = useSocialsData();
+  const saveSocials = useSaveSocials();
+
+  const { register, handleSubmit, reset } = useForm<SocialsFormData>({
+    defaultValues: EMPTY_DEFAULTS,
   });
 
+  // Populate form when API data loads
+  useEffect(() => {
+    if (socialsData) {
+      const mapped = { ...EMPTY_DEFAULTS };
+      for (const param of socialsData) {
+        const key = param.key as SocialKey;
+        if (key in mapped) {
+          mapped[key] = param.value ?? "";
+        }
+      }
+      reset(mapped);
+    }
+  }, [socialsData, reset]);
+
   const onSubmit = (data: SocialsFormData) => {
-    console.log("Socials form data:", data);
+    saveSocials.mutate(
+      { formData: data, existing: socialsData ?? [] },
+      {
+        onSuccess: () => {
+          toast({ type: "success", message: "تم حفظ وسائل التواصل بنجاح" });
+        },
+        onError: (error) => {
+          toast({ type: "error", message: getErrorMessage(error) });
+        },
+      },
+    );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -114,6 +146,7 @@ export function SocialsForm() {
         <div className="mt-8">
           <Button
             type="submit"
+            loading={saveSocials.isPending}
             className="w-full font-light! rounded-[20px]!"
             size="lg"
           >

@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { proxyApi, clientApi } from "@/shared/lib/api";
 
 let interceptorAttached = false;
 
+/**
+ * On 401: try refresh, then retry. If refresh fails, clear all cached data
+ * and redirect to login so the user never sees the dashboard with stale/false data.
+ */
 export function ApiInterceptorSetup() {
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     if (interceptorAttached) return;
     interceptorAttached = true;
@@ -48,6 +55,8 @@ export function ApiInterceptorSetup() {
           return proxyApi(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError);
+          // Clear all cached data so dashboard never shows stale data after 401
+          queryClient.clear();
           window.location.href = "/login";
           return Promise.reject(refreshError);
         } finally {
@@ -55,7 +64,7 @@ export function ApiInterceptorSetup() {
         }
       },
     );
-  }, []);
+  }, [queryClient]);
 
   return null;
 }

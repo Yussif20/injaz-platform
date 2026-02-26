@@ -3,35 +3,55 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/shared/components/ui";
-import { mockTermsContent } from "../data/terms.mock";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
+import { useTermsContent, useSaveTerms } from "../hooks/useTerms";
 import { EditorToolbar } from "./EditorToolbar";
 import { PreviewModal } from "./PreviewModal";
 
 export function TermsContent() {
   const { t } = useTranslation();
   const termsT = t("terms") as any;
+  const { toast } = useToast();
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
 
-  // Set initial content once on mount (not via dangerouslySetInnerHTML to avoid React overwriting user edits)
+  const { data, isLoading } = useTermsContent();
+  const saveTerms = useSaveTerms();
+
+  // Populate editor once data loads (not via dangerouslySetInnerHTML to avoid React overwriting user edits)
   useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = mockTermsContent;
+    if (data && editorRef.current) {
+      editorRef.current.innerHTML = data.content;
     }
-  }, []);
+  }, [data]);
 
   const handleSave = () => {
     const html = editorRef.current?.innerHTML ?? "";
-    console.log("Terms saved:", html);
-    // TODO: POST to API
+    saveTerms.mutate(html, {
+      onSuccess: () => {
+        toast({ type: "success", message: "تم حفظ الشروط والأحكام بنجاح" });
+      },
+      onError: (error) => {
+        toast({ type: "error", message: getErrorMessage(error) });
+      },
+    });
   };
 
   const handlePreview = () => {
     setPreviewHtml(editorRef.current?.innerHTML ?? "");
     setIsPreviewOpen(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -70,6 +90,7 @@ export function TermsContent() {
         <Button
           size="lg"
           onClick={handleSave}
+          loading={saveTerms.isPending}
           className="w-full rounded-[20px]! font-light!"
         >
           {termsT.save}

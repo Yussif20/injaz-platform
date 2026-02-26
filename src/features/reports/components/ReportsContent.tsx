@@ -64,6 +64,19 @@ export function ReportsContent() {
     },
   ] as const;
 
+  // Don't show stat cards with placeholder zeros when there was an error (e.g. 401)
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-grey-200 bg-white p-8 text-center">
+          <p className="text-grey-600">
+            {reportsT.error}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Stat Cards */}

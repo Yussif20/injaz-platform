@@ -2,10 +2,38 @@
 
 import { Star, Check, Trash2, User } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
-import type { Review } from "../data/reviews.mock";
+import type { ReviewDto } from "../types/reviews.types";
+
+const STORAGE_BASE_URL =
+  process.env.NEXT_PUBLIC_STORAGE_URL ||
+  "https://enjazmo3alem-staging.s3.us-east-005.backblazeb2.com";
+
+const API_BASE_URL = "https://staging.enjazfile.com";
+
+function normalizePhotoUrl(path: string | null | undefined): string | null {
+  if (!path || path.trim() === "") return null;
+  // Already a full URL — use as-is
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  // Strip any accidental leading slash before checking prefix
+  const clean = path.startsWith("/") ? path.slice(1) : path;
+  if (clean.startsWith("uploads/")) return `${STORAGE_BASE_URL}/${clean}`;
+  return `${API_BASE_URL}/${clean}`;
+}
+
+/**
+ * Resolves the best available photo URL from a ReviewDto.
+ * Tries publicUrl first (backend-constructed full URL),
+ * then falls back to normalizing reviewerPhotoPath.
+ */
+function resolveAvatarUrl(
+  publicUrl: string | null,
+  photoPath: string | null,
+): string | null {
+  return normalizePhotoUrl(publicUrl) ?? normalizePhotoUrl(photoPath);
+}
 
 interface ReviewCardProps {
-  review: Review;
+  review: ReviewDto;
   onTogglePublish: (id: number) => void;
   onDelete: (id: number) => void;
 }
@@ -18,6 +46,11 @@ export function ReviewCard({
   const { t } = useTranslation();
   const reviewsT = t("reviews") as any;
 
+  const avatarUrl = resolveAvatarUrl(review.publicUrl, review.reviewerPhotoPath);
+  const daysAgo = Math.floor(
+    (Date.now() - new Date(review.createdAt).getTime()) / 86400000,
+  );
+
   return (
     <div className="border-b border-grey-200 px-6 py-5 last:border-b-0">
       {/* Header: user info + rating */}
@@ -25,10 +58,10 @@ export function ReviewCard({
         {/* User info (right side in RTL) */}
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-grey-100">
-            {review.avatar ? (
+            {avatarUrl ? (
               <img
-                src={review.avatar}
-                alt={review.clientName}
+                src={avatarUrl}
+                alt={review.reviewerName ?? ""}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -37,9 +70,9 @@ export function ReviewCard({
           </div>
           <div>
             <h4 className="text-sm font-medium text-text-dark">
-              {review.clientName}
+              {review.reviewerName ?? ""}
             </h4>
-            <p className="text-xs text-grey-400">{review.jobTitle}</p>
+            <p className="text-xs text-grey-400">{review.reviewerJobTitle ?? ""}</p>
           </div>
         </div>
 
@@ -63,14 +96,14 @@ export function ReviewCard({
             </span>
           </div>
           <p className="mt-0.5 text-xs text-grey-400">
-            {reviewsT.daysAgo} {review.daysAgo} {reviewsT.days}
+            {reviewsT.daysAgo} {daysAgo} {reviewsT.days}
           </p>
         </div>
       </div>
 
       {/* Review content */}
       <p className="mt-4 text-sm leading-relaxed text-text-dark">
-        {review.content}
+        {review.content ?? ""}
       </p>
 
       {/* Actions: publish/unpublish + delete */}
@@ -86,25 +119,25 @@ export function ReviewCard({
         {/* Publish / Unpublish buttons (right in RTL) */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => !review.isPublished && onTogglePublish(review.id)}
+            onClick={() => review.isActive && onTogglePublish(review.id)}
             className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm transition-colors ${
-              !review.isPublished
+              !review.isActive
                 ? "border-primary-500 text-primary-500"
                 : "border-grey-200 text-grey-400 hover:border-grey-300"
             }`}
           >
-            {!review.isPublished && <Check className="h-4 w-4" />}
+            {!review.isActive && <Check className="h-4 w-4" />}
             {reviewsT.unpublish}
           </button>
           <button
-            onClick={() => review.isPublished || onTogglePublish(review.id)}
+            onClick={() => !review.isActive && onTogglePublish(review.id)}
             className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm transition-colors ${
-              review.isPublished
+              review.isActive
                 ? "border-primary-500 bg-primary-500 text-white"
                 : "border-primary-500 bg-primary-500 text-white opacity-80 hover:opacity-100"
             }`}
           >
-            {review.isPublished && <Check className="h-4 w-4" />}
+            {review.isActive && <Check className="h-4 w-4" />}
             {reviewsT.publish}
           </button>
         </div>

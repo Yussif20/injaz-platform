@@ -4,32 +4,64 @@ import { useState } from "react";
 import { Plus, Calendar, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/shared/components/ui";
-import { mockReviews, type Review } from "../data/reviews.mock";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { ReviewCard } from "./ReviewCard";
 import { AddReviewModal } from "./AddReviewModal";
 import { Pagination } from "./Pagination";
+import { useReviews, useUpdateReview, useDeleteReview } from "../hooks/useReviews";
+
+const PAGE_SIZE = 10;
 
 export function ReviewsContent() {
   const { t } = useTranslation();
   const reviewsT = t("reviews") as any;
+  const { toast } = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [reviews, setReviews] = useState<Review[]>(mockReviews);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = 7; // Mock total for pagination display
+  const { data: reviews = [], isLoading } = useReviews();
+  const updateReview = useUpdateReview();
+  const deleteReview = useDeleteReview();
+
+  const totalPages = Math.ceil(reviews.length / PAGE_SIZE);
+  const paginatedReviews = reviews.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+  const isEmpty = reviews.length === 0;
 
   const handleTogglePublish = (id: number) => {
-    setReviews((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, isPublished: !r.isPublished } : r)),
+    const review = reviews.find((r) => r.id === id);
+    if (!review) return;
+    updateReview.mutate(
+      { id, data: { isActive: !review.isActive } },
+      {
+        onSuccess: () =>
+          toast({ type: "success", message: "تم تحديث حالة التقييم" }),
+        onError: (err) =>
+          toast({ type: "error", message: getErrorMessage(err) }),
+      },
     );
   };
 
   const handleDelete = (id: number) => {
-    setReviews((prev) => prev.filter((r) => r.id !== id));
+    deleteReview.mutate(id, {
+      onSuccess: () =>
+        toast({ type: "delete", message: "تم حذف التقييم" }),
+      onError: (err) =>
+        toast({ type: "error", message: getErrorMessage(err) }),
+    });
   };
 
-  const isEmpty = reviews.length === 0;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -57,7 +89,6 @@ export function ReviewsContent() {
       {isEmpty ? (
         /* Empty state */
         <div className="flex flex-col items-center justify-center py-16">
-          {/* Illustration placeholder */}
           <div className="mb-6">
             <EmptyIllustration />
           </div>
@@ -76,7 +107,7 @@ export function ReviewsContent() {
       ) : (
         /* Reviews list */
         <div className="rounded-2xl border border-grey-200 bg-white">
-          {reviews.map((review) => (
+          {paginatedReviews.map((review) => (
             <ReviewCard
               key={review.id}
               review={review}
@@ -87,12 +118,14 @@ export function ReviewsContent() {
         </div>
       )}
 
-      {/* Pagination (always visible as per design) */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Add Review Modal */}
       <AddReviewModal
@@ -136,7 +169,7 @@ function EmptyIllustration() {
       <rect x="125" y="68" width="40" height="3" rx="1.5" fill="#e5e7eb" />
       {/* Stars on card 2 */}
       <g transform="translate(125, 80)">
-        <polygon points="5,0 6.5,3 10,3.5 7.5,6 8,9.5 5,8 2,9.5 2.5,6 0,3.5 3.5,3" fill="#fbbf24" />
+        <polygon points="5,0 6.5,3 10,3.5 7.5,6 8,9.5 5,8 2,9.5 2.5,6 10,3.5 13.5,3" fill="#fbbf24" />
         <polygon points="15,0 16.5,3 20,3.5 17.5,6 18,9.5 15,8 12,9.5 12.5,6 10,3.5 13.5,3" fill="#fbbf24" />
         <polygon points="25,0 26.5,3 30,3.5 27.5,6 28,9.5 25,8 22,9.5 22.5,6 20,3.5 23.5,3" fill="#fbbf24" />
         <polygon points="35,0 36.5,3 40,3.5 37.5,6 38,9.5 35,8 32,9.5 32.5,6 30,3.5 33.5,3" fill="#fbbf24" />

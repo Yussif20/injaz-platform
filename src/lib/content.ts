@@ -178,6 +178,8 @@ export const content = {
       },
     },
     reports: {
+      error:
+        "فشل تحميل التقرير. يرجى تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
       stats: {
         totalProfits: "إجمالي الأرباح",
         newUsers: "عدد المستخدمين الجدد",
@@ -405,6 +407,8 @@ export const content = {
       },
     },
     reports: {
+      error:
+        "Failed to load report. Please refresh the page or sign in again.",
       stats: {
         totalProfits: "Total Profits",
         newUsers: "New Users",

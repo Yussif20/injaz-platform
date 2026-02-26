@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { X, Plus, Star, Upload, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
+import { useCreateReview, useUploadReviewerPhoto } from "../hooks/useReviews";
 
 interface AddReviewModalProps {
   isOpen: boolean;
@@ -14,12 +17,21 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
   const { t } = useTranslation();
   const modalT = (t("reviews") as any).modal;
   const jobTitlesT = (t("reviews") as any).jobTitles;
+  const { toast } = useToast();
 
   const [rating, setRating] = useState(4);
   const [hoveredStar, setHoveredStar] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
   const [jobTitleOpen, setJobTitleOpen] = useState(false);
+  const [clientName, setClientName] = useState("");
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const createReview = useCreateReview();
+  const uploadPhoto = useUploadReviewerPhoto();
 
   if (!isOpen) return null;
 
@@ -29,16 +41,75 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
     { value: "advancedTeacher", label: jobTitlesT.advancedTeacher },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Add review submitted");
+  const selectedJobTitleLabel =
+    jobTitleOptions.find((o) => o.value === selectedJobTitle)?.label ??
+    selectedJobTitle;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleClose = () => {
+    setClientName("");
+    setSelectedJobTitle("");
+    setContent("");
+    setRating(4);
+    setImageFile(null);
+    setImagePreview(null);
+    setShowLogo(false);
     onClose();
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    createReview.mutate(
+      {
+        reviewerName: clientName,
+        reviewerJobTitle: selectedJobTitleLabel,
+        content,
+        rating,
+      },
+      {
+        onSuccess: (newReview) => {
+          if (imageFile && !showLogo) {
+            uploadPhoto.mutate(
+              { id: newReview.id, file: imageFile },
+              {
+                onSuccess: () => {
+                  toast({ type: "success", message: "تمت إضافة التقييم بنجاح" });
+                  handleClose();
+                },
+                onError: (err) => {
+                  // Review created but photo failed — close anyway, show partial success
+                  toast({ type: "error", message: getErrorMessage(err) });
+                  handleClose();
+                },
+              },
+            );
+          } else {
+            toast({ type: "success", message: "تمت إضافة التقييم بنجاح" });
+            handleClose();
+          }
+        },
+        onError: (err) => {
+          toast({ type: "error", message: getErrorMessage(err) });
+        },
+      },
+    );
+  };
+
+  const isPending = createReview.isPending || uploadPhoto.isPending;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
@@ -50,7 +121,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
             {modalT.title}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg p-1 text-grey-400 hover:bg-grey-100"
           >
             <X className="h-5 w-5" />
@@ -65,6 +136,9 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               {modalT.clientName}
             </label>
             <input
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              required
               className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
               placeholder={modalT.clientNamePlaceholder}
             />
@@ -83,7 +157,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               >
                 <span className={selectedJobTitle ? "text-text-dark" : "text-text-muted"}>
                   {selectedJobTitle
-                    ? jobTitleOptions.find((o) => o.value === selectedJobTitle)?.label
+                    ? selectedJobTitleLabel
                     : modalT.jobTitlePlaceholder}
                 </span>
                 <ChevronDown className="h-4 w-4 text-grey-400" />
@@ -115,6 +189,9 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
             </label>
             <textarea
               rows={4}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
               className="w-full resize-none rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
               placeholder={modalT.contentPlaceholder}
             />
@@ -151,31 +228,55 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
             </div>
           </div>
 
-          {/* Client Image Upload */}
-          <div>
+          {/* Client Image Upload — hidden when showLogo is on */}
+          {!showLogo && <div>
             <label className="mb-2 block text-sm font-medium text-text-dark">
               {modalT.clientImage}
             </label>
-            <div className="rounded-lg border border-dashed border-grey-300 bg-[#f6f6f6] px-6 py-6 text-center">
-              <Upload className="mx-auto h-6 w-6 text-grey-400" />
-              <p className="mt-2 text-xs text-grey-400">
-                {modalT.imageMaxSize}
-              </p>
-              <button
-                type="button"
-                className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700"
-              >
-                <Upload className="h-4 w-4" />
-                {modalT.uploadImage}
-              </button>
+            <div
+              className="cursor-pointer rounded-lg border border-dashed border-grey-300 bg-[#f6f6f6] px-6 py-6 text-center"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="preview"
+                  className="mx-auto h-20 w-20 rounded-full object-cover"
+                />
+              ) : (
+                <>
+                  <Upload className="mx-auto h-6 w-6 text-grey-400" />
+                  <p className="mt-2 text-xs text-grey-400">
+                    {modalT.imageMaxSize}
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700">
+                    <Upload className="h-4 w-4" />
+                    {modalT.uploadImage}
+                  </span>
+                </>
+              )}
             </div>
-          </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>}
 
           {/* Show Site Logo Toggle */}
           <div className="flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setShowLogo(!showLogo)}
+              onClick={() => {
+                const next = !showLogo;
+                setShowLogo(next);
+                if (next) {
+                  setImageFile(null);
+                  setImagePreview(null);
+                }
+              }}
               className={`relative h-6 w-11 rounded-full transition-colors ${
                 showLogo ? "bg-primary-500" : "bg-grey-300"
               }`}
@@ -196,6 +297,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
             type="submit"
             className="w-full rounded-[20px]! font-light!"
             size="lg"
+            loading={isPending}
           >
             <Plus className="h-5 w-5" />
             {modalT.add}

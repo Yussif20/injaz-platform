@@ -23,6 +23,7 @@ export const queryKeys = {
   subscriptionSettings: createKeys("subscriptionSettings"),
   profiles: createKeys("profiles"),
   systemParameters: createKeys("systemParameters"),
+  reviews: createKeys("reviews"),
   reports: {
     all: () => ["reports"] as const,
     stats: () => ["reports", "stats"] as const,

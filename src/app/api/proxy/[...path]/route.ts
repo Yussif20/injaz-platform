@@ -18,18 +18,34 @@ async function proxyRequest(request: NextRequest, context: RouteContext) {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAMES.AUTH_TOKEN)?.value;
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const incomingContentType = request.headers.get("content-type") ?? "";
+  const isMultipart = incomingContentType.includes("multipart/form-data");
+
+  const headers: Record<string, string> = {};
+  if (!isMultipart) {
+    headers["Content-Type"] = "application/json";
+  }
+  // For multipart: do NOT set Content-Type — let Node.js fetch set it with the
+  // correct boundary when we pass a FormData body below.
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
   // Read body for non-GET requests
-  let body: string | undefined;
+  let body: string | FormData | undefined;
   if (request.method !== "GET" && request.method !== "DELETE") {
     try {
-      body = await request.text();
+      if (isMultipart) {
+        // Re-create FormData so Node.js fetch can attach its own boundary
+        const incoming = await request.formData();
+        const outgoing = new FormData();
+        for (const [key, value] of incoming.entries()) {
+          outgoing.append(key, value);
+        }
+        body = outgoing;
+      } else {
+        body = await request.text();
+      }
     } catch {
       // no body
     }

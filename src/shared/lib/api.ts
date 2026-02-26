@@ -119,10 +119,18 @@ export const API_ENDPOINTS = {
     BY_KEY: (key: string) => `SystemParameters/key/${key}`,
     BY_CATEGORY: (category: string) => `SystemParameters/category/${category}`,
     FILTERED: "SystemParameters/filtered",
+    TERMS_AND_CONDITIONS: "SystemParameters/terms-and-conditions",
   },
   SHARE_LINKS: {
     BASE: "ShareLinks",
     BY_PROFILE: (profileId: number) => `ShareLinks/profile/${profileId}`,
     BY_ID: (id: number) => `ShareLinks/${id}`,
+  },
+  REVIEWS: {
+    BASE: "Reviews",
+    BY_ID: (id: number) => `Reviews/${id}`,
+    ACTIVE: "Reviews/active",
+    PHOTO: (id: number) => `Reviews/${id}/photo`,
+    PERMANENT_DELETE: (id: number) => `Reviews/${id}/permanent`,
   },
 } as const;
