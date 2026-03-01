@@ -18,6 +18,7 @@ import type { SubsectionImage } from "@/features/profiles/types/profile.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { Button, ConfirmModal } from "@/shared/components/ui";
+import { saveDraft } from "@/features/profiles/services/profiles.service";
 
 export default function ProfileSectionsPage() {
   const params = useParams();
@@ -46,6 +47,10 @@ export default function ProfileSectionsPage() {
   // Delete Confirmation Modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<SubsectionImage | null>(null);
+
+  // Save as Draft state
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [saveDraftError, setSaveDraftError] = useState<string | null>(null);
 
   // Add Evidence Handlers
   const handleAddEvidence = (subsectionId: number) => {
@@ -148,8 +153,21 @@ export default function ProfileSectionsPage() {
   };
 
   // Page Actions
-  const handleSaveAsDraft = () => {
-    router.push(ROUTES.DASHBOARD);
+  const handleSaveAsDraft = async () => {
+    setSaveDraftError(null);
+    setIsSavingDraft(true);
+    try {
+      const result = await saveDraft(Number(profileId));
+      if (result.status) {
+        router.push(ROUTES.DASHBOARD);
+      } else {
+        setSaveDraftError(result.message);
+      }
+    } catch {
+      setSaveDraftError("حدث خطأ أثناء الحفظ");
+    } finally {
+      setIsSavingDraft(false);
+    }
   };
 
   const handlePreviewFile = () => {
@@ -205,21 +223,27 @@ export default function ProfileSectionsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handlePreviewFile}
-            className="!w-auto px-6"
-          >
-            {sectionsPage.previewFile}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSaveAsDraft}
-            className="!w-auto px-6"
-          >
-            {sectionsPage.saveAsDraft}
-          </Button>
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={handlePreviewFile}
+              className="!w-auto px-6"
+            >
+              {sectionsPage.previewFile}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSaveAsDraft}
+              disabled={isSavingDraft}
+              className="!w-auto px-6"
+            >
+              {isSavingDraft ? "جاري الحفظ..." : sectionsPage.saveAsDraft}
+            </Button>
+          </div>
+          {saveDraftError && (
+            <p className="text-sm text-warning-500">{saveDraftError}</p>
+          )}
         </div>
       </div>
 

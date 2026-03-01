@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAccessToken } from "@/shared/lib/cookies";
-import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
+import { BACKEND_API_URL, serverApi, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
 import type { ProfileImage } from "@/features/profiles/types/image.types";
 
@@ -51,36 +51,42 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         const backendFormData = new FormData();
         backendFormData.append("file", imageFile);
 
-        const response = await serverApi.put<ApiResponse<ProfileImage>>(
-          `${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
-          backendFormData,
+        // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
+        // Axios can throw when serialising native File objects in Node.js; fetch does not.
+        // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
+        const fetchResponse = await fetch(
+          `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
           {
+            method: "PUT",
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
+            body: backendFormData,
           }
         );
 
-        if (isApiSuccess(response.data.status)) {
+        const responseData = (await fetchResponse.json()) as ApiResponse<ProfileImage>;
+
+        if (isApiSuccess(responseData.status)) {
           return NextResponse.json({
             status: "Success",
-            message: response.data.message || "تم تحديث الصورة بنجاح",
-            data: response.data.data,
+            message: responseData.message || "تم تحديث الصورة بنجاح",
+            data: responseData.data,
           });
         }
 
         return NextResponse.json(
           {
             status: "Failure",
-            message: response.data.message || "فشل في تحديث الصورة",
-            errors: response.data.errors,
+            message: responseData.message || "فشل في تحديث الصورة",
+            errors: responseData.errors,
           },
-          { status: 400 }
+          { status: fetchResponse.ok ? 400 : fetchResponse.status }
         );
       }
     }
 
-    // No file, just update metadata
+    // No file — just update metadata via JSON
     const response = await serverApi.put<ApiResponse<ProfileImage>>(
       `${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
       null,

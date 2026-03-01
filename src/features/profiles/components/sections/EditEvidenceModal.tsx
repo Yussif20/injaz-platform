@@ -29,7 +29,7 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
   const [imageTitle, setImageTitle] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [errors, setErrors] = useState<{ title?: string }>({});
+  const [errors, setErrors] = useState<{ title?: string; image?: string }>({});
 
   // Initialize form with existing image data when modal opens
   useEffect(() => {
@@ -94,11 +94,13 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (1GB limit)
-      const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
+      // Check file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
+        setErrors((prev) => ({ ...prev, image: "حجم الصورة يتجاوز الحد المسموح" }));
         return;
       }
+      setErrors((prev) => ({ ...prev, image: undefined }));
 
       setSelectedImage(file);
 
@@ -293,6 +295,10 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
               </svg>
               <span>{addEvidenceModal.changeImage}</span>
             </button>
+          )}
+
+          {errors.image && (
+            <p className="mt-1 text-sm text-warning-500 text-center">{errors.image}</p>
           )}
         </div>
 

@@ -6,6 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent } from "@/content";
 import { Button, DatePicker, Input } from "@/shared/components/ui";
+import {
+  hijriValueToGregorianISO,
+  gregorianISOToHijriDisplay,
+  gregorianISOToGregorianDisplay,
+} from "@/shared/lib/hijri-utils";
 import { DataCard } from "./DataCard";
 import { useMyProfile, useUpdatePersonalInfo } from "../hooks";
 import type { UpdatePersonalInfoRequest } from "../types/me.types";
@@ -75,13 +80,25 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
     }
   }, [personalInfo, reset]);
 
+  // Resolve form value (Gregorian or H-prefixed Hijri) to plain Gregorian ISO for display/submit
+  const resolveGregorianISO = (val: string): string =>
+    val.startsWith("H") ? hijriValueToGregorianISO(val) : val;
+
+  const formatBirthDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return "-";
+    const iso = dateString.split("T")[0];
+    const gregorian = gregorianISOToGregorianDisplay(iso);
+    const hijri = gregorianISOToHijriDisplay(iso);
+    return `${gregorian}  •  ${hijri}`;
+  };
+
   const handleSave = async (data: MyDataFormData) => {
     setError(null);
     try {
       const requestData: UpdatePersonalInfoRequest = {
         nationalId: data.nationalId,
         address: data.address,
-        birthDate: data.birthDate,
+        birthDate: resolveGregorianISO(data.birthDate), // always Gregorian to backend
         email: data.email || undefined,
       };
 
@@ -94,20 +111,6 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
     } catch (err) {
       console.error("Failed to save:", err);
       setError("حدث خطأ غير متوقع");
-    }
-  };
-
-  const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return "-";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("ar-SA", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString;
     }
   };
 
@@ -159,6 +162,16 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
               }
               error={errors.birthDate?.message}
             />
+            {watch("birthDate") && (() => {
+              const iso = resolveGregorianISO(watch("birthDate"));
+              return (
+                <div className="flex items-center gap-2 text-sm text-grey-500 mt-1 text-right">
+                  <span>{gregorianISOToGregorianDisplay(iso)}</span>
+                  <span className="text-grey-300">|</span>
+                  <span>{gregorianISOToHijriDisplay(iso)}</span>
+                </div>
+              );
+            })()}
             <Input
               label={profileData.fields.workEmail}
               type="email"
@@ -228,7 +241,7 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
             <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
             <DataCard
               label={profileData.fields.birthDate}
-              value={formatDate(personalInfo?.birthDate)}
+              value={formatBirthDate(personalInfo?.birthDate)}
             />
           </div>
           <div className="flex items-center gap-3">

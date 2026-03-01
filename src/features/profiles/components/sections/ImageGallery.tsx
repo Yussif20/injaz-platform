@@ -4,6 +4,15 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import type { SubsectionImage } from "../../types/profile.types";
 import { dashboardContent } from "@/content";
+import { PUBLIC_STORAGE_BASE_URL, PUBLIC_API_BASE_URL } from "@/shared/lib/api";
+
+function resolveImageUrl(image: SubsectionImage): string | null {
+  if (image.publicUrl) return image.publicUrl;
+  if (!image.imagePath) return null;
+  const path = image.imagePath.replace(/^\//, "");
+  const base = path.startsWith("uploads/") ? PUBLIC_STORAGE_BASE_URL : PUBLIC_API_BASE_URL;
+  return `${base.replace(/\/$/, "")}/${path}`;
+}
 
 interface ImageGalleryProps {
   images: SubsectionImage[];
@@ -19,6 +28,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   onDeleteImage,
 }) => {
   const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { imageActions } = dashboardContent;
@@ -57,7 +67,9 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
     }
   };
 
-  const toggleMenu = (imageId: number) => {
+  const toggleMenu = (imageId: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMenuPos({ top: rect.bottom + 4, left: rect.left - 80 });
     setActiveMenuId(activeMenuId === imageId ? null : imageId);
   };
 
@@ -112,9 +124,9 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             {image ? (
               <>
                 {/* Image */}
-                {image.publicUrl ? (
+                {resolveImageUrl(image) ? (
                   <img
-                    src={image.publicUrl}
+                    src={resolveImageUrl(image)!}
                     alt={image.description || "صورة الشاهد"}
                     className="w-full h-full object-cover"
                   />
@@ -125,7 +137,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                 {/* Three-dot Menu Button */}
                 <button
                   type="button"
-                  onClick={() => toggleMenu(image.id)}
+                  onClick={(e) => toggleMenu(image.id, e)}
                   className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center rounded-full bg-primary-500 text-white hover:bg-primary-800 transition-colors z-10"
                 >
                   <svg
@@ -138,10 +150,11 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                 </button>
 
                 {/* Dropdown Menu */}
-                {activeMenuId === image.id && (
+                {activeMenuId === image.id && menuPos && (
                   <div
                     ref={menuRef}
-                    className="absolute top-8 right-1 bg-white rounded-lg shadow-lg border border-grey-200 py-1 z-20 min-w-28"
+                    style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+                    className="z-[9999] bg-white rounded-lg shadow-lg border border-grey-200 py-1 min-w-28"
                   >
                     <button
                       type="button"

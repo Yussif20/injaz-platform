@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAccessToken } from "@/shared/lib/cookies";
-import { serverApi, API_ENDPOINTS } from "@/shared/lib/api";
+import { BACKEND_API_URL, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
 import type { ProfileImage } from "@/features/profiles/types/image.types";
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create backend form data
+    // Re-create FormData for the backend request
     const backendFormData = new FormData();
     backendFormData.append("file", imageFile);
 
@@ -56,54 +56,40 @@ export async function POST(request: NextRequest) {
     if (description) backendParams.append("description", description);
     if (displayOrder) backendParams.append("displayOrder", displayOrder);
 
-    const response = await serverApi.post<ApiResponse<ProfileImage>>(
-      `${API_ENDPOINTS.IMAGES_UPLOAD}?${backendParams.toString()}`,
-      backendFormData,
+    // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
+    // Axios can throw when serialising native File objects in Node.js; fetch does not.
+    // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
+    const fetchResponse = await fetch(
+      `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES_UPLOAD}?${backendParams.toString()}`,
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        body: backendFormData,
       }
     );
 
-    if (isApiSuccess(response.data.status)) {
+    const responseData = (await fetchResponse.json()) as ApiResponse<ProfileImage>;
+
+    if (isApiSuccess(responseData.status)) {
       return NextResponse.json({
         status: "Success",
-        message: response.data.message || "تم رفع الصورة بنجاح",
-        data: response.data.data,
+        message: responseData.message || "تم رفع الصورة بنجاح",
+        data: responseData.data,
       });
     }
 
     return NextResponse.json(
       {
         status: "Failure",
-        message: response.data.message || "فشل في رفع الصورة",
-        errors: response.data.errors,
+        message: responseData.message || "فشل في رفع الصورة",
+        errors: responseData.errors,
       },
-      { status: 400 }
+      { status: fetchResponse.ok ? 400 : fetchResponse.status }
     );
   } catch (error) {
     console.error("Upload image error:", error);
-
-    if (error && typeof error === "object" && "response" in error) {
-      const axiosError = error as {
-        response?: {
-          data?: ApiResponse<null>;
-          status?: number;
-        };
-      };
-      const errorData = axiosError.response?.data;
-      const statusCode = axiosError.response?.status || 500;
-
-      return NextResponse.json(
-        {
-          status: "Failure",
-          message: errorData?.message || "فشل في رفع الصورة",
-          errors: errorData?.errors || null,
-        },
-        { status: statusCode }
-      );
-    }
 
     return NextResponse.json(
       { status: "Failure", message: "حدث خطأ غير متوقع", data: null },

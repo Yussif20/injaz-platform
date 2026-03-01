@@ -81,8 +81,8 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (1GB limit)
-      const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
+      // Check file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
         setErrors((prev) => ({ ...prev, image: "حجم الصورة يتجاوز الحد المسموح" }));
         return;

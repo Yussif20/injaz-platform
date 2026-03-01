@@ -221,7 +221,7 @@ export const dashboardContent = {
     title: "بيانات الشاهد",
     imageTitleLabel: "عنوان الصورة",
     imageTitlePlaceholder: "ادخل وصف مناسب للصورة",
-    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 ميجا",
+    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 5 ميجا",
     uploadImage: "تحميل الصورة",
     submitButton: "اضافة الشاهد",
     changeImage: "تغيير الصورة",

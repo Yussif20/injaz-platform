@@ -122,7 +122,7 @@ export const Footer = async () => {
                   {footer.links.subscribe}
                 </Link>
                 <Link
-                  href="/profiles/new"
+                  href="/sign/up"
                   className="font-normal hover:text-primary-300 transition-colors"
                 >
                   {footer.links.createProfile}

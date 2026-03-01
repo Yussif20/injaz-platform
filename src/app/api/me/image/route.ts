@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 import { getAccessToken } from "@/shared/lib/cookies";
 import { BACKEND_API_URL, API_ENDPOINTS } from "@/shared/lib/api";
 import { isApiSuccess, type ApiResponse } from "@/features/auth/types/auth.types";
@@ -39,61 +38,40 @@ export async function POST(request: NextRequest) {
     const backendFormData = new FormData();
     backendFormData.append("file", imageFile);
 
-    // Use axios.post directly without default Content-Type so the request is sent as
-    // multipart/form-data with boundary. serverApi has Content-Type: application/json
-    // which causes the backend to return 415 Unsupported Media Type.
-    const response = await axios.post<ApiResponse<ImageUploadResponse>>(
+    // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
+    // Axios can throw when serialising native File objects in Node.js; fetch does not.
+    // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
+    const fetchResponse = await fetch(
       `${BACKEND_API_URL}${API_ENDPOINTS.MY_IMAGE}`,
-      backendFormData,
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-        timeout: 30000,
+        body: backendFormData,
       }
     );
 
-    if (isApiSuccess(response.data.status)) {
+    const responseData = (await fetchResponse.json()) as ApiResponse<ImageUploadResponse>;
+
+    if (isApiSuccess(responseData.status)) {
       return NextResponse.json({
         status: true,
-        message: response.data.message || "تم رفع الصورة بنجاح",
-        data: response.data.data,
+        message: responseData.message || "تم رفع الصورة بنجاح",
+        data: responseData.data,
       });
     }
 
     return NextResponse.json(
       {
         status: false,
-        message: response.data.message || "فشل في رفع الصورة",
-        errors: response.data.errors,
+        message: responseData.message || "فشل في رفع الصورة",
+        errors: responseData.errors,
       },
-      { status: 400 }
+      { status: fetchResponse.ok ? 400 : fetchResponse.status }
     );
   } catch (error) {
     console.error("Upload image error:", error);
-
-    // Handle axios errors - extract backend error message
-    if (error && typeof error === "object" && "response" in error) {
-      const axiosError = error as {
-        response?: {
-          data?: ApiResponse<null>;
-          status?: number;
-        }
-      };
-      const errorData = axiosError.response?.data;
-      const statusCode = axiosError.response?.status || 500;
-
-      console.error("Backend response:", errorData);
-
-      return NextResponse.json(
-        {
-          status: false,
-          message: errorData?.message || "فشل في رفع الصورة",
-          errors: errorData?.errors || null,
-        },
-        { status: statusCode }
-      );
-    }
 
     return NextResponse.json(
       { status: false, message: "حدث خطأ غير متوقع", data: null },

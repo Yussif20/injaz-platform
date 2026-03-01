@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui";
 import { commonContent } from "@/content";
+import { ROUTES } from "@/config";
 
 export const Navbar = () => {
   const { nav } = commonContent;
@@ -18,7 +19,7 @@ export const Navbar = () => {
   const navLinks = [
     { href: "/", label: nav.home },
     { href: "/download", label: nav.downloadApp },
-    { href: "/profiles/new", label: nav.createProfile },
+    { href: ROUTES.SIGN_UP, label: nav.createProfile },
     { href: "/how-to-use", label: nav.howToUse },
   ];
 
