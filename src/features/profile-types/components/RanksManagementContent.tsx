@@ -7,12 +7,11 @@ import {
   useProfileTypes,
   useProfileTypeWithSections,
   useDeleteSection,
-  useDeleteSubsection,
+  useDuplicateProfileType,
 } from "../hooks";
-import type { SectionDto, SubsectionDto } from "../types/profile-types.types";
+import type { SectionDto } from "../types/profile-types.types";
 import { AddProfileTypeModal } from "./AddProfileTypeModal";
 import { AddSectionModal } from "./AddSectionModal";
-import { AddSubsectionModal } from "./AddSubsectionModal";
 import { ProfileTypeTabs } from "./ProfileTypeTabs";
 import { SectionItemCard } from "./SectionItemCard";
 
@@ -33,19 +32,6 @@ export function RanksManagementContent() {
     sectionId: number | null;
   }>({ open: false, sectionId: null });
 
-  const [addSubsectionModal, setAddSubsectionModal] = useState<{
-    open: boolean;
-    sectionId: number | null;
-  }>({ open: false, sectionId: null });
-  const [editSubsectionModal, setEditSubsectionModal] = useState<{
-    open: boolean;
-    subsection: SubsectionDto | null;
-  }>({ open: false, subsection: null });
-  const [deleteSubsectionDialog, setDeleteSubsectionDialog] = useState<{
-    open: boolean;
-    subsection: SubsectionDto | null;
-  }>({ open: false, subsection: null });
-
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: profileTypes = [], isLoading: isLoadingTypes } =
     useProfileTypes();
@@ -54,7 +40,7 @@ export function RanksManagementContent() {
     useProfileTypeWithSections(selectedTypeId ?? undefined);
 
   const deleteSection = useDeleteSection();
-  const deleteSubsection = useDeleteSubsection();
+  const duplicateProfileType = useDuplicateProfileType();
 
   // Auto-select first type on load
   useEffect(() => {
@@ -77,18 +63,6 @@ export function RanksManagementContent() {
     deleteSection.mutate(
       { id: deleteSectionDialog.sectionId, profileTypeId: selectedTypeId },
       { onSuccess: () => setDeleteSectionDialog({ open: false, sectionId: null }) },
-    );
-  };
-
-  const handleDeleteSubsection = () => {
-    const { subsection } = deleteSubsectionDialog;
-    if (!subsection) return;
-    deleteSubsection.mutate(
-      { id: subsection.id, sectionId: subsection.sectionId },
-      {
-        onSuccess: () =>
-          setDeleteSubsectionDialog({ open: false, subsection: null }),
-      },
     );
   };
 
@@ -136,14 +110,19 @@ export function RanksManagementContent() {
                 <h2 className="text-lg font-medium text-text-dark">
                   البنود الخاصة برتبة {selectedType.typeName}
                 </h2>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setIsAddSectionModalOpen(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                  إضافة بند
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button onClick={() => setIsAddSectionModalOpen(true)}>
+                    <Plus className="h-4 w-4" />
+                    إضافة بند جديد
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => duplicateProfileType.mutate(selectedTypeId!)}
+                    loading={duplicateProfileType.isPending}
+                  >
+                    نسخ الرتبة
+                  </Button>
+                </div>
               </div>
 
               {isLoadingSections ? (
@@ -168,18 +147,6 @@ export function RanksManagementContent() {
                           open: true,
                           sectionId: section.id,
                         })
-                      }
-                      onAddSubsection={() =>
-                        setAddSubsectionModal({
-                          open: true,
-                          sectionId: section.id,
-                        })
-                      }
-                      onEditSubsection={(subsection) =>
-                        setEditSubsectionModal({ open: true, subsection })
-                      }
-                      onDeleteSubsection={(subsection) =>
-                        setDeleteSubsectionDialog({ open: true, subsection })
                       }
                     />
                   ))}
@@ -232,49 +199,6 @@ export function RanksManagementContent() {
         title="حذف البند"
         message="هل أنت متأكد من حذف هذا البند؟ سيتم حذف جميع البنود الفرعية المرتبطة به."
         isLoading={deleteSection.isPending}
-      />
-
-      {/* Add Subsection */}
-      {addSubsectionModal.sectionId !== null && (
-        <AddSubsectionModal
-          isOpen={addSubsectionModal.open}
-          onClose={() => setAddSubsectionModal({ open: false, sectionId: null })}
-          onSuccess={() =>
-            setAddSubsectionModal({ open: false, sectionId: null })
-          }
-          sectionId={addSubsectionModal.sectionId}
-          existingSubsections={
-            sections.find((s) => s.id === addSubsectionModal.sectionId)
-              ?.subsections ?? []
-          }
-        />
-      )}
-
-      {/* Edit Subsection */}
-      {editSubsectionModal.subsection && (
-        <AddSubsectionModal
-          isOpen={editSubsectionModal.open}
-          onClose={() =>
-            setEditSubsectionModal({ open: false, subsection: null })
-          }
-          onSuccess={() =>
-            setEditSubsectionModal({ open: false, subsection: null })
-          }
-          sectionId={editSubsectionModal.subsection.sectionId}
-          initialData={editSubsectionModal.subsection}
-        />
-      )}
-
-      {/* Delete Subsection Confirm */}
-      <ConfirmDialog
-        isOpen={deleteSubsectionDialog.open}
-        onClose={() =>
-          setDeleteSubsectionDialog({ open: false, subsection: null })
-        }
-        onConfirm={handleDeleteSubsection}
-        title="حذف البند الفرعي"
-        message="هل أنت متأكد من حذف هذا البند الفرعي؟"
-        isLoading={deleteSubsection.isPending}
       />
     </div>
   );
