@@ -486,11 +486,19 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     <div className="flex flex-col gap-2 relative" ref={containerRef}>
       {label && (
         <label className="text-sm md:text-base font-normal text-[#333]">
-          {label}
+          {label.includes("*") ? (
+            <>
+              {label.split("*").flatMap((part, i) =>
+                i === 0 ? [part] : [<span key={i} className="text-warning-500">*</span>, part],
+              )}
+            </>
+          ) : (
+            label
+          )}
         </label>
       )}
 
-      {/* Input trigger */}
+      {/* Input trigger - span first so in RTL the date text appears on the right */}
       <button
         type="button"
         onClick={openCalendar}
@@ -502,7 +510,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           transition-colors duration-200
           ${error ? "border-warning-500" : "border-[#EBEBEB] focus:border-primary-500"}
           focus:outline-none
-          flex items-center justify-between
+          flex items-center justify-between flex-row-reverse
         `}
       >
         <svg

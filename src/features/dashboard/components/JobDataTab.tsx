@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent, authContent } from "@/content";
 import { Input, Select } from "@/shared/components/ui";
 import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
+import { GraduationYearPicker } from "@/features/auth/components/GraduationYearPicker";
+import { QualificationCard } from "@/features/auth/components/QualificationCard";
 import {
   useCareerJobs,
   useAddCareerJob,
@@ -17,13 +19,26 @@ import {
 import type { CareerJob, CreateCareerJobRequest } from "../types/me.types";
 
 // Validation schema for single job form (سنوات العمل من - الي)
-const jobSchema = z.object({
-  school: z.string().min(1, "اسم المدرسة مطلوب"),
-  jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
-  educationalStage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
-  startYear: z.string().min(1, "سنة البداية مطلوبة"),
-  endYear: z.string().min(1, "سنة النهاية مطلوبة"),
-});
+const jobSchema = z
+  .object({
+    school: z.string().min(1, "اسم المدرسة مطلوب"),
+    jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
+    educationalStage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
+    startYear: z.string().min(1, "سنة البداية مطلوبة"),
+    endYear: z.string().min(1, "سنة النهاية مطلوبة"),
+  })
+  .refine(
+    (data) => {
+      const start = parseInt(data.startYear, 10);
+      const end = parseInt(data.endYear, 10);
+      if (Number.isNaN(start) || Number.isNaN(end)) return true;
+      return end >= start;
+    },
+    {
+      message: "سنة النهاية يجب أن تكون بعد أو تساوي سنة البداية",
+      path: ["endYear"],
+    },
+  );
 
 type JobFormData = z.infer<typeof jobSchema>;
 
@@ -41,17 +56,22 @@ const EDUCATIONAL_STAGES = [
   { value: "التعليم العالي", label: "التعليم العالي" },
 ];
 
-// Generate years for dropdown
-const generateYears = () => {
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let year = currentYear; year >= 1960; year--) {
-    years.push({ value: year.toString(), label: year.toString() });
-  }
-  return years;
-};
-
-const YEARS = generateYears();
+/** Format job year range for display: "2020 / 1442 ھ - 2024 / 1446 ھ" (Aug 1 for correct Gregorian↔Hijri alignment) */
+function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
+  const fmt = (y: number) => {
+    const dateInSecondHalf = new Date(y, 7, 1); // August 1
+    const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
+      year: "numeric",
+    });
+    const parts = formatter.formatToParts(dateInSecondHalf);
+    const yearPart = parts.find((p) => p.type === "year");
+    const hijri = yearPart
+      ? parseInt(yearPart.value.replace(/\D/g, ""), 10)
+      : y - 622;
+    return `${y} / ${hijri} ھ`;
+  };
+  return `${fmt(startYear)} - ${fmt(endYear)}`;
+}
 
 export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   const { profileData } = dashboardContent;
@@ -59,7 +79,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   const [editingJob, setEditingJob] = useState<CareerJob | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<number | null>(null);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
@@ -72,12 +91,13 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
   } = useForm<JobFormData>({
     resolver: zodResolver(jobSchema),
-    mode: "onChange",
+    mode: "onChange", // so endYear >= startYear error shows when picking years
     defaultValues: {
       school: "",
       jobTitle: "",
@@ -88,22 +108,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   });
 
   const isSaving = isAdding || isUpdating;
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target?.closest("[data-job-menu]")) {
-        setActiveMenuId(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleMenu = (jobId: number) => {
-    setActiveMenuId((current) => (current === jobId ? null : jobId));
-  };
 
   // Reset form when editing job changes
   useEffect(() => {
@@ -174,7 +178,6 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   const handleDeleteJob = (id: number) => {
     setJobToDelete(id);
     setShowDeleteConfirm(true);
-    setActiveMenuId(null);
   };
 
   const handleConfirmDelete = async () => {
@@ -241,77 +244,17 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
       {/* Career Job Cards */}
       <div className="space-y-4">
         {careerJobs.map((job) => (
-          <div
+          <QualificationCard
             key={job.id}
-            className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
-          >
-            <div className="flex-1 text-right border-r-2 border-primary-500 pr-3">
-              <p className="font-normal text-[#333] text-sm md:text-lg">
-                {(job.jobTitle ?? job.title ?? job.rank) || "وظيفة"}
-              </p>
-              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {job.school || "-"} - {job.educationalStage || ""}
-              </p>
-              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {job.startYear} - {job.endYear ?? "-"}
-              </p>
-            </div>
-            <div className="relative" data-job-menu>
-              <button
-                type="button"
-                className="p-1"
-                aria-label="خيارات"
-                onClick={() => toggleMenu(job.id)}
-              >
-                <svg
-                  className="w-5 h-5 text-grey-500"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="5" cy="12" r="2" />
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="19" cy="12" r="2" />
-                </svg>
-              </button>
-              {/* Dropdown menu */}
-              {activeMenuId === job.id ? (
-                <div className="absolute left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      openEditModal(job);
-                      setActiveMenuId(null);
-                    }}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700 flex items-center justify-start gap-1"
-                  >
-                    <Image
-                      src="/icons/ui/edit-black.svg"
-                      alt="تعديل"
-                      width={16}
-                      height={16}
-                    />
-                    <span>تعديل</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleDeleteJob(job.id);
-                      setActiveMenuId(null);
-                    }}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500 flex items-center justify-start gap-1"
-                  >
-                    <Image
-                      src="/icons/ui/delete.svg"
-                      alt="حذف"
-                      width={16}
-                      height={16}
-                    />
-                    <span>حذف</span>
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+            degree={(job.jobTitle ?? job.title ?? job.rank) || "وظيفة"}
+            institution={job.school || "-"}
+            year={formatJobYearRangeDisplay(
+              job.startYear,
+              job.endYear ?? job.startYear,
+            )}
+            onEdit={() => openEditModal(job)}
+            onDelete={() => handleDeleteJob(job.id)}
+          />
         ))}
 
         {/* Add Button */}
@@ -428,38 +371,58 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
         isFormValid={isValid}
       >
         <Input
-          label={onboarding.careerJobs.schoolLabel}
-          placeholder="اسم المدرسة"
-          error={errors.school?.message}
-          {...register("school")}
-        />
-        <Input
           label={onboarding.careerJobs.positionLabel}
           placeholder="مثال: معلم لغة عربية"
           error={errors.jobTitle?.message}
+          className="text-right"
           {...register("jobTitle")}
+        />
+        <Input
+          label={onboarding.careerJobs.schoolLabel}
+          placeholder="اسم المدرسة"
+          error={errors.school?.message}
+          className="text-right"
+          {...register("school")}
         />
         <Select
           label={onboarding.careerJobs.stageLabel}
-          placeholder="اختر المرحلة التعليمية"
+          placeholder="اختر المرحلة الدراسية"
           options={EDUCATIONAL_STAGES}
           error={errors.educationalStage?.message}
           {...register("educationalStage")}
         />
-        <Select
-          label={onboarding.careerJobs.startYearLabel}
-          placeholder="سنة البداية"
-          options={YEARS}
-          error={errors.startYear?.message}
-          {...register("startYear")}
-        />
-        <Select
-          label={onboarding.careerJobs.endYearLabel}
-          placeholder="سنة النهاية"
-          options={YEARS}
-          error={errors.endYear?.message}
-          {...register("endYear")}
-        />
+        <div className="grid w-full grid-cols-2 gap-4">
+          <Controller
+            name="startYear"
+            control={control}
+            render={({ field }) => (
+              <div className="min-w-0 w-full">
+                <GraduationYearPicker
+                  label={onboarding.careerJobs.startYearLabel}
+                  placeholder="من"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.startYear?.message}
+                />
+              </div>
+            )}
+          />
+          <Controller
+            name="endYear"
+            control={control}
+            render={({ field }) => (
+              <div className="min-w-0 w-full">
+                <GraduationYearPicker
+                  label={onboarding.careerJobs.endYearLabel}
+                  placeholder="إلى"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.endYear?.message}
+                />
+              </div>
+            )}
+          />
+        </div>
       </OnboardingDataModal>
     </div>
   );

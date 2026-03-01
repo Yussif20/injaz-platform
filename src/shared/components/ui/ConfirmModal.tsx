@@ -35,7 +35,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  // title,
+  title,
   message,
   confirmText = "تأكيد",
   cancelText = "إلغاء",
@@ -96,76 +96,45 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       {/* Modal */}
       <div
         ref={modalRef}
-        className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-right"
+        className="relative bg-white rounded-3xl shadow-xl w-full max-w-lg p-8 text-right"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        {/* Icon */}
-        {/* <div className="flex justify-center mb-4">
-          <div
-            className={`w-16 h-16 rounded-full bg-grey-100 flex items-center justify-center ${styles.icon}`}
-          >
-            {variant === "danger" || variant === "warning" ? (
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            )}
-          </div>
-        </div> */}
-
-        {/* Title
-        <h2
-          id="modal-title"
-          className="text-xl font-medium text-center text-secondary-800 mb-2"
+        {/* Close X - top right */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-5 right-5 p-1 rounded-lg text-grey-500 hover:bg-grey-100 hover:text-grey-700 transition-colors"
+          aria-label="إغلاق"
         >
-          {title}
-        </h2> */}
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-        {/* Message */}
-        <p className="text-grey-600 text-center mb-6">{message}</p>
+        {/* Message (centered question) */}
+        <p id="modal-title" className="text-secondary-800 text-center mb-10 pr-10 text-base md:text-lg">
+          {message}
+        </p>
 
-        {/* Actions */}
-        <div className="flex gap-3 justify-center">
-          <Button
-            variant={styles.button}
-            onClick={onConfirm}
-            isLoading={isLoading}
-            className="flex-1 max-w-35"
-          >
-            {confirmText}
-          </Button>
+        {/* Actions: reversed order - Cancel then Confirm (outline teal, solid red) */}
+        <div className="flex flex-row-reverse gap-5 justify-center">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 max-w-35"
+            className="flex-1 max-w-40 rounded-2xl font-light! border-2 border-primary-500 text-primary-500 bg-white hover:bg-primary-50"
           >
             {cancelText}
+          </Button>
+          <Button
+            variant={styles.button}
+            onClick={onConfirm}
+            isLoading={isLoading}
+            className="flex-1 max-w-40 rounded-2xl font-light!"
+          >
+            {confirmText}
           </Button>
         </div>
       </div>

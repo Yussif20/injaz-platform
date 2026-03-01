@@ -36,7 +36,15 @@ export function OnboardingDataModal({
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      // Don't close when clicking inside a portaled dropdown (e.g. year picker)
+      if (
+        target instanceof Element &&
+        target.closest?.("[data-onboarding-dropdown]")
+      ) {
+        return;
+      }
+      if (modalRef.current && !modalRef.current.contains(target)) {
         onClose();
       }
     };

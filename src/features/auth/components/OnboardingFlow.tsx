@@ -8,7 +8,7 @@
 "use client";
 
 import { useState, forwardRef, useImperativeHandle } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -32,10 +32,22 @@ import {
   OnboardingProgressStepper,
   type OnboardingStep,
 } from "./OnboardingProgressStepper";
+import { GraduationYearPicker } from "./GraduationYearPicker";
 import { OnboardingDataModal } from "./OnboardingDataModal";
 import { QualificationCard } from "./QualificationCard";
 import { OnboardingImageCollage } from "./OnboardingImageCollage";
 import Image from "next/image";
+
+// WhatsApp/phone validation (optional; if provided must be valid)
+const whatsappSchema = z.string().refine(
+  (val) =>
+    !val ||
+    val.trim() === "" ||
+    (/^[0-9+]+$/.test(val) &&
+      val.replace(/\D/g, "").length >= 9 &&
+      val.length <= 15),
+  "رقم واتساب يجب أن يحتوي على أرقام فقط وأن يكون 9 أرقام على الأقل",
+);
 
 // Basic info form schema
 const basicInfoSchema = z.object({
@@ -50,7 +62,7 @@ const basicInfoSchema = z.object({
     .email("البريد الإلكتروني غير صالح")
     .optional()
     .or(z.literal("")),
-  whatsapp: z.string().optional(),
+  whatsapp: whatsappSchema,
 });
 
 type BasicInfoFormData = z.infer<typeof basicInfoSchema>;
@@ -85,13 +97,26 @@ const qualificationSchema = z.object({
 type QualificationFormData = z.infer<typeof qualificationSchema>;
 
 // Career job form schema (سنوات العمل من - الي)
-const careerJobSchema = z.object({
-  school: z.string().min(1, "اسم المدرسة مطلوب"),
-  jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
-  stage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
-  startYear: z.string().min(1, "سنة البداية مطلوبة"),
-  endYear: z.string().min(1, "سنة النهاية مطلوبة"),
-});
+const careerJobSchema = z
+  .object({
+    school: z.string().min(1, "اسم المدرسة مطلوب"),
+    jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
+    stage: z.string().min(1, "المرحلة التعليمية مطلوبة"),
+    startYear: z.string().min(1, "سنة البداية مطلوبة"),
+    endYear: z.string().min(1, "سنة النهاية مطلوبة"),
+  })
+  .refine(
+    (data) => {
+      const start = parseInt(data.startYear, 10);
+      const end = parseInt(data.endYear, 10);
+      if (Number.isNaN(start) || Number.isNaN(end)) return true;
+      return end >= start;
+    },
+    {
+      message: "سنة النهاية يجب أن تكون بعد أو تساوي سنة البداية",
+      path: ["endYear"],
+    },
+  );
 
 type CareerJobFormData = z.infer<typeof careerJobSchema>;
 
@@ -125,6 +150,23 @@ const generateYears = () => {
 };
 
 const YEARS = generateYears();
+
+/** Format job year range for display: "2020 / 1442 ھ - 2024 / 1446 ھ" (Aug 1 for correct Gregorian↔Hijri alignment) */
+function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
+  const fmt = (y: number) => {
+    const dateInSecondHalf = new Date(y, 7, 1); // August 1
+    const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
+      year: "numeric",
+    });
+    const parts = formatter.formatToParts(dateInSecondHalf);
+    const yearPart = parts.find((p) => p.type === "year");
+    const hijri = yearPart
+      ? parseInt(yearPart.value.replace(/\D/g, ""), 10)
+      : y - 622;
+    return `${y} / ${hijri} ھ`;
+  };
+  return `${fmt(startYear)} - ${fmt(endYear)}`;
+}
 
 export interface OnboardingFlowHandle {
   handleBack: () => void;
@@ -182,9 +224,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
       },
     });
 
-    // Career job form
+    // Career job form (mode: onChange so endYear >= startYear error shows when picking years)
     const careerJobForm = useForm<CareerJobFormData>({
       resolver: zodResolver(careerJobSchema),
+      mode: "onChange",
       defaultValues: {
         school: "",
         jobTitle: "",
@@ -206,6 +249,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
           nationalId: data.nationalId,
           birthDate: data.birthDate,
           address: data.address,
+          phoneNumber: data.whatsapp?.trim() || undefined,
           email: data.email?.trim() || undefined,
         });
         if (res.status) {
@@ -447,15 +491,15 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                   />
                 </div>
 
-                {/* Step Content */}
-                <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-7 min-h-0 p-4 lg:p-6">
+                {/* Step Content - RTL aligned */}
+                <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-7 min-h-0 p-4 lg:p-6 text-right">
                   {/* Step 1: Basic Info Form */}
                   {currentStep === "basicInfo" && (
                     <form
                       onSubmit={basicInfoForm.handleSubmit(
                         handleBasicInfoSubmit,
                       )}
-                      className="flex flex-col gap-4 md:gap-6 lg:gap-7"
+                      className="flex flex-col gap-4 md:gap-6 lg:gap-7 text-right"
                     >
                       {/* Main Section Title */}
                       <h2 className="text-xl hidden lg:block md:text-2xl lg:text-3xl font-medium text-text-dark text-right">
@@ -476,6 +520,8 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             error={
                               basicInfoForm.formState.errors.nationalId?.message
                             }
+                            className="text-right"
+                            maxLength={14}
                             {...basicInfoForm.register("nationalId")}
                           />
                           <Input
@@ -486,24 +532,27 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             error={
                               basicInfoForm.formState.errors.address?.message
                             }
+                            className="text-right"
                             {...basicInfoForm.register("address")}
                           />
-                          <DatePicker
-                            label={onboarding.basicInfo.birthDateLabel}
-                            placeholder={
-                              onboarding.basicInfo.birthDatePlaceholder
-                            }
-                            value={basicInfoForm.watch("birthDate")}
-                            onChange={(val) =>
-                              basicInfoForm.setValue("birthDate", val, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              })
-                            }
-                            error={
-                              basicInfoForm.formState.errors.birthDate?.message
-                            }
-                          />
+                          <div className="text-right">
+                            <DatePicker
+                              label={onboarding.basicInfo.birthDateLabel}
+                              placeholder={
+                                onboarding.basicInfo.birthDatePlaceholder
+                              }
+                              value={basicInfoForm.watch("birthDate")}
+                              onChange={(val) =>
+                                basicInfoForm.setValue("birthDate", val, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                })
+                              }
+                              error={
+                                basicInfoForm.formState.errors.birthDate?.message
+                              }
+                            />
+                          </div>
                           <Input
                             label={onboarding.basicInfo.emailLabel}
                             placeholder={onboarding.basicInfo.emailPlaceholder}
@@ -511,6 +560,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             error={
                               basicInfoForm.formState.errors.email?.message
                             }
+                            className="text-right"
                             {...basicInfoForm.register("email")}
                           />
                         </div>
@@ -527,8 +577,18 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             placeholder={
                               onboarding.basicInfo.whatsappPlaceholder
                             }
+                            error={
+                              basicInfoForm.formState.errors.whatsapp?.message
+                            }
                             dir="ltr"
-                            {...basicInfoForm.register("whatsapp")}
+                            className="text-right"
+                            maxLength={15}
+                            {...basicInfoForm.register("whatsapp", {
+                              onChange: (e) => {
+                                const v = e.target.value.replace(/[^\d+]/g, "");
+                                e.target.value = v;
+                              },
+                            })}
                           />
                         </div>
                       </div>
@@ -609,7 +669,10 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             key={job.id}
                             degree={job.jobTitle}
                             institution={job.school}
-                            year={`${job.startYear} - ${job.endYear}`}
+                            year={formatJobYearRangeDisplay(
+                              job.startYear,
+                              job.endYear,
+                            )}
                             onEdit={() => openEditCareerModal(job)}
                             onDelete={() => deleteCareerJob(job.id)}
                           />
@@ -718,12 +781,18 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
             error={qualificationForm.formState.errors.specialization?.message}
             {...qualificationForm.register("specialization")}
           />
-          <Select
-            label={onboarding.qualifications.graduationDateLabel}
-            placeholder="اختر السنة"
-            options={YEARS}
-            error={qualificationForm.formState.errors.graduationYear?.message}
-            {...qualificationForm.register("graduationYear")}
+          <Controller
+            name="graduationYear"
+            control={qualificationForm.control}
+            render={({ field }) => (
+              <GraduationYearPicker
+                label={onboarding.qualifications.graduationDateLabel}
+                placeholder="اختر السنة"
+                value={field.value}
+                onChange={field.onChange}
+                error={qualificationForm.formState.errors.graduationYear?.message}
+              />
+            )}
           />
         </OnboardingDataModal>
 
@@ -746,38 +815,58 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
           isFormValid={careerJobForm.formState.isValid}
         >
           <Input
-            label={onboarding.careerJobs.schoolLabel}
-            placeholder="اسم المدرسة"
-            error={careerJobForm.formState.errors.school?.message}
-            {...careerJobForm.register("school")}
-          />
-          <Input
             label={onboarding.careerJobs.positionLabel}
             placeholder="مثال: معلم لغة عربية"
             error={careerJobForm.formState.errors.jobTitle?.message}
+            className="text-right"
             {...careerJobForm.register("jobTitle")}
+          />
+          <Input
+            label={onboarding.careerJobs.schoolLabel}
+            placeholder="اسم المدرسة"
+            error={careerJobForm.formState.errors.school?.message}
+            className="text-right"
+            {...careerJobForm.register("school")}
           />
           <Select
             label={onboarding.careerJobs.stageLabel}
-            placeholder="اختر المرحلة التعليمية"
+            placeholder="اختر المرحلة الدراسية"
             options={EDUCATIONAL_STAGES}
             error={careerJobForm.formState.errors.stage?.message}
             {...careerJobForm.register("stage")}
           />
-          <Select
-            label={onboarding.careerJobs.startYearLabel}
-            placeholder="سنة البداية"
-            options={YEARS}
-            error={careerJobForm.formState.errors.startYear?.message}
-            {...careerJobForm.register("startYear")}
-          />
-          <Select
-            label={onboarding.careerJobs.endYearLabel}
-            placeholder="سنة النهاية"
-            options={YEARS}
-            error={careerJobForm.formState.errors.endYear?.message}
-            {...careerJobForm.register("endYear")}
-          />
+          <div className="grid w-full grid-cols-2 gap-4">
+            <Controller
+              name="startYear"
+              control={careerJobForm.control}
+              render={({ field }) => (
+                <div className="min-w-0 w-full">
+                  <GraduationYearPicker
+                    label={onboarding.careerJobs.startYearLabel}
+                    placeholder="من"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={careerJobForm.formState.errors.startYear?.message}
+                  />
+                </div>
+              )}
+            />
+            <Controller
+              name="endYear"
+              control={careerJobForm.control}
+              render={({ field }) => (
+                <div className="min-w-0 w-full">
+                  <GraduationYearPicker
+                    label={onboarding.careerJobs.endYearLabel}
+                    placeholder="إلى"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={careerJobForm.formState.errors.endYear?.message}
+                  />
+                </div>
+              )}
+            />
+          </div>
         </OnboardingDataModal>
 
         {/* Delete Toast */}

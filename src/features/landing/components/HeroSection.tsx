@@ -1,6 +1,7 @@
-import { Button } from "@/shared/components/ui";
-import { landingContent } from "@/content";
+import Link from "next/link";
 import Image from "next/image";
+import { ROUTES } from "@/config/routes";
+import { landingContent } from "@/content";
 
 export const HeroSection = () => {
   const { hero } = landingContent;
@@ -8,8 +9,8 @@ export const HeroSection = () => {
   return (
     <section className="flex flex-col gap-10 items-center justify-center py-12 sm:py-16 lg:py-20">
       {/* Hero Title with Highlight */}
-      <h1 className="text-center max-w-4xl ">
-        <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-text-dark">
+      <h1 className="text-center max-w-4xl">
+        <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-text-dark leading-tight">
           {hero.titleStart}
           <span className="text-primary-500">{hero.titleHighlight}</span>
           {hero.titleEnd1}
@@ -19,7 +20,10 @@ export const HeroSection = () => {
       </h1>
 
       {/* CTA Button with Icon */}
-      <Button variant="primary" size="lg" className="flex items-center gap-3">
+      <Link
+        href={ROUTES.SIGN_UP}
+        className="flex items-center justify-center gap-3 w-[200px] h-[54px] px-2 py-2 text-lg rounded-4xl bg-primary-500 text-white hover:bg-primary-800 active:bg-primary-700 transition-colors duration-200"
+      >
         <svg
           className="h-6 w-6 text-white"
           fill="none"
@@ -36,7 +40,7 @@ export const HeroSection = () => {
           />
         </svg>
         {hero.ctaButton}
-      </Button>
+      </Link>
 
       {/* Hero Image */}
       <div

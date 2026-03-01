@@ -3,6 +3,24 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
+/** Format stored Gregorian year as "2025 / 1447 ھ" for display (Aug 1 for correct Gregorian↔Hijri alignment). If yearStr is already a range (contains " - "), return as-is. */
+function formatGraduationYearDisplay(yearStr: string): string {
+  if (yearStr === "") return yearStr;
+  if (yearStr.includes(" - ")) return yearStr; // already a formatted range (e.g. job card)
+  const y = parseInt(yearStr, 10);
+  if (isNaN(y)) return yearStr;
+  const dateInSecondHalf = new Date(y, 7, 1); // August 1
+  const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
+    year: "numeric",
+  });
+  const parts = formatter.formatToParts(dateInSecondHalf);
+  const yearPart = parts.find((p) => p.type === "year");
+  const hijriYear = yearPart
+    ? parseInt(yearPart.value.replace(/\D/g, ""), 10)
+    : y - 622;
+  return `${y} / ${hijriYear} ھ`;
+}
+
 interface QualificationCardProps {
   degree: string;
   institution: string;
@@ -46,7 +64,7 @@ export function QualificationCard({
             {institution}
           </p>
           <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-            {year}
+            {formatGraduationYearDisplay(year)}
           </p>
         </div>
 

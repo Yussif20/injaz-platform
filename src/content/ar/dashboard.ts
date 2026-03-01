@@ -146,13 +146,13 @@ export const dashboardContent = {
   modals: {
     logout: {
       title: "تسجيل الخروج",
-      message: "هل أنت متأكد من تسجيل الخروج؟",
+      message: "هل ترغب بتسجيل الخروج؟",
       confirm: "تسجيل الخروج",
       cancel: "إلغاء",
     },
     deleteAccount: {
       title: "حذف الحساب",
-      message: "هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.",
+      message: "هل انت متأكد من حذف الحساب؟",
       confirm: "حذف الحساب",
       cancel: "إلغاء",
     },
@@ -221,7 +221,7 @@ export const dashboardContent = {
     title: "بيانات الشاهد",
     imageTitleLabel: "عنوان الصورة",
     imageTitlePlaceholder: "ادخل وصف مناسب للصورة",
-    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
+    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 ميجا",
     uploadImage: "تحميل الصورة",
     submitButton: "اضافة الشاهد",
     changeImage: "تغيير الصورة",
@@ -285,7 +285,7 @@ export const dashboardContent = {
       "لديك بالفعل ملف لهذه السنة الدراسية. يمكنك العودة للوحة التحكم لتعديله أو إنشاء ملف لسنة أخرى.",
     imageLabel: "صورة الملف",
     imageHint: "(صورة شخصية او عادية)",
-    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
+    imageSizeLimit: "يجب أن لا يزيد حجم الصورة عن 1 ميجا",
     uploadImage: "تحميل الصورة",
     changeImage: "تغيير الصورة",
     yearLabel: "حدد العام الدراسي",

@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { CirclePlus } from "lucide-react";
 import {
   FileCard,
   FileData,
@@ -13,6 +16,7 @@ import {
   useRemoveProfilePassword,
 } from "@/features/profiles";
 import { dashboardContent } from "@/content";
+import { ROUTES } from "@/config";
 import type { Profile } from "@/features/profiles/types";
 
 function mapProfileStatusToFileStatus(status: string | null): FileStatus {
@@ -70,6 +74,7 @@ const PASSWORD_BUTTON_LABELS = {
 } as const;
 
 export default function FilePasswordPage() {
+  const { filesSection } = dashboardContent;
   const { profiles, isLoading } = useMyProfiles();
   const { setPasswordAsync, isLoading: isSettingPassword } = useSetProfilePassword();
   const { removePasswordAsync, isLoading: isRemovingPassword } = useRemoveProfilePassword();
@@ -167,9 +172,28 @@ export default function FilePasswordPage() {
     <>
       <div className="bg-[#FAFAFA] rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8">
         {fileData.length === 0 ? (
-          <p className="text-grey-500 text-center py-8 text-sm sm:text-base">
-            لا توجد ملفات لعرضها
-          </p>
+          <div className="bg-[#FAFAFA] rounded-2xl p-12 text-center flex flex-col items-center justify-center min-h-[320px]">
+            <Image
+              src="/images/dashboard/empty-files.svg"
+              alt=""
+              width={280}
+              height={200}
+              className="w-full max-w-[280px] h-auto mb-6"
+            />
+            <p className="text-secondary-800 text-lg md:text-[28px] font-normal mb-2">
+              {filesSection.emptyStateTitle}
+            </p>
+            <p className="text-sm md:text-[20px] font-light text-[#4D4D4D] mb-6">
+              {filesSection.emptyStateSubtitle}
+            </p>
+            <Link
+              href={ROUTES.DASHBOARD_PROFILE_NEW}
+              className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 bg-primary-500 text-white text-base md:text-lg font-light hover:bg-primary-800 transition-colors"
+            >
+              <CirclePlus className="w-5 h-5" />
+              {filesSection.emptyStateButton}
+            </Link>
+          </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
             {fileData.map((file) => (

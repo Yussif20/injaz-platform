@@ -68,6 +68,7 @@ export function RegisterForm() {
     name: "acceptTerms",
   });
 
+
   // Direct register (OTP path commented out): submit form → register endpoint
   const handleDetailsSubmit = (data: RegisterDetailsFormValues) => {
     registerUser({
@@ -91,6 +92,18 @@ export function RegisterForm() {
   // Step 1 used to: sendOtpAsync(phone) → setStep("otp")
   // Step 2 used to: verifyOtpAsync({ phone, code }) → registerUser({ ...pendingDetails, verificationCode: otpCode })
   // handleResendOtp, handleBack, handleOtpVerify — removed while OTP is disabled
+
+  // Render label with required (*) in warning color (handles * anywhere, e.g. "إلى*:")
+  const requiredLabel = (text: string) =>
+    text.includes("*") ? (
+      <>
+        {text.split("*").flatMap((part, i) =>
+          i === 0 ? [part] : [<span key={i} className="text-warning-500">*</span>, part],
+        )}
+      </>
+    ) : (
+      text
+    );
 
   // Handle phone input - only allow numbers and +
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +138,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="fullName"
               >
-                {signUp.fullNameLabel}
+                {requiredLabel(signUp.fullNameLabel)}
                 <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.fullNameNote}
@@ -159,7 +172,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="phone"
               >
-                {signUp.phoneLabel}
+                {requiredLabel(signUp.phoneLabel)}
                 <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.phoneNote}
@@ -196,7 +209,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="gender"
               >
-                {signUp.genderLabel}
+                {requiredLabel(signUp.genderLabel)}
                 <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.genderRequired}
@@ -238,7 +251,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="email"
               >
-                {signUp.emailLabel}
+                {requiredLabel(signUp.emailLabel)}
               </label>
               <input
                 id="email"
@@ -268,7 +281,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="password"
               >
-                {signUp.passwordLabel}
+                {requiredLabel(signUp.passwordLabel)}
                 <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.passwordRequired}
@@ -279,7 +292,9 @@ export function RegisterForm() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder={signUp.passwordPlaceholder}
-                  {...detailsForm.register("password")}
+                  {...detailsForm.register("password", {
+                    onChange: () => detailsForm.trigger("password"),
+                  })}
                   className={`
                     w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
                     pr-4 pl-10 py-2.5 sm:py-3 rounded-xl outline-none
@@ -309,7 +324,7 @@ export function RegisterForm() {
                 </button>
               </div>
               {detailsForm.formState.errors.password && (
-                <p className="text-warning-500 text-xs mt-1">
+                <p className="text-xs text-red-600 mt-1">
                   {detailsForm.formState.errors.password.message}
                 </p>
               )}
@@ -321,7 +336,7 @@ export function RegisterForm() {
                 className="text-sm sm:text-base font-medium text-text-dark"
                 htmlFor="confirmPassword"
               >
-                {signUp.confirmPasswordLabel}
+                {requiredLabel(signUp.confirmPasswordLabel)}
                 <span className="text-warning-500 text-xs sm:text-sm font-normal">
                   {" "}
                   {signUp.confirmPasswordRequired}
@@ -374,7 +389,7 @@ export function RegisterForm() {
                 htmlFor="acceptTerms"
                 className="text-sm sm:text-base text-primary-500 cursor-pointer hover:underline"
               >
-                {signUp.termsLabel}
+                {requiredLabel(signUp.termsLabel)}
               </label>
               <input
                 id="acceptTerms"

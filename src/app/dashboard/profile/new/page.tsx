@@ -90,10 +90,12 @@ function CreateFileContent() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 1024 * 1024 * 1024) {
-        setError("يجب أن لا يزيد حجم الصورة عن 1 جيجا");
+      const maxSizeBytes = 1024 * 1024; // 1 MB
+      if (file.size > maxSizeBytes) {
+        setError(createFile.imageSizeLimit);
         return;
       }
+      setError(null);
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -234,7 +236,7 @@ function CreateFileContent() {
           )}
 
           {/* Image Upload Section */}
-          <div className="space-y-2 max-w-150">
+          <div className="space-y-4 max-w-150">
             <label className="text-base font-normal text-secondary-800">
               {createFile.imageLabel}
               <span className="text-grey-400 text-sm mr-1">
@@ -244,7 +246,7 @@ function CreateFileContent() {
 
             <div
               onClick={handleImageClick}
-              className="relative w-full h-[200px] border-2 border-dashed border-grey-300 rounded-[20px] overflow-hidden cursor-pointer hover:border-primary-500 transition-colors flex items-center justify-center"
+              className="mt-2 relative w-full h-[200px] border-2 border-dashed border-grey-300 rounded-[20px] overflow-hidden cursor-pointer hover:border-primary-500 transition-colors flex items-center justify-center"
               style={{ backgroundColor: imagePreview ? "#B3B3B3" : "#F9FAFB" }}
             >
               {imagePreview ? (
@@ -256,9 +258,17 @@ function CreateFileContent() {
                     className="absolute inset-0 w-full h-full object-contain"
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {createFile.changeImage}
-                    </span>
+                    <div className="inline-flex flex-row-reverse items-center justify-center gap-2 rounded-full bg-primary-500 px-6 py-3 text-white text-sm font-medium">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/icons/ui/image-upload-white.svg"
+                        alt=""
+                        width={20}
+                        height={20}
+                        className="h-5 w-5 object-contain"
+                      />
+                      <span>{createFile.changeImage}</span>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -277,7 +287,7 @@ function CreateFileContent() {
                     />
                   </svg>
                   <span className="text-sm" style={{ color: "#666666" }}>
-                    يجب أن لا يزيد حجم الصورة عن 1 جيجا
+                    {createFile.imageSizeLimit}
                   </span>
                   <div className="flex items-center gap-2 text-primary-500">
                     <svg

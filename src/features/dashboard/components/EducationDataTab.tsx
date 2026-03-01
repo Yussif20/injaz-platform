@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { dashboardContent, authContent } from "@/content";
 import { Input, Select } from "@/shared/components/ui";
 import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
+import { GraduationYearPicker } from "@/features/auth/components/GraduationYearPicker";
+import { QualificationCard } from "@/features/auth/components/QualificationCard";
 import {
   useQualifications,
   useAddQualification,
@@ -45,18 +47,6 @@ const DEGREE_TYPES = [
   { value: "شهادة مهنية", label: "شهادة مهنية" },
 ];
 
-// Generate years for dropdown
-const generateYears = () => {
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let year = currentYear; year >= 1960; year--) {
-    years.push({ value: year.toString(), label: year.toString() });
-  }
-  return years;
-};
-
-const YEARS = generateYears();
-
 export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   onSave,
 }) => {
@@ -66,7 +56,6 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     useState<Qualification | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [qualificationToDelete, setQualificationToDelete] = useState<
     number | null
@@ -83,6 +72,7 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
@@ -165,7 +155,6 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   const handleDeleteQualification = (id: number) => {
     setQualificationToDelete(id);
     setShowDeleteConfirm(true);
-    setActiveMenuId(null);
   };
 
   const handleConfirmDelete = async () => {
@@ -212,38 +201,10 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
     reset();
   };
 
-  const formatYear = (dateString: string | null) => {
-    if (!dateString) return "-";
-    try {
-      const date = new Date(dateString);
-      return date.getFullYear().toString();
-    } catch {
-      return dateString;
-    }
-  };
-
   const getDegreeLabel = (value: string | null) => {
     if (!value) return "-";
     const degree = DEGREE_TYPES.find((d) => d.value === value);
     return degree?.label || value;
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target?.closest("[data-qualification-menu]")) {
-        setActiveMenuId(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleMenu = (qualificationId: number) => {
-    setActiveMenuId((current) =>
-      current === qualificationId ? null : qualificationId,
-    );
   };
 
   // Loading state
@@ -266,78 +227,18 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
       {/* Qualification Cards */}
       <div className="space-y-4">
         {qualifications.map((qualification) => (
-          <div
+          <QualificationCard
             key={qualification.id}
-            className="bg-shade-100 rounded-xl p-4 flex items-start justify-between gap-4"
-          >
-            <div className="flex-1 text-right border-r-2 border-primary-500 pr-3">
-              <p className="font-normal text-[#333] text-sm md:text-lg">
-                {getDegreeLabel(qualification.degreeType)}{" "}
-                {(qualification.major ?? qualification.title) || ""}
-              </p>
-              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {qualification.institution || qualification.grade || "-"}
-              </p>
-              <p className="font-normal text-[#4D4D4D] text-xs md:text-lg mt-1">
-                {formatYear(qualification.graduationDate)}
-              </p>
-            </div>
-            <div className="relative" data-qualification-menu>
-              <button
-                type="button"
-                className="p-1"
-                aria-label="خيارات"
-                onClick={() => toggleMenu(qualification.id)}
-              >
-                <svg
-                  className="w-5 h-5 text-grey-500"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="5" cy="12" r="2" />
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="19" cy="12" r="2" />
-                </svg>
-              </button>
-              {/* Dropdown menu */}
-              {activeMenuId === qualification.id ? (
-                <div className="absolute left-0 top-full mt-1 bg-white border border-grey-200 rounded-lg shadow-lg z-10 min-w-25">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      openEditModal(qualification);
-                      setActiveMenuId(null);
-                    }}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-grey-700 flex items-center justify-start gap-1"
-                  >
-                    <Image
-                      src="/icons/ui/edit-black.svg"
-                      alt="تعديل"
-                      width={16}
-                      height={16}
-                    />
-                    <span>تعديل</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleDeleteQualification(qualification.id);
-                      setActiveMenuId(null);
-                    }}
-                    className="w-full text-right px-4 py-2 hover:bg-grey-50 transition-colors text-sm text-warning-500 flex items-center justify-start gap-1"
-                  >
-                    <Image
-                      src="/icons/ui/delete.svg"
-                      alt="حذف"
-                      width={16}
-                      height={16}
-                    />
-                    <span>حذف</span>
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+            degree={`${getDegreeLabel(qualification.degreeType)} ${(qualification.major ?? qualification.title) || ""}`.trim()}
+            institution={qualification.institution || qualification.grade || "-"}
+            year={
+              qualification.graduationDate
+                ? new Date(qualification.graduationDate).getFullYear().toString()
+                : ""
+            }
+            onEdit={() => openEditModal(qualification)}
+            onDelete={() => handleDeleteQualification(qualification.id)}
+          />
         ))}
 
         {/* Add Button */}
@@ -464,20 +365,28 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
           label={onboarding.qualifications.institutionLabel}
           placeholder="مثال: جامعة الملك فهد"
           error={errors.institution?.message}
+          className="text-right"
           {...register("institution")}
         />
         <Input
           label={onboarding.qualifications.titleLabel}
           placeholder="مثال: تربية لغة عربية"
           error={errors.title?.message}
+          className="text-right"
           {...register("title")}
         />
-        <Select
-          label={onboarding.qualifications.graduationDateLabel}
-          placeholder="اختر السنة"
-          options={YEARS}
-          error={errors.graduationDate?.message}
-          {...register("graduationDate")}
+        <Controller
+          name="graduationDate"
+          control={control}
+          render={({ field }) => (
+            <GraduationYearPicker
+              label={onboarding.qualifications.graduationDateLabel}
+              placeholder="اختر السنة"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.graduationDate?.message}
+            />
+          )}
         />
       </OnboardingDataModal>
     </div>

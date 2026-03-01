@@ -7,7 +7,7 @@ export const ROUTES = {
   HOME: "/",
   TERMS: "/terms",
   PRIVACY: "/privacy",
-  TERMS_CONDITIONS: "/sign/terms-conditions",
+  TERMS_CONDITIONS: "/terms",
   TECHNICAL_SUPPORT: "/sign/support",
 
   // Auth routes

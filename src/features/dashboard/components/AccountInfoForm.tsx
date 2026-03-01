@@ -17,11 +17,9 @@ import {
   useUploadProfileImage,
   useDeleteAccount,
 } from "../hooks";
-import { genderToFormValue, formValueToGender } from "../types/me.types";
 
-// Form validation schema
+// Form validation schema (gender is read-only, not submitted)
 const accountInfoSchema = z.object({
-  gender: z.enum(["male", "female"]),
   email: z
     .string()
     .email(dashboardContent.errors.invalidEmail)
@@ -65,18 +63,14 @@ export const AccountInfoForm: React.FC = () => {
   } = useForm<AccountInfoFormData>({
     resolver: zodResolver(accountInfoSchema),
     defaultValues: {
-      gender: genderToFormValue(user?.gender) || "male",
       email: user?.email || "",
     },
   });
 
   // Update form when profile or user data changes
   useEffect(() => {
-    // Profile uses nested personalInfo for email, fallback to user data
-    const gender = profile?.gender ?? user?.gender;
     const email = profile?.personalInfo?.email || user?.email || "";
     reset({
-      gender: genderToFormValue(gender) || "male",
       email: email,
     });
   }, [profile, user, reset]);
@@ -141,30 +135,7 @@ export const AccountInfoForm: React.FC = () => {
         });
       }
 
-      // Update basic info (gender) if changed
-      // Backend uses: Male = 1, Female = 2
-      const genderValue = formValueToGender(data.gender);
-
-      if (genderValue !== displayData.gender) {
-        await new Promise<void>((resolve, reject) => {
-          updateBasicInfo(
-            {
-              fullName: displayData.fullName,
-              gender: genderValue,
-            },
-            {
-              onSuccess: (response) => {
-                if (response.status) {
-                  resolve();
-                } else {
-                  reject(new Error(response.message));
-                }
-              },
-              onError: (error) => reject(error),
-            },
-          );
-        });
-      }
+      // Gender is read-only and not updated here
 
       // Update personal info (email) if changed
       // Send current personal info along with new email so backend receives required fields (birthDate, address, etc.)
@@ -231,11 +202,6 @@ export const AccountInfoForm: React.FC = () => {
     });
   };
 
-  const genderOptions = [
-    { value: "male", label: accountInfo.genderMale },
-    { value: "female", label: accountInfo.genderFemale },
-  ];
-
   // Show loading skeleton until profile data has loaded (avoid showing empty form)
   if (isLoadingProfile && !profile) {
     return (
@@ -268,6 +234,14 @@ export const AccountInfoForm: React.FC = () => {
     email: profile?.personalInfo?.email || user?.email || "",
     profileImage: profile?.imageUrl || user?.profileImage || null,
   };
+
+  // Backend: Male = 1, Female = 2 — gender is read-only
+  const genderDisplayLabel =
+    displayData.gender === 1
+      ? accountInfo.genderMale
+      : displayData.gender === 2
+        ? accountInfo.genderFemale
+        : "";
 
   return (
     <>
@@ -337,13 +311,13 @@ export const AccountInfoForm: React.FC = () => {
               className="text-text-dark"
             />
 
-            {/* Gender (editable) */}
-            <Select
+            {/* Gender (read-only) */}
+            <Input
               label={accountInfo.genderLabel}
-              options={genderOptions}
-              error={errors.gender?.message}
+              value={genderDisplayLabel}
+              disabled
+              readOnly
               className="text-text-dark"
-              {...register("gender")}
             />
 
             {/* Email (editable) */}

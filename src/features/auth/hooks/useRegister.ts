@@ -14,6 +14,7 @@ import {
 import { AUTH_QUERY_KEY } from "./useAuth";
 import { ROUTES } from "@/config";
 import { VerificationPurpose, type RegisterCredentials } from "../types/auth.types";
+import { getRegisterErrorMessage } from "../utils/getRegisterErrorMessage";
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
@@ -52,11 +53,15 @@ export function useRegister(options: UseRegisterOptions = {}) {
   // Step 3: Complete registration
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterCredentials) => {
-      const response = await register(data);
-      if (!response.status) {
-        throw new Error(response.message || "فشل إنشاء الحساب");
+      try {
+        const response = await register(data);
+        if (!response.status) {
+          throw new Error(response.message || "فشل إنشاء الحساب");
+        }
+        return response.data;
+      } catch (err) {
+        throw new Error(getRegisterErrorMessage(err));
       }
-      return response.data;
     },
     onSuccess: (user) => {
       // Update auth query cache

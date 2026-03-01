@@ -13,11 +13,58 @@ const phoneSchema = z
   .min(9, "رقم الجوال يجب أن يكون 9 أرقام على الأقل")
   .max(15, "رقم الجوال طويل جداً");
 
-// Password validation
+// Password requirement checks (for UI guide + schema)
+const PASSWORD_MIN_LENGTH = 8;
+const hasMinLength = (s: string) => s.length >= PASSWORD_MIN_LENGTH;
+const hasUpperCase = (s: string) => /[A-Z]/.test(s);
+const hasLowerCase = (s: string) => /[a-z]/.test(s);
+const hasNumber = (s: string) => /[0-9]/.test(s);
+const hasSpecialChar = (s: string) => /[^A-Za-z0-9]/.test(s);
+
+/** Use in UI to show per-rule checkmarks; same rules as passwordSchema */
+export function getPasswordChecks(password: string) {
+  return {
+    minLength: hasMinLength(password),
+    upperCase: hasUpperCase(password),
+    lowerCase: hasLowerCase(password),
+    number: hasNumber(password),
+    specialChar: hasSpecialChar(password),
+    allPass:
+      hasMinLength(password) &&
+      hasUpperCase(password) &&
+      hasLowerCase(password) &&
+      hasNumber(password) &&
+      hasSpecialChar(password),
+  };
+}
+
+// Progressive password messages: show first failing requirement in order
+function getPasswordErrorMessage(val: string): string {
+  if (!val || val.length === 0) return "كلمة المرور مطلوبة";
+  if (!hasMinLength(val))
+    return "كلمة المرور يجب أن تحتوي على: ٨ أحرف على الأقل";
+  if (!hasUpperCase(val))
+    return "كلمة المرور يجب أن تحتوي على: حرف إنجليزي كبير واحد على الأقل (A-Z)";
+  if (!hasLowerCase(val))
+    return "كلمة المرور يجب أن تحتوي على: حرف إنجليزي صغير واحد على الأقل (a-z)";
+  if (!hasNumber(val))
+    return "كلمة المرور يجب أن تحتوي على: رقم واحد على الأقل (0-9)";
+  if (!hasSpecialChar(val))
+    return "كلمة المرور يجب أن تحتوي على: رمز خاص واحد على الأقل (!@#$...)";
+  return "";
+}
+
+// Password validation (align with backend: min 8, upper, lower, number)
 const passwordSchema = z
   .string()
   .min(1, "كلمة المرور مطلوبة")
-  .min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+  .superRefine((val, ctx) => {
+    if (hasMinLength(val) && hasUpperCase(val) && hasLowerCase(val) && hasNumber(val) && hasSpecialChar(val))
+      return;
+    const message = getPasswordErrorMessage(val);
+    if (message)
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  });
 
 // Email validation (optional)
 const emailSchema = z

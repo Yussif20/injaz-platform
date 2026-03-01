@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Button } from "@/shared/components/ui";
+import Link from "next/link";
+import { ROUTES } from "@/config/routes";
 import { landingContent } from "@/content";
 
 export const HowToSection = () => {
@@ -37,7 +38,10 @@ export const HowToSection = () => {
 
             {/* CTA Button */}
             <div className="pt-4">
-              <Button variant="outline" size="lg" className="w-full font-light">
+              <Link
+                href={ROUTES.SIGN_UP}
+                className="flex justify-center items-center gap-2 w-full font-light rounded-4xl border-2 bg-white border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100 transition-colors duration-200 h-[54px] px-2 py-2 text-lg"
+              >
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -69,7 +73,7 @@ export const HowToSection = () => {
                   />
                 </svg>
                 {howToSection.ctaButton}
-              </Button>
+              </Link>
             </div>
           </div>
 

@@ -12,7 +12,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div className="flex flex-col gap-2">
         {label && (
           <label className="text-sm md:text-base font-normal text-[#333]">
-            {label}
+            {label.includes("*") ? (
+              <>
+                {label.split("*").flatMap((part, i) =>
+                  i === 0 ? [part] : [<span key={i} className="text-warning-500">*</span>, part],
+                )}
+              </>
+            ) : (
+              label
+            )}
             {note && <span className="text-grey-400 text-xs mr-1">{note}</span>}
           </label>
         )}

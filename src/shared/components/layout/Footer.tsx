@@ -146,7 +146,7 @@ export const Footer = async () => {
                   {footer.links.technicalSupport}
                 </Link>
                 <Link
-                  href="/sign/terms-conditions"
+                  href="/terms"
                   className="font-normal hover:text-primary-300 transition-colors"
                 >
                   {footer.links.termsConditions}

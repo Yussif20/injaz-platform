@@ -24,7 +24,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className="flex flex-col gap-2">
         {label && (
           <label className="text-sm md:text-base font-normal text-[#333]">
-            {label}
+            {label.includes("*") ? (
+              <>
+                {label.split("*").flatMap((part, i) =>
+                  i === 0 ? [part] : [<span key={i} className="text-warning-500">*</span>, part],
+                )}
+              </>
+            ) : (
+              label
+            )}
           </label>
         )}
         <div className="relative">
@@ -35,7 +43,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               w-full bg-white
               text-[#333333]
               text-xs sm:text-xs md:text-sm font-light sm:font-light md:font-normal text-right
-              px-3 py-2 pr-10
+              px-3 py-2 pe-10 ps-3
               border rounded-2xl
               transition-colors duration-200
               appearance-none cursor-pointer
@@ -61,8 +69,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          {/* Arrow icon */}
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          {/* Arrow icon - on inline-end so RTL has no extra spacing on text side */}
+          <div className="absolute end-3 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg
               className="w-4 h-4 text-grey-500"
               fill="none"
