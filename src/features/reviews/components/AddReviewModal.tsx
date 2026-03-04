@@ -82,7 +82,10 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               { id: newReview.id, file: imageFile },
               {
                 onSuccess: () => {
-                  toast({ type: "success", message: "تمت إضافة التقييم بنجاح" });
+                  toast({
+                    type: "success",
+                    message: "تمت إضافة التقييم بنجاح",
+                  });
                   handleClose();
                 },
                 onError: (err) => {
@@ -117,9 +120,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
       >
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-text-dark">
-            {modalT.title}
-          </h2>
+          <h2 className="text-lg font-medium text-text-dark">{modalT.title}</h2>
           <button
             onClick={handleClose}
             className="rounded-lg p-1 text-grey-400 hover:bg-grey-100"
@@ -155,7 +156,11 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
                 onClick={() => setJobTitleOpen(!jobTitleOpen)}
                 className="flex w-full items-center justify-between rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
               >
-                <span className={selectedJobTitle ? "text-text-dark" : "text-text-muted"}>
+                <span
+                  className={
+                    selectedJobTitle ? "text-text-dark" : "text-text-muted"
+                  }
+                >
                   {selectedJobTitle
                     ? selectedJobTitleLabel
                     : modalT.jobTitlePlaceholder}
@@ -229,44 +234,46 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
           </div>
 
           {/* Client Image Upload — hidden when showLogo is on */}
-          {!showLogo && <div>
-            <label className="mb-2 block text-sm font-medium text-text-dark">
-              {modalT.clientImage}
-            </label>
-            <div
-              className="cursor-pointer rounded-lg border border-dashed border-grey-300 bg-[#f6f6f6] px-6 py-6 text-center"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="preview"
-                  className="mx-auto h-20 w-20 rounded-full object-cover"
-                />
-              ) : (
-                <>
-                  <Upload className="mx-auto h-6 w-6 text-grey-400" />
-                  <p className="mt-2 text-xs text-grey-400">
-                    {modalT.imageMaxSize}
-                  </p>
-                  <span className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700">
-                    <Upload className="h-4 w-4" />
-                    {modalT.uploadImage}
-                  </span>
-                </>
-              )}
+          {!showLogo && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-text-dark">
+                {modalT.clientImage}
+              </label>
+              <div
+                className="cursor-pointer rounded-lg border border-dashed border-grey-300 bg-[#f6f6f6] px-6 py-6 text-center"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="preview"
+                    className="mx-auto h-20 w-20 rounded-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <Upload className="mx-auto h-6 w-6 text-grey-400" />
+                    <p className="mt-2 text-xs text-grey-400">
+                      {modalT.imageMaxSize}
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700">
+                      <Upload className="h-4 w-4" />
+                      {modalT.uploadImage}
+                    </span>
+                  </>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </div>}
+          )}
 
           {/* Show Site Logo Toggle */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => {

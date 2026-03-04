@@ -31,19 +31,23 @@ export const content = {
       },
       confirm: {
         deleteTitle: "تأكيد الحذف",
-        deleteMessage: "هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+        deleteMessage:
+          "هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
         delete: "حذف",
         cancel: "إلغاء",
       },
     },
     auth: {
       login: {
-        title: "تسجيل الدخول",
+        title: "تسجيل دخول",
+        description:
+          "مرحبا بك في لوحة تحكم انجاز معلم، سجل دخولك لمتابعة البيانات والإحصائيات",
+        email: "البريد الإلكتروني",
         phone: "رقم الهاتف",
-        phonePlaceholder: "05xxxxxxxx",
+        phonePlaceholder: "مثال: mohammed@gmail.com",
         password: "كلمة المرور",
         passwordPlaceholder: "أدخل كلمة المرور",
-        submit: "دخول",
+        submit: "تسجيل دخول",
         forgotPassword: "نسيت كلمة المرور؟",
         errorGeneric: "فشل تسجيل الدخول، يرجى المحاولة مرة أخرى",
       },
@@ -163,7 +167,8 @@ export const content = {
         jobTitle: "المسمى الوظيفي",
         jobTitlePlaceholder: "اختر المسمى الوظيفي",
         content: "محتوى التقييم",
-        contentPlaceholder: "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
+        contentPlaceholder:
+          "تجربة مرة ممتازة صراحة انصح فيها كل مدرس يبي يصمم ملف انجاز مميز ومختلف",
         selectRating: "حدد التقييم",
         clientImage: "صورة العميل",
         imageMaxSize: "يجب أن لا يزيد حجم الصورة عن 1 جيجا",
@@ -178,8 +183,7 @@ export const content = {
       },
     },
     reports: {
-      error:
-        "فشل تحميل التقرير. يرجى تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
+      error: "فشل تحميل التقرير. يرجى تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
       stats: {
         totalProfits: "إجمالي الأرباح",
         newUsers: "عدد المستخدمين الجدد",
@@ -260,7 +264,8 @@ export const content = {
       },
       confirm: {
         deleteTitle: "Confirm Delete",
-        deleteMessage: "Are you sure you want to delete this item? This action cannot be undone.",
+        deleteMessage:
+          "Are you sure you want to delete this item? This action cannot be undone.",
         delete: "Delete",
         cancel: "Cancel",
       },
@@ -392,7 +397,8 @@ export const content = {
         jobTitle: "Job Title",
         jobTitlePlaceholder: "Select job title",
         content: "Review Content",
-        contentPlaceholder: "An excellent experience, I recommend every teacher to create an achievement file",
+        contentPlaceholder:
+          "An excellent experience, I recommend every teacher to create an achievement file",
         selectRating: "Select Rating",
         clientImage: "Client Image",
         imageMaxSize: "Image must not exceed 1 GB",
@@ -407,8 +413,7 @@ export const content = {
       },
     },
     reports: {
-      error:
-        "Failed to load report. Please refresh the page or sign in again.",
+      error: "Failed to load report. Please refresh the page or sign in again.",
       stats: {
         totalProfits: "Total Profits",
         newUsers: "New Users",
