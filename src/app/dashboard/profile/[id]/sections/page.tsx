@@ -198,21 +198,6 @@ export default function ProfileSectionsPage() {
 
   return (
     <div className="text-right" dir="rtl">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-grey-500 mb-6">
-        <Link href={ROUTES.DASHBOARD} className="hover:text-primary-500">
-          {sectionsPage.breadcrumb.home}
-        </Link>
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        <span>{sectionsPage.breadcrumb.addEvidence}</span>
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        <span className="text-secondary-800">{sectionsPage.breadcrumb.sections}</span>
-      </nav>
-
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>

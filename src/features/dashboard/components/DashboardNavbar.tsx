@@ -66,9 +66,12 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
 
       return (
         <>
-          <span className={`text-[#666666] ${baseClass}`}>
+          <Link
+            href={ROUTES.DASHBOARD}
+            className={`text-[#666666] hover:text-primary-500 transition-colors ${baseClass}`}
+          >
             {sectionsPage.breadcrumb.home}
-          </span>
+          </Link>
           {sep()}
           <span className={`text-[#666666] ${baseClass}`}>
             {sectionsPage.breadcrumb.addEvidence}
