@@ -133,7 +133,6 @@ export const DarkPortfolioHeader = ({
             </p>
             <h1
               className="text-lg md:text-[28px] lg:text-4xl font-normal bg-clip-text text-transparent bg-[linear-gradient(90deg,#1940A6_-22.92%,#478AE2_59.95%,#FFFFFF_119.01%)]"
-              data-screenshot-text-color="#FFFFFF"
             >
               {teacherName}
             </h1>

@@ -58,6 +58,10 @@ export function ApiInterceptorSetup() {
           return clientApi(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError);
+          // Skip redirect on the print page (rendered by Puppeteer without cookies)
+          if (window.location.pathname.endsWith("/print")) {
+            return Promise.reject(refreshError);
+          }
           // Clear all cached data so dashboard never shows stale data after redirect
           queryClient.clear();
           // Redirect to sign-in (or landing) so user must log in again
