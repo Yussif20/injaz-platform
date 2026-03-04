@@ -472,6 +472,11 @@ export const dashboardContent = {
     callbackRefresh: "تحديث الحالة",
     callbackGoToSubscription: "الذهاب إلى الاشتراك",
 
+    // Payment success page (dedicated redirect after successful payment)
+    successTitle: "تم الاشتراك بنجاح",
+    successSubtitle: "يمكنك إنشاء ونشر أول ملف لك الآن",
+    successBackHome: "العودة للرئيسية",
+
     // Subscription form
     form: {
       title: "تأكيد الإشتراك",

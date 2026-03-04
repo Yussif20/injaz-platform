@@ -180,16 +180,7 @@ export function RegisterForm() {
                   {signUp.phoneNote}
                 </span>
               </label>
-              <div className="flex items-stretch gap-2">
-                <select
-                  aria-label="country-code"
-                  value={countryCode}
-                  onChange={(e) => setCountryCode(e.target.value)}
-                  className="bg-grey-100 text-text-dark text-sm sm:text-base px-3 py-2.5 sm:py-3 rounded-xl outline-none border-2 border-transparent focus:border-primary-500"
-                >
-                  <option value="+20">+20</option>
-                  <option value="+966">+966</option>
-                </select>
+              <div className="relative">
                 <input
                   id="phone"
                   type="tel"
@@ -198,8 +189,8 @@ export function RegisterForm() {
                     onChange: handlePhoneInput,
                   })}
                   className={`
-                    flex-1 bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-                    px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
+                    w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                    pr-24 pl-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
                     border-2 transition-colors duration-200
                     ${
                       detailsForm.formState.errors.phone
@@ -208,6 +199,29 @@ export function RegisterForm() {
                     }
                   `}
                 />
+                <select
+                  aria-label="country-code"
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="
+                    absolute right-2 top-1/2 -translate-y-1/2
+                    bg-white/80 text-text-dark text-xs sm:text-sm
+                    px-2.5 sm:px-3 pr-6 py-1.5 sm:py-2
+                    rounded-full border border-grey-300 shadow-sm
+                    outline-none cursor-pointer
+                    focus:border-primary-500 focus:ring-2 focus:ring-primary-100
+                    appearance-none
+                  "
+                  style={{
+                    backgroundImage: "url('/icons/ui/arrow-down.svg')",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "left 0.5rem center",
+                    backgroundSize: "14px 14px",
+                  }}
+                >
+                  <option value="+20">+20</option>
+                  <option value="+966">+966</option>
+                </select>
               </div>
               {detailsForm.formState.errors.phone && (
                 <p className="text-warning-500 text-xs mt-1">

@@ -14,6 +14,7 @@ import { authContent } from "@/content";
 import { ROUTES } from "@/config";
 import { useLogin } from "../hooks/useLogin";
 import { loginSchema, type LoginFormValues } from "../validations/auth.schemas";
+import { CountryCodePicker } from "./CountryCodePicker";
 
 interface LoginFormProps {
   onForgotPassword?: () => void;
@@ -66,23 +67,14 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
       )}
 
       {/* Phone Input */}
-      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
         <label
           className="text-sm sm:text-base font-medium text-text-dark"
           htmlFor="phone"
         >
           {signIn.phoneLabel}
         </label>
-        <div className="flex items-stretch gap-2">
-          <select
-            aria-label="country-code"
-            value={countryCode}
-            onChange={(e) => setCountryCode(e.target.value)}
-            className="bg-grey-100 text-text-dark text-sm sm:text-base px-3 py-3 sm:py-3.5 rounded-xl outline-none border-2 border-transparent focus:border-primary-500"
-          >
-            <option value="+20">+20</option>
-            <option value="+966">+966</option>
-          </select>
+        <div className="relative">
           <input
             id="phone"
             type="tel"
@@ -91,8 +83,8 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
               onChange: handlePhoneInput,
             })}
             className={`
-              flex-1 bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-              px-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
+              w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+              pr-24 pl-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
               border-2 transition-colors duration-200
               ${
                 errors.phone
@@ -100,6 +92,11 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
                   : "border-transparent focus:border-primary-500"
               }
             `}
+          />
+          <CountryCodePicker
+            value={countryCode}
+            onChange={setCountryCode}
+              className="absolute right-2 -top-11 z-10"
           />
         </div>
         {errors.phone && (

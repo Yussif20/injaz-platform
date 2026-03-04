@@ -40,6 +40,9 @@ export const ROUTES = {
     "/dashboard/account/subscription/manage",
   DASHBOARD_ACCOUNT_SUBSCRIPTION_HISTORY:
     "/dashboard/account/subscription/history",
+  /** Redirect URL for successful subscription payment (give to backend) */
+  DASHBOARD_ACCOUNT_SUBSCRIPTION_SUCCESS:
+    "/dashboard/account/subscription/success",
   DASHBOARD_ACCOUNT_SUPPORT: "/dashboard/account/support",
   DASHBOARD_ACCOUNT_TERMS: "/dashboard/account/terms",
   DASHBOARD_ACCOUNT_HOW_TO_USE: "/dashboard/account/how-to-use",
