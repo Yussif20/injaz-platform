@@ -3,6 +3,10 @@
 import Image from "next/image";
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
+import {
+  gregorianISOToGregorianDisplay,
+  gregorianISOToHijriDisplay,
+} from "@/shared/lib/hijri-utils";
 
 interface DefaultPersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
@@ -17,57 +21,24 @@ interface DefaultPersonalInfoSectionProps {
   theme: ThemeColors;
 }
 
-// Curved dashed line SVG for connecting cards
-const ConnectorLine = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 400 400"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <path
-      d="M200 0 C 200 40, 380 60, 380 100 S 20 160, 20 200 S 380 260, 380 300 S 200 360, 200 400"
-      stroke="#8CBFBF"
-      strokeWidth="2.5"
-      strokeDasharray="10 8"
-      fill="none"
-    />
-  </svg>
-);
-
-// Mobile connector line (vertical flowing)
-const MobileConnectorLine = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 100 600"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <path
-      d="M50 0 C 80 60, 20 120, 50 180 S 80 240, 50 300 S 20 360, 50 420 S 80 480, 50 540 S 20 580, 50 600"
-      stroke="#B8D8D8"
-      strokeWidth="2"
-      strokeDasharray="6 6"
-      fill="none"
-    />
-  </svg>
-);
-
 export const DefaultPersonalInfoSection = ({
   personalInfo,
   content,
   theme,
 }: DefaultPersonalInfoSectionProps) => {
-  // Format birth date
-  const formatDate = (dateString: string | null) => {
+  // Format birth date with both Gregorian and Hijri (returns object for two-line display)
+  const formatDate = (
+    dateString: string | null,
+  ): { gregorian: string; hijri: string } | null => {
     if (!dateString) return null;
     try {
-      const date = new Date(dateString);
-      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      const iso = dateString.split("T")[0];
+      return {
+        gregorian: gregorianISOToGregorianDisplay(iso),
+        hijri: gregorianISOToHijriDisplay(iso),
+      };
     } catch {
-      return dateString;
+      return null;
     }
   };
 
@@ -81,7 +52,7 @@ export const DefaultPersonalInfoSection = ({
 
   if (!hasData) return null;
 
-  const birthDate = formatDate(personalInfo?.birthDate ?? null);
+  const birthDateFormatted = formatDate(personalInfo?.birthDate ?? null);
 
   // Card data configuration
   // patternSide: "start" means pattern renders first in flex (right in RTL), "end" means last (left in RTL)
@@ -89,7 +60,12 @@ export const DefaultPersonalInfoSection = ({
     {
       id: "birthday",
       label: content.birthday,
-      value: birthDate,
+      value: birthDateFormatted
+        ? `${birthDateFormatted.gregorian}\n${birthDateFormatted.hijri}`
+        : null,
+      valueLines: birthDateFormatted
+        ? [birthDateFormatted.gregorian, birthDateFormatted.hijri]
+        : null,
       pattern: "/images/profiles/default/birthday-pattern.svg",
       position: "right" as const,
       patternSide: "end" as const, // Pattern on left/inner side
@@ -124,19 +100,25 @@ export const DefaultPersonalInfoSection = ({
   if (cards.length === 0) return null;
 
   return (
-    <div className="px-4 py-6">
-      {/* Full section wrapper: header + cards, with zig-zag from section start */}
-      <div className="relative">
-        {/* Desktop: Connector Line - spans from section start (header) through cards */}
-        <div className="absolute inset-0 hidden md:flex justify-center pointer-events-none">
-          <ConnectorLine className="w-[70%] lg:w-[65%] max-w-[600px] h-full opacity-80" />
-        </div>
+    <div className="relative py-6 overflow-hidden">
+      {/* Zig-zag background pattern - full screen width */}
+      <div
+        className="absolute inset-0 pointer-events-none bg-repeat-y bg-center opacity-80"
+        style={{
+          backgroundImage: "url('/images/profiles/default/zig-zag.svg')",
+          backgroundSize: "100% auto",
+          left: "50%",
+          right: "50%",
+          marginLeft: "-50vw",
+          marginRight: "-30vw",
+          marginBottom: "-25vw",
+          width: "52vw",
+          // transform: "scaleX(-1)",
+        }}
+      />
 
-        {/* Mobile: Connector Line - spans from section start through cards */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 md:hidden pointer-events-none w-24">
-          <MobileConnectorLine className="w-full h-full opacity-60" />
-        </div>
-
+      {/* Content wrapper with padding */}
+      <div className="relative px-4">
         {/* Section Header */}
         <div className="flex items-center justify-start gap-2 md:gap-3 mb-6 md:mb-10 relative">
           {/* Star Icon */}
@@ -157,63 +139,75 @@ export const DefaultPersonalInfoSection = ({
         <div className="hidden md:block relative">
           {/* Cards */}
           <div className="relative space-y-6 lg:space-y-8">
-          {cards.map((card) => (
-            <div
-              key={card.id}
-              className={`flex ${
-                card.position === "right" ? "justify-start" : "justify-end"
-              }`}
-            >
+            {cards.map((card) => (
               <div
-                className="w-[320px] lg:w-[380px] rounded-[28px] lg:rounded-[36px] overflow-hidden flex"
-                style={{ backgroundColor: theme.primary }}
+                key={card.id}
+                className={`flex ${
+                  card.position === "right" ? "justify-start" : "justify-end"
+                }`}
               >
-                {/* Pattern - renders first (right side in RTL) */}
-                {card.patternSide === "start" && (
-                  <div className="w-20 lg:w-24 shrink-0 relative">
-                    <Image
-                      src={card.pattern}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-
-                {/* Content */}
                 <div
-                  className={`flex-1 min-w-0 flex flex-col justify-center py-5 lg:py-6 px-4 lg:px-6 ${
-                    (card as { contentAlign?: "right" | "left" }).contentAlign === "right"
-                      ? "text-right"
-                      : (card as { contentAlign?: "right" | "left" }).contentAlign === "left"
-                        ? "text-left"
-                        : card.position === "right"
-                          ? "text-right"
-                          : "text-left"
-                  }`}
+                  className="w-[320px] lg:w-[380px] rounded-[28px] lg:rounded-[36px] overflow-hidden flex"
+                  style={{ backgroundColor: theme.primary }}
                 >
-                  <h3 className="text-white text-base lg:text-lg font-semibold mb-1 lg:mb-2">
-                    {card.label}
-                  </h3>
-                  <p className="text-white/90 text-sm lg:text-base font-light break-words">
-                    {card.value}
-                  </p>
-                </div>
+                  {/* Pattern - renders first (right side in RTL) */}
+                  {card.patternSide === "start" && (
+                    <div className="w-20 lg:w-24 shrink-0 relative">
+                      <Image
+                        src={card.pattern}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
 
-                {/* Pattern - renders last (left side in RTL) */}
-                {card.patternSide === "end" && (
-                  <div className="w-20 lg:w-24 shrink-0 relative">
-                    <Image
-                      src={card.pattern}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
+                  {/* Content */}
+                  <div
+                    className={`flex-1 min-w-0 flex flex-col justify-center py-5 lg:py-6 px-4 lg:px-6 ${
+                      (card as { contentAlign?: "right" | "left" })
+                        .contentAlign === "right"
+                        ? "text-right"
+                        : (card as { contentAlign?: "right" | "left" })
+                              .contentAlign === "left"
+                          ? "text-left"
+                          : card.position === "right"
+                            ? "text-right"
+                            : "text-left"
+                    }`}
+                  >
+                    <h3 className="text-white text-base lg:text-lg font-semibold mb-1 lg:mb-2">
+                      {card.label}
+                    </h3>
+                    {(card as { valueLines?: string[] | null }).valueLines ? (
+                      <div className="text-white/90 text-sm lg:text-base font-light">
+                        {(card as { valueLines: string[] }).valueLines.map(
+                          (line, i) => (
+                            <p key={i}>{line}</p>
+                          ),
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-white/90 text-sm lg:text-base font-light wrap-break-word">
+                        {card.value}
+                      </p>
+                    )}
                   </div>
-                )}
+
+                  {/* Pattern - renders last (left side in RTL) */}
+                  {card.patternSide === "end" && (
+                    <div className="w-20 lg:w-24 shrink-0 relative">
+                      <Image
+                        src={card.pattern}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
 
@@ -221,63 +215,65 @@ export const DefaultPersonalInfoSection = ({
         <div className="md:hidden relative">
           {/* Cards */}
           <div className="relative space-y-4">
-          {cards.map((card, index) => (
-            <div
-              key={card.id}
-              className={`flex ${
-                index % 2 === 0 ? "justify-start" : "justify-end"
-              }`}
-            >
+            {cards.map((card, index) => (
               <div
-                className="w-[85%] max-w-[300px] rounded-[24px] overflow-hidden flex"
-                style={{ backgroundColor: theme.primary }}
+                key={card.id}
+                className={`flex ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
               >
-                {/* Pattern - renders first (right side in RTL) */}
-                {card.patternSide === "start" && (
-                  <div className="w-16 shrink-0 relative">
-                    <Image
-                      src={card.pattern}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-
-                {/* Content */}
                 <div
-                  className={`flex-1 min-w-0 flex flex-col justify-center py-4 px-4 ${
-                    (card as { contentAlign?: "right" | "left" }).contentAlign === "right"
-                      ? "text-right"
-                      : (card as { contentAlign?: "right" | "left" }).contentAlign === "left"
-                        ? "text-left"
-                        : card.position === "right"
-                          ? "text-right"
-                          : "text-left"
-                  }`}
+                  className="w-[85%] max-w-[300px] rounded-[24px] overflow-hidden flex"
+                  style={{ backgroundColor: theme.primary }}
                 >
-                  <h3 className="text-white text-sm font-semibold mb-1">
-                    {card.label}
-                  </h3>
-                  <p className="text-white/90 text-xs font-light break-words">
-                    {card.value}
-                  </p>
-                </div>
+                  {/* Pattern - renders first (right side in RTL) */}
+                  {card.patternSide === "start" && (
+                    <div className="w-16 shrink-0 relative">
+                      <Image
+                        src={card.pattern}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
 
-                {/* Pattern - renders last (left side in RTL) */}
-                {card.patternSide === "end" && (
-                  <div className="w-16 shrink-0 relative">
-                    <Image
-                      src={card.pattern}
-                      alt=""
-                      fill
-                      className="object-cover"
-                    />
+                  {/* Content */}
+                  <div
+                    className={`flex-1 min-w-0 flex flex-col justify-center py-4 px-4 ${
+                      (card as { contentAlign?: "right" | "left" })
+                        .contentAlign === "right"
+                        ? "text-right"
+                        : (card as { contentAlign?: "right" | "left" })
+                              .contentAlign === "left"
+                          ? "text-left"
+                          : card.position === "right"
+                            ? "text-right"
+                            : "text-left"
+                    }`}
+                  >
+                    <h3 className="text-white text-sm font-semibold mb-1">
+                      {card.label}
+                    </h3>
+                    <p className="text-white/90 text-xs font-light break-words">
+                      {card.value}
+                    </p>
                   </div>
-                )}
+
+                  {/* Pattern - renders last (left side in RTL) */}
+                  {card.patternSide === "end" && (
+                    <div className="w-16 shrink-0 relative">
+                      <Image
+                        src={card.pattern}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>

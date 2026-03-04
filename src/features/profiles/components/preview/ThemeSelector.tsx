@@ -50,11 +50,7 @@ export const ThemeSelector = ({
     <>
       {/* Floating Template Button */}
       <div className="fixed bottom-24 left-4 flex flex-col items-center gap-2 z-40 bg-white rounded-3xl p-4 shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full flex items-center justify-center transition-transform hover:scale-110"
-          style={{}}
-        >
+        <div className="w-14 h-14 rounded-full flex items-center justify-center">
           <div className="relative w-8 h-8">
             <Image
               src="/images/profiles/controller.svg"
@@ -63,16 +59,16 @@ export const ThemeSelector = ({
               className="object-contain"
             />
           </div>
-        </button>
+        </div>
 
         {/* Templates Label Button */}
-        <p
-          // onClick={() => setIsOpen(true)}
-          className="px-3 py-1 rounded-full text-white text-[12px] md:text-base font-light"
+        <button
+          onClick={() => setIsOpen(true)}
+          className="px-3 py-1 rounded-full text-white text-[12px] md:text-base font-light transition-transform hover:scale-105"
           style={{ backgroundColor: currentColor }}
         >
           القوالب
-        </p>
+        </button>
       </div>
 
       {/* Modal Overlay */}

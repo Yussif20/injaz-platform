@@ -3,6 +3,10 @@
 import Image from "next/image";
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
+import {
+  gregorianISOToGregorianDisplay,
+  gregorianISOToHijriDisplay,
+} from "@/shared/lib/hijri-utils";
 
 interface DarkPersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
@@ -24,16 +28,16 @@ export const DarkPersonalInfoSection = ({
 }: DarkPersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
-  // Format date (Hijri "HYYYY-MM-DD" or Gregorian)
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "—";
-    if (dateStr.startsWith("H")) {
-      const parts = dateStr.slice(1).split("-");
-      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]} هـ`;
-      return dateStr;
-    }
-    const date = new Date(dateStr);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  // Format date with both Gregorian and Hijri (returns object for two-line display)
+  const formatDate = (
+    dateStr: string,
+  ): { gregorian: string; hijri: string } | null => {
+    if (!dateStr) return null;
+    const iso = dateStr.split("T")[0];
+    return {
+      gregorian: gregorianISOToGregorianDisplay(iso),
+      hijri: gregorianISOToHijriDisplay(iso),
+    };
   };
 
   const cards = [
@@ -48,6 +52,7 @@ export const DarkPersonalInfoSection = ({
       label: content.birthday,
       value: formatDate(personalInfo.birthDate),
       icon: "birthday-card.svg",
+      isDateField: true,
     },
     {
       id: "origin",
@@ -101,9 +106,23 @@ export const DarkPersonalInfoSection = ({
               <p className="text-[#F8F8F8] text-sm lg:text-2xl font-medium">
                 {card.label}
               </p>
-              <p className="text-[#F8F8F8] text-xs md:text-xl break-all font-light">
-                {card.value}
-              </p>
+              {(card as { isDateField?: boolean }).isDateField && card.value ? (
+                <div className="text-[#F8F8F8] text-xs md:text-xl font-light">
+                  <p>
+                    {
+                      (card.value as { gregorian: string; hijri: string })
+                        .gregorian
+                    }
+                  </p>
+                  <p>
+                    {(card.value as { gregorian: string; hijri: string }).hijri}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-[#F8F8F8] text-xs md:text-xl break-all font-light">
+                  {card.value as string}
+                </p>
+              )}
             </div>
 
             {/* Card Image - Left Side */}

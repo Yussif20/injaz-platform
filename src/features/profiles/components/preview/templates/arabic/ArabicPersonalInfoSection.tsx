@@ -2,6 +2,10 @@
 
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
+import {
+  gregorianISOToGregorianDisplay,
+  gregorianISOToHijriDisplay,
+} from "@/shared/lib/hijri-utils";
 
 interface ArabicPersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
@@ -33,33 +37,39 @@ const CARD_COLORS = {
 export const ArabicPersonalInfoSection = ({
   personalInfo,
   content,
-  theme,
 }: ArabicPersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
-  // Format date (Hijri "HYYYY-MM-DD" or Gregorian)
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "—";
-    if (dateStr.startsWith("H")) {
-      const parts = dateStr.slice(1).split("-");
-      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]} هـ`;
-      return dateStr;
-    }
-    const date = new Date(dateStr);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  // Format date with both Gregorian and Hijri (returns object for two-line display)
+  const formatDate = (
+    dateStr: string,
+  ): { gregorian: string; hijri: string } | null => {
+    if (!dateStr) return null;
+    const iso = dateStr.split("T")[0];
+    return {
+      gregorian: gregorianISOToGregorianDisplay(iso),
+      hijri: gregorianISOToHijriDisplay(iso),
+    };
   };
+
+  const birthDateFormatted = formatDate(personalInfo.birthDate);
 
   return (
     <div className="px-4 py-6">
       {/* Section Header */}
-      <div
-        className="flex items-start justify-start gap-2 md:gap-3 mb-4 md:mb-8 border-r-2 pr-3 md:pr-6"
-        style={{ borderColor: theme.primary }}
-      >
-        <div className="text-right flex flex-col gap-2 md:gap-4">
-          <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
-            {content.title}
-          </h2>
+      <div className="mb-4 md:mb-8">
+        <div className="flex items-center w-full">
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
+              1
+            </span>
+            <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark">
+              {content.title}
+            </h2>
+          </div>
+          <div className="flex-1 h-px bg-[#E7E7E3] ms-4" />
+        </div>
+        <div className="text-right flex flex-col gap-2 md:gap-4 mt-2 md:mt-3">
           <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
             {content.subtitle}
           </p>
@@ -95,9 +105,16 @@ export const ArabicPersonalInfoSection = ({
               <p className=" text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.birthday}
               </p>
-              <p className=" text-xs md:text-xl lg:text-2xl">
-                {formatDate(personalInfo.birthDate)}
-              </p>
+              <div className="text-xs md:text-xl lg:text-2xl">
+                {birthDateFormatted ? (
+                  <>
+                    <p>{birthDateFormatted.gregorian}</p>
+                    <p>{birthDateFormatted.hijri}</p>
+                  </>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -130,9 +147,16 @@ export const ArabicPersonalInfoSection = ({
               <p className=" text-sm md:text-2xl lg:text-[28px] mb-1 md:mb-2">
                 {content.birthday}
               </p>
-              <p className=" text-xs md:text-xl lg:text-2xl">
-                {formatDate(personalInfo.birthDate)}
-              </p>
+              <div className="text-xs md:text-xl lg:text-2xl">
+                {birthDateFormatted ? (
+                  <>
+                    <p>{birthDateFormatted.gregorian}</p>
+                    <p>{birthDateFormatted.hijri}</p>
+                  </>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
 

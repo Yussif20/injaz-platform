@@ -51,6 +51,50 @@ function normalizeImageUrl(raw: string | null | undefined): string | null {
 }
 
 /**
+ * Convert all external <img> elements in a cloned document to inline data URLs
+ * so html2canvas can render them (it cannot draw cross-origin images on canvas).
+ * Fetches through /api/images/proxy to avoid CORS issues with Backblaze S3.
+ */
+async function inlineExternalImages(clonedDoc: Document): Promise<void> {
+  const imgs = clonedDoc.querySelectorAll("img");
+  const promises: Promise<void>[] = [];
+
+  imgs.forEach((img) => {
+    const src = img.getAttribute("src") || "";
+    // Only convert external http(s) URLs — skip local, data:, and empty
+    if (!src.startsWith("http://") && !src.startsWith("https://")) return;
+    if (src.startsWith("data:")) return;
+
+    const proxyUrl = `/api/images/proxy?url=${encodeURIComponent(src)}`;
+
+    const p = fetch(proxyUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Proxy returned ${res.status}`);
+        return res.blob();
+      })
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }),
+      )
+      .then((dataUrl) => {
+        img.setAttribute("src", dataUrl);
+      })
+      .catch((err) => {
+        console.warn("Could not inline image for capture:", src, err);
+      });
+
+    promises.push(p);
+  });
+
+  await Promise.all(promises);
+}
+
+/**
  * Convert a CSS color string that may use oklab/oklch to rgb/rgba.
  * html2canvas and some parsers don't support oklab, so we convert for the clone.
  */
@@ -238,7 +282,10 @@ export default function ProfilePreviewPage() {
         scrollY: -window.scrollY,
         windowHeight: contentRef.current.scrollHeight,
         logging: false,
-        onclone: (clonedDoc) => {
+        onclone: async (clonedDoc) => {
+          // Inline external images as data URLs so html2canvas can render them
+          await inlineExternalImages(clonedDoc);
+
           // Force all elements to use RGB colors (html2canvas doesn't support oklab)
           const win = clonedDoc.defaultView || window;
           const allElements = clonedDoc.body.querySelectorAll("*");
@@ -413,7 +460,10 @@ export default function ProfilePreviewPage() {
         scrollY: -window.scrollY,
         windowHeight: contentRef.current.scrollHeight,
         logging: false,
-        onclone: (clonedDoc) => {
+        onclone: async (clonedDoc) => {
+          // Inline external images as data URLs so html2canvas can render them
+          await inlineExternalImages(clonedDoc);
+
           const win = clonedDoc.defaultView || window;
           const allElements = clonedDoc.body.querySelectorAll("*");
           allElements.forEach((el) => {

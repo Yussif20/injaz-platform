@@ -19,6 +19,8 @@ export const HeritageEducationSection = ({
 }: HeritageEducationSectionProps) => {
   if (!qualifications || qualifications.length === 0) return null;
 
+  const heritageSubtitle = "تعرف على البيانات العلمية الخاصة بي";
+
   // Format graduation date to year only
   const formatYear = (dateStr: string) => {
     if (!dateStr) return "—";
@@ -35,7 +37,7 @@ export const HeritageEducationSection = ({
             {content.title}
           </h2>
           <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
-            {content.subtitle}
+            {heritageSubtitle}
           </p>
         </div>
       </div>

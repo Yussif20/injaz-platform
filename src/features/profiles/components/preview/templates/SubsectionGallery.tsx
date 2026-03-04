@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useRef, useState } from "react";
 import type { ThemeColors } from "../../../types/theme.types";
 import type { SubsectionImage } from "../../../types/profile.types";
+import { normalizeImageSrc } from "@/shared/components/ui/ProfileImage";
 
 interface SubsectionGalleryProps {
   images: SubsectionImage[];
@@ -20,6 +20,7 @@ export const SubsectionGallery = ({
 }: SubsectionGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedImage = images[selectedIndex];
+  const thumbsRef = useRef<HTMLDivElement>(null);
 
   const attachmentLabelColorMap: Record<string, string> = {
     "#008387": "#333333", // default
@@ -49,46 +50,68 @@ export const SubsectionGallery = ({
   const arrowStyle = arrowBgColorMap[theme.primary] || { bg: theme.primary };
 
   const handlePrev = () => {
-    setSelectedIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    setSelectedIndex((prev) => {
+      const next = prev > 0 ? prev - 1 : images.length - 1;
+      scrollThumbIntoView(next);
+      return next;
+    });
   };
 
   const handleNext = () => {
-    setSelectedIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    setSelectedIndex((prev) => {
+      const next = prev < images.length - 1 ? prev + 1 : 0;
+      scrollThumbIntoView(next);
+      return next;
+    });
+  };
+
+  const scrollThumbIntoView = (index: number) => {
+    const container = thumbsRef.current;
+    if (!container) return;
+    const thumb = container.children[index] as HTMLElement | undefined;
+    thumb?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    });
   };
 
   return (
     <div className="flex flex-col gap-5 lg:gap-10">
-      {/* Description text at top - right aligned */}
-      {selectedImage?.description && (
-        <p
-          className="text-right text-xs font-light md:text-xl md:font-normal lg:text-2xl"
-          style={{ color: attachmentLabelColor }}
-        >
-          {attachmentLabel} {selectedImage.description}
-        </p>
-      )}
+      {/* Attachment label + subsection title at top */}
+      <p
+        className="text-right text-xs font-light md:text-xl md:font-normal lg:text-2xl"
+        style={{ color: attachmentLabelColor }}
+      >
+        {attachmentLabel} {subsectionTitle}
+      </p>
 
       {/* Featured Image - full width with rounded corners */}
-      <div className="relative h-33.5 md:h-80 lg:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden">
-        <Image
-          src={selectedImage?.publicUrl || "/images/profiles/achievment.png"}
+      <div className="relative h-33.5 md:h-80 lg:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden bg-black/5">
+        <img
+          src={
+            selectedImage?.publicUrl
+              ? normalizeImageSrc(selectedImage.publicUrl)
+              : "/images/profiles/achievment.png"
+          }
           alt={selectedImage?.description || "صورة الشاهد"}
-          fill
-          className="object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </div>
 
-      {/* Title */}
-      <p
-        className="text-xs font-normal md:text-2xl lg:text-[28px] text-right"
-        style={{ color: subsectionTitleColor }}
-      >
-        {subsectionTitle}
-      </p>
+      {/* Image title */}
+      {selectedImage?.description && (
+        <p
+          className="text-xs font-normal md:text-2xl lg:text-[28px] text-right"
+          style={{ color: subsectionTitleColor }}
+        >
+          {selectedImage.description}
+        </p>
+      )}
 
-      {/* Navigation Arrows - below title, aligned to left (appears on left in RTL) */}
+      {/* Navigation Arrows + Counter */}
       {images.length > 1 && (
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex w-full items-center justify-start gap-2">
           <button
             onClick={handlePrev}
             className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors"
@@ -112,6 +135,12 @@ export const SubsectionGallery = ({
               />
             </svg>
           </button>
+          <span
+            className="text-xs md:text-sm tabular-nums mx-2"
+            style={{ color: subsectionTitleColor }}
+          >
+            {selectedIndex + 1} / {images.length}
+          </span>
           <button
             onClick={handleNext}
             className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-colors"
@@ -138,14 +167,21 @@ export const SubsectionGallery = ({
         </div>
       )}
 
-      {/* Thumbnails - show only for multiple images */}
+      {/* Thumbnails - scrollable row */}
       {images.length > 1 && (
-        <div className="flex gap-2 justify-start">
+        <div
+          ref={thumbsRef}
+          className="flex gap-2 justify-start overflow-x-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
           {images.map((image, index) => (
             <button
               key={image.id}
-              onClick={() => setSelectedIndex(index)}
-              className={`relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden transition-all ${
+              onClick={() => {
+                setSelectedIndex(index);
+                scrollThumbIntoView(index);
+              }}
+              className={`relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden transition-all shrink-0 ${
                 index === selectedIndex
                   ? "ring-2 ring-offset-2"
                   : "opacity-60 hover:opacity-100"
@@ -157,11 +193,14 @@ export const SubsectionGallery = ({
               }
               aria-label={`صورة ${index + 1}`}
             >
-              <Image
-                src={image?.publicUrl || "/images/profiles/achievment.png"}
+              <img
+                src={
+                  image?.publicUrl
+                    ? normalizeImageSrc(image.publicUrl)
+                    : "/images/profiles/achievment.png"
+                }
                 alt={`صورة ${index + 1}`}
-                fill
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </button>
           ))}

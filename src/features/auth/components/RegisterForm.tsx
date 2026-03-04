@@ -25,6 +25,7 @@ import { OtpInput } from "./OtpInput";
 export function RegisterForm() {
   const { signUp, otp, buttons } = authContent;
   const [step, setStep] = useState<RegistrationStep>("details");
+  const [countryCode, setCountryCode] = useState("+966");
   const [phone, setPhone] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpError, setOtpError] = useState("");
@@ -71,9 +72,10 @@ export function RegisterForm() {
 
   // Direct register (OTP path commented out): submit form → register endpoint
   const handleDetailsSubmit = (data: RegisterDetailsFormValues) => {
+    const normalizedPhone = `${countryCode}${data.phone.replace(/^\+/, "")}`;
     registerUser({
       fullName: data.fullName,
-      phone: data.phone,
+      phone: normalizedPhone,
       password: data.password,
       confirmPassword: data.confirmPassword,
       gender: data.gender as Gender,
@@ -105,10 +107,10 @@ export function RegisterForm() {
       text
     );
 
-  // Handle phone input - only allow numbers and +
+  // Handle phone input - only allow digits
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const sanitized = value.replace(/[^\d+]/g, "");
+    const sanitized = value.replace(/\D/g, "");
     e.target.value = sanitized;
   };
 
@@ -178,24 +180,35 @@ export function RegisterForm() {
                   {signUp.phoneNote}
                 </span>
               </label>
-              <input
-                id="phone"
-                type="tel"
-                placeholder={signUp.phonePlaceholder}
-                {...detailsForm.register("phone", {
-                  onChange: handlePhoneInput,
-                })}
-                className={`
-                  bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-                  px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
-                  border-2 transition-colors duration-200
-                  ${
-                    detailsForm.formState.errors.phone
-                      ? "border-warning-500"
-                      : "border-transparent focus:border-primary-500"
-                  }
-                `}
-              />
+              <div className="flex items-stretch gap-2">
+                <select
+                  aria-label="country-code"
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="bg-grey-100 text-text-dark text-sm sm:text-base px-3 py-2.5 sm:py-3 rounded-xl outline-none border-2 border-transparent focus:border-primary-500"
+                >
+                  <option value="+20">+20</option>
+                  <option value="+966">+966</option>
+                </select>
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder={signUp.phonePlaceholder}
+                  {...detailsForm.register("phone", {
+                    onChange: handlePhoneInput,
+                  })}
+                  className={`
+                    flex-1 bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                    px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
+                    border-2 transition-colors duration-200
+                    ${
+                      detailsForm.formState.errors.phone
+                        ? "border-warning-500"
+                        : "border-transparent focus:border-primary-500"
+                    }
+                  `}
+                />
+              </div>
               {detailsForm.formState.errors.phone && (
                 <p className="text-warning-500 text-xs mt-1">
                   {detailsForm.formState.errors.phone.message}

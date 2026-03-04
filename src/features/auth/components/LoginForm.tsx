@@ -23,6 +23,7 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
   const { signIn } = authContent;
   const { login, isLoading, error, reset } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
+  const [countryCode, setCountryCode] = useState("+966");
 
   const {
     register,
@@ -38,13 +39,17 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
 
   const onSubmit = (data: LoginFormValues) => {
     reset();
-    login(data);
+    const normalizedPhone = `${countryCode}${data.phone.replace(/^\+/, "")}`;
+    login({
+      ...data,
+      phone: normalizedPhone,
+    });
   };
 
-  // Handle phone input - only allow numbers and +
+  // Handle phone input - only allow digits
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const sanitized = value.replace(/[^\d+]/g, "");
+    const sanitized = value.replace(/\D/g, "");
     e.target.value = sanitized;
   };
 
@@ -68,24 +73,35 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
         >
           {signIn.phoneLabel}
         </label>
-        <input
-          id="phone"
-          type="tel"
-          placeholder={signIn.phonePlaceholder}
-          {...register("phone", {
-            onChange: handlePhoneInput,
-          })}
-          className={`
-            bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-            px-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
-            border-2 transition-colors duration-200
-            ${
-              errors.phone
-                ? "border-warning-500"
-                : "border-transparent focus:border-primary-500"
-            }
-          `}
-        />
+        <div className="flex items-stretch gap-2">
+          <select
+            aria-label="country-code"
+            value={countryCode}
+            onChange={(e) => setCountryCode(e.target.value)}
+            className="bg-grey-100 text-text-dark text-sm sm:text-base px-3 py-3 sm:py-3.5 rounded-xl outline-none border-2 border-transparent focus:border-primary-500"
+          >
+            <option value="+20">+20</option>
+            <option value="+966">+966</option>
+          </select>
+          <input
+            id="phone"
+            type="tel"
+            placeholder={signIn.phonePlaceholder}
+            {...register("phone", {
+              onChange: handlePhoneInput,
+            })}
+            className={`
+              flex-1 bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+              px-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
+              border-2 transition-colors duration-200
+              ${
+                errors.phone
+                  ? "border-warning-500"
+                  : "border-transparent focus:border-primary-500"
+              }
+            `}
+          />
+        </div>
         {errors.phone && (
           <p className="text-warning-500 text-xs mt-1">
             {errors.phone.message}

@@ -19,6 +19,8 @@ export const HeritageCareerSection = ({
 }: HeritageCareerSectionProps) => {
   if (!careerJobs || careerJobs.length === 0) return null;
 
+  const heritageSubtitle = "تعرف على البيانات الوظيفية الخاصة بي";
+
   // Format year range
   const formatYearRange = (startYear: number, endYear: number | null) => {
     if (endYear) {
@@ -36,7 +38,7 @@ export const HeritageCareerSection = ({
             {content.title}
           </h2>
           <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
-            {content.subtitle}
+            {heritageSubtitle}
           </p>
         </div>
       </div>

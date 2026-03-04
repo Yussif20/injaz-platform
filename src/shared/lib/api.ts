@@ -35,9 +35,6 @@ export const serverApi = axios.create({
 // Client-side axios instance (for calling Next.js API routes)
 export const clientApi = axios.create({
   baseURL: "",
-  headers: {
-    "Content-Type": "application/json",
-  },
   timeout: 30000,
 });
 

@@ -21,7 +21,7 @@ interface ProfileImageProps {
  * Upload paths (uploads/...) use PUBLIC_STORAGE_BASE_URL (e.g. Backblaze S3); other relative
  * paths use PUBLIC_API_BASE_URL.
  */
-function normalizeImageSrc(raw: string): string {
+export function normalizeImageSrc(raw: string): string {
   const s = raw.trim();
   if (s.startsWith("http://") || s.startsWith("https://")) return s;
   if (s.startsWith("/")) return s;

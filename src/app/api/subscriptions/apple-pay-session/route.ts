@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
 
   const res = await fetch("https://api.moyasar.com/v1/applepay/initiate", {
-    method: "GET",
+    method: "POST",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: JSON.stringify({
       validation_url: validationURL,

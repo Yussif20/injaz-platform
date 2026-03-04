@@ -137,9 +137,18 @@ export const DefaultPortfolioHeader = ({
             >
               {profileImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={profileImageUrl} alt={teacherName} className="w-full h-full object-cover" />
+                <img
+                  src={profileImageUrl}
+                  alt={teacherName}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <Image src="/images/profiles/default/fallback-header-image.svg" alt={teacherName} fill className="object-cover" />
+                <Image
+                  src="/images/profiles/default/fallback-header-image.svg"
+                  alt={teacherName}
+                  fill
+                  className="object-cover"
+                />
               )}
             </div>
           </div>
@@ -192,19 +201,6 @@ const DefaultHeaderBar = ({
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base"
       style={{ backgroundColor: primaryColor, color: "#ffffff" }}
     >
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
       {publishLabel}
     </button>
   </div>

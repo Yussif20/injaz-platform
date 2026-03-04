@@ -3,6 +3,10 @@
 import type { ThemeColors } from "../../../../types/theme.types";
 import type { PersonalInfo } from "../../../../types/profile.types";
 import Image from "next/image";
+import {
+  gregorianISOToGregorianDisplay,
+  gregorianISOToHijriDisplay,
+} from "@/shared/lib/hijri-utils";
 
 interface HeritagePersonalInfoSectionProps {
   personalInfo: PersonalInfo | null;
@@ -47,17 +51,19 @@ export const HeritagePersonalInfoSection = ({
 }: HeritagePersonalInfoSectionProps) => {
   if (!personalInfo) return null;
 
-  // Format date (Hijri "HYYYY-MM-DD" or Gregorian)
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "—";
-    if (dateStr.startsWith("H")) {
-      const parts = dateStr.slice(1).split("-");
-      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]} هـ`;
-      return dateStr;
-    }
-    const date = new Date(dateStr);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  // Format date with both Gregorian and Hijri (returns object for two-line display)
+  const formatDate = (
+    dateStr: string,
+  ): { gregorian: string; hijri: string } | null => {
+    if (!dateStr) return null;
+    const iso = dateStr.split("T")[0];
+    return {
+      gregorian: gregorianISOToGregorianDisplay(iso),
+      hijri: gregorianISOToHijriDisplay(iso),
+    };
   };
+
+  const birthDateFormatted = formatDate(personalInfo.birthDate);
 
   return (
     <div className="px-4 py-6">
@@ -188,12 +194,19 @@ export const HeritagePersonalInfoSection = ({
               >
                 {content.birthday}
               </p>
-              <p
+              <div
                 className="text-xs md:text-xl lg:text-2xl font-light"
                 style={{ color: CARD_STYLES.birthday.text, opacity: 0.9 }}
               >
-                {formatDate(personalInfo.birthDate)}
-              </p>
+                {birthDateFormatted ? (
+                  <>
+                    <p>{birthDateFormatted.gregorian}</p>
+                    <p>{birthDateFormatted.hijri}</p>
+                  </>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

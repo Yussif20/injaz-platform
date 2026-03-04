@@ -15,86 +15,15 @@ interface AchievementsContentProps {
   theme: ThemeColors;
 }
 
-// Mock data for development
-const MOCK_SECTIONS: ProfileSection[] = [
-  {
-    id: 1,
-    title: "أداء الواجبات الوظيفية",
-    weightPercent: 10,
-    displayOrder: 1,
-    subsections: [
-      {
-        id: 101,
-        title: "إعداد المعلم للإختبارات الخاصة بالترم الأول",
-        weightPercent: 5,
-        displayOrder: 1,
-        images: [
-          {
-            id: 1,
-            imagePath: null,
-            publicUrl: null,
-            description: "إعداد ومتابعة الدروس والإختبارات",
-            displayOrder: 1,
-          },
-          {
-            id: 2,
-            imagePath: null,
-            publicUrl: null,
-            description: "متابعة الطلاب",
-            displayOrder: 2,
-          },
-          {
-            id: 3,
-            imagePath: null,
-            publicUrl: null,
-            description: "تقييم الأداء",
-            displayOrder: 3,
-          },
-          {
-            id: 4,
-            imagePath: null,
-            publicUrl: null,
-            description: "إعداد التقارير",
-            displayOrder: 4,
-          },
-          {
-            id: 5,
-            imagePath: null,
-            publicUrl: null,
-            description: "المشاركة في الأنشطة",
-            displayOrder: 5,
-          },
-          {
-            id: 6,
-            imagePath: null,
-            publicUrl: null,
-            description: "المعارض",
-            displayOrder: 6,
-          },
-        ],
-      },
-    ],
-  },
-];
-
 export const AchievementsContent = ({
   sections,
   content,
   theme,
 }: AchievementsContentProps) => {
-  // Use mock data for testing if no real sections available
-  // TODO: Remove mock data usage in production
-  const useMockData =
-    !sections ||
-    sections.length === 0 ||
-    !sections.some((section) =>
-      section.subsections?.some((sub) => sub.images && sub.images.length > 0),
-    );
-
-  const sectionsToUse = useMockData ? MOCK_SECTIONS : sections;
+  if (!sections || sections.length === 0) return null;
 
   // Filter sections that have at least one subsection with images
-  const sectionsWithContent = sectionsToUse!.filter((section) =>
+  const sectionsWithContent = sections.filter((section) =>
     section.subsections?.some((sub) => sub.images && sub.images.length > 0),
   );
 

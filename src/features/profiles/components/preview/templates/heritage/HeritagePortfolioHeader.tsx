@@ -71,9 +71,19 @@ export const HeritagePortfolioHeader = ({
               <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-2xl overflow-hidden">
                 {profileImageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profileImageUrl} alt={teacherName} className="w-full h-full object-cover" />
+                  <img
+                    src={profileImageUrl}
+                    alt={teacherName}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <Image src="/images/profiles/heritage/fallback-header-image.svg" alt={teacherName} fill sizes="(max-width: 768px) 256px, (max-width: 1024px) 288px, 320px" className="object-cover" />
+                  <Image
+                    src="/images/profiles/heritage/fallback-header-image.svg"
+                    alt={teacherName}
+                    fill
+                    sizes="(max-width: 768px) 256px, (max-width: 1024px) 288px, 320px"
+                    className="object-cover"
+                  />
                 )}
               </div>
             </div>
@@ -203,19 +213,6 @@ const HeritageHeaderBar = ({
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base transition-opacity hover:opacity-90"
       style={{ backgroundColor: "#F5E6E8", color: "#52161E" }}
     >
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
       {publishLabel}
     </button>
   </div>
