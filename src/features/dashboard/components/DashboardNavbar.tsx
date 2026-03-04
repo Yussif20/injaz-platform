@@ -31,7 +31,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
   // Use profile image from Me API (imageUrl) when available, else auth user
   const profileImageSrc = profile?.imageUrl ?? user?.profileImage ?? undefined;
 
-  const { navbar, breadcrumb, modals } = dashboardContent;
+  const { navbar, breadcrumb, modals, sectionsPage } = dashboardContent;
 
   // Generate breadcrumb based on current path
   const getBreadcrumb = () => {
@@ -48,6 +48,34 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
           <span className="text-grey-400 mx-2">&lt;</span>
           <span className="text-text-dark text-sm md:text-lg font-light md:font-normal">
             {breadcrumb.createFile}
+          </span>
+        </>
+      );
+    }
+
+    // Sections page breadcrumb: الرئيسية < اضافة شواهد < البنود
+    if (
+      pathname.startsWith("/dashboard/profile/") &&
+      pathname.endsWith("/sections")
+    ) {
+      const sep = () => (
+        <span className="text-grey-400 mx-2">&lt;</span>
+      );
+      const baseClass =
+        "text-sm md:text-lg font-light md:font-normal";
+
+      return (
+        <>
+          <span className={`text-[#666666] ${baseClass}`}>
+            {sectionsPage.breadcrumb.home}
+          </span>
+          {sep()}
+          <span className={`text-[#666666] ${baseClass}`}>
+            {sectionsPage.breadcrumb.addEvidence}
+          </span>
+          {sep()}
+          <span className={`text-text-dark ${baseClass}`}>
+            {sectionsPage.breadcrumb.sections}
           </span>
         </>
       );
