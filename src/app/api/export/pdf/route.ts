@@ -72,12 +72,18 @@ export async function GET(request: NextRequest) {
 
     console.log("[PDF Export] Generating PDF...");
 
-    // Generate PDF
+    // Measure actual content dimensions to create a single-page PDF
+    const contentSize = await page.evaluate(() => ({
+      width: document.body.scrollWidth,
+      height: document.body.scrollHeight,
+    }));
+
+    // Generate a single continuous PDF (no page breaks)
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      width: `${contentSize.width}px`,
+      height: `${contentSize.height + 20}px`, // small padding at bottom
       printBackground: true,
       margin: { top: "0", bottom: "0", left: "0", right: "0" },
-      preferCSSPageSize: false,
     });
 
     return new NextResponse(Buffer.from(pdfBuffer), {

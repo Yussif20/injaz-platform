@@ -109,7 +109,7 @@ export const DefaultPortfolioHeader = ({
                   }}
                 >
                   <ImageIcon className="w-6 h-6 shrink-0 text-primary-500" />
-                  {content.downloadAsImage}
+                  {isDownloading ? "جاري التحميل..." : content.downloadAsImage}
                 </button>
               )}
 
@@ -165,7 +165,7 @@ const DefaultHeaderBar = ({
   textColor,
   primaryColor,
 }: DefaultHeaderBarProps) => (
-  <div className="flex items-center justify-between mb-6 md:mb-8">
+  <div data-preview-bar className="flex items-center justify-between mb-6 md:mb-8">
     <button
       data-back-button
       aria-label="رجوع"

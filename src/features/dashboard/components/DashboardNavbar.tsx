@@ -236,7 +236,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({
                 />
               </div>
               <div className="leading-snug text-right">
-                <p className="text-[16px] md:text-[18px] font-normal text-text-dark">
+                <p className="text-[16px] md:text-[18px] font-normal text-text-dark" suppressHydrationWarning>
                   مرحبًا بك، {user?.fullName || ""}
                   <span className="mr-1">👋</span>
                 </p>

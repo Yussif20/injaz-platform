@@ -165,7 +165,8 @@ export default function PrintPreviewPage() {
         [data-theme-button],
         [data-download-button],
         [data-download-image-button],
-        [data-share-button] {
+        [data-share-button],
+        [data-preview-bar] {
           display: none !important;
         }
 

@@ -39,7 +39,7 @@ const DarkHeaderBar = ({
   textColor,
   primaryColor,
 }: DarkHeaderBarProps) => (
-  <div className="flex items-center justify-between mb-6 md:mb-8">
+  <div data-preview-bar className="flex items-center justify-between mb-6 md:mb-8">
     <button
       data-back-button
       onClick={onBack}
@@ -171,7 +171,7 @@ export const DarkPortfolioHeader = ({
                   }}
                 >
                   <ImageIcon className="w-6 h-6 shrink-0 text-white" />
-                  {content.downloadAsImage}
+                  {isDownloading ? "جاري التحميل..." : content.downloadAsImage}
                 </button>
               )}
 

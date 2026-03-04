@@ -109,10 +109,10 @@ export const DefaultPersonalInfoSection = ({
           backgroundSize: "100% auto",
           left: "50%",
           right: "50%",
-          marginLeft: "-50vw",
-          marginRight: "-30vw",
-          marginBottom: "-25vw",
-          width: "52vw",
+          marginLeft: "max(-50vw, -650px)",
+          marginRight: "max(-30vw, -390px)",
+          marginBottom: "max(-25vw, -325px)",
+          width: "min(52vw, 676px)",
           // transform: "scaleX(-1)",
         }}
       />

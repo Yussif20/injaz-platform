@@ -39,7 +39,7 @@ const ArabicHeaderBar = ({
   textColor,
   primaryColor,
 }: ArabicHeaderBarProps) => (
-  <div className="flex items-center justify-between mb-6 md:mb-8">
+  <div data-preview-bar className="flex items-center justify-between mb-6 md:mb-8">
     <button
       data-back-button
       onClick={onBack}
@@ -146,7 +146,7 @@ export const ArabicPortfolioHeader = ({
                   }}
                 >
                   <ImageIcon className="w-6 h-6 shrink-0 text-[#543A31]" />
-                  {content.downloadAsImage}
+                  {isDownloading ? "جاري التحميل..." : content.downloadAsImage}
                 </button>
               )}
 

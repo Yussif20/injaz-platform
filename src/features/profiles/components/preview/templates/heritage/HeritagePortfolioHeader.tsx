@@ -140,7 +140,7 @@ export const HeritagePortfolioHeader = ({
                     }}
                   >
                     <ImageIcon className="w-6 h-6 shrink-0 text-white" />
-                    {content.downloadAsImage}
+                    {isDownloading ? "جاري التحميل..." : content.downloadAsImage}
                   </button>
                 )}
 
@@ -178,7 +178,7 @@ const HeritageHeaderBar = ({
   onPublish,
   publishLabel,
 }: HeritageHeaderBarProps) => (
-  <div className="flex items-center justify-between mb-6 md:mb-10 lg:mb-12">
+  <div data-preview-bar className="flex items-center justify-between mb-6 md:mb-10 lg:mb-12">
     {/* Back Arrow */}
     <button
       data-back-button
