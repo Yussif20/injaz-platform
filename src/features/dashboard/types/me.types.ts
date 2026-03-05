@@ -33,7 +33,7 @@ export interface PersonalInfo {
  */
 export interface UpdatePersonalInfoRequest {
   rankId?: number;
-  nationalId?: string; // 14 digits
+  nationalId?: string; // 10 digits
   birthDate?: string; // ISO date - Required by backend for full update
   address?: string; // Max 500 chars - Required by backend for full update
   phoneNumber?: string; // contact/WhatsApp number (stored in personal info)

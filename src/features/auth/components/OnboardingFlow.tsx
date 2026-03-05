@@ -15,15 +15,9 @@ import { z } from "zod";
 import { Button, DatePicker, Input, Select } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
-import {
-  updatePersonalInfo,
-} from "@/features/dashboard/services/me.service";
-import {
-  addQualification,
-} from "@/features/dashboard/services/qualifications.service";
-import {
-  addCareerJob,
-} from "@/features/dashboard/services/career.service";
+import { updatePersonalInfo } from "@/features/dashboard/services/me.service";
+import { addQualification } from "@/features/dashboard/services/qualifications.service";
+import { addCareerJob } from "@/features/dashboard/services/career.service";
 import type {
   CreateQualificationRequest,
   CreateCareerJobRequest,
@@ -39,22 +33,24 @@ import { OnboardingImageCollage } from "./OnboardingImageCollage";
 import Image from "next/image";
 
 // WhatsApp/phone validation (optional; if provided must be valid)
-const whatsappSchema = z.string().refine(
-  (val) =>
-    !val ||
-    val.trim() === "" ||
-    (/^[0-9+]+$/.test(val) &&
-      val.replace(/\D/g, "").length >= 9 &&
-      val.length <= 15),
-  "رقم واتساب يجب أن يحتوي على أرقام فقط وأن يكون 9 أرقام على الأقل",
-);
+const whatsappSchema = z
+  .string()
+  .refine(
+    (val) =>
+      !val ||
+      val.trim() === "" ||
+      (/^[0-9+]+$/.test(val) &&
+        val.replace(/\D/g, "").length >= 9 &&
+        val.length <= 15),
+    "رقم واتساب يجب أن يحتوي على أرقام فقط وأن يكون 9 أرقام على الأقل",
+  );
 
 // Basic info form schema
 const basicInfoSchema = z.object({
   nationalId: z
     .string()
     .min(1, "رقم الهوية مطلوب")
-    .regex(/^\d{14}$/, "رقم الهوية يجب أن يكون 14 أرقام"),
+    .regex(/^\d{10}$/, "رقم الهوية يجب أن يكون 10 أرقام"),
   address: z.string().min(1, "المنشأ مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
   email: z
@@ -521,7 +517,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                               basicInfoForm.formState.errors.nationalId?.message
                             }
                             className="text-right"
-                            maxLength={14}
+                            maxLength={10}
                             {...basicInfoForm.register("nationalId")}
                           />
                           <Input
@@ -549,7 +545,8 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                                 })
                               }
                               error={
-                                basicInfoForm.formState.errors.birthDate?.message
+                                basicInfoForm.formState.errors.birthDate
+                                  ?.message
                               }
                             />
                           </div>
@@ -603,7 +600,8 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                         <Button
                           type="submit"
                           disabled={
-                            !basicInfoForm.formState.isValid || isSavingBasicInfo
+                            !basicInfoForm.formState.isValid ||
+                            isSavingBasicInfo
                           }
                           className="w-full rounded-full! h-14"
                         >
@@ -790,7 +788,9 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                 placeholder="اختر السنة"
                 value={field.value}
                 onChange={field.onChange}
-                error={qualificationForm.formState.errors.graduationYear?.message}
+                error={
+                  qualificationForm.formState.errors.graduationYear?.message
+                }
               />
             )}
           />

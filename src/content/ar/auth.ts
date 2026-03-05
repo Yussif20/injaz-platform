@@ -162,7 +162,7 @@ export const authContent = {
       generalInfo: "بيانات عامة",
       contactInfo: "بيانات التواصل",
       nationalIdLabel: "رقم الهوية*",
-      nationalIdPlaceholder: "ادخل رقم هويتك الشخصية",
+      nationalIdPlaceholder: "ادخل رقم هويتك الشخصية (10 أرقام)",
       addressLabel: "المنشأ*",
       addressPlaceholder: "ادخل مدينتك هنا",
       birthDateLabel: "تاريخ الميلاد*",

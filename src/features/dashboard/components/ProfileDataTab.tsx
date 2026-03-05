@@ -20,7 +20,7 @@ const myDataSchema = z.object({
   nationalId: z
     .string()
     .min(1, "رقم الهوية مطلوب")
-    .regex(/^\d{14}$/, "رقم الهوية يجب أن يكون 14 أرقام"),
+    .regex(/^\d{10}$/, "رقم الهوية يجب أن يكون 10 أرقام"),
   address: z.string().min(1, "العنوان مطلوب"),
   birthDate: z.string().min(1, "تاريخ الميلاد مطلوب"),
   email: z.string().email("البريد الإلكتروني غير صالح").or(z.literal("")),
@@ -143,6 +143,8 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
           <div className="space-y-4">
             <Input
               label={`${profileData.fields.nationalId}*`}
+              placeholder="ادخل رقم الهوية (10 أرقام)"
+              maxLength={10}
               error={errors.nationalId?.message}
               {...register("nationalId")}
             />
@@ -162,16 +164,17 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
               }
               error={errors.birthDate?.message}
             />
-            {watch("birthDate") && (() => {
-              const iso = resolveGregorianISO(watch("birthDate"));
-              return (
-                <div className="flex items-center gap-2 text-sm text-grey-500 mt-1 text-right">
-                  <span>{gregorianISOToGregorianDisplay(iso)}</span>
-                  <span className="text-grey-300">|</span>
-                  <span>{gregorianISOToHijriDisplay(iso)}</span>
-                </div>
-              );
-            })()}
+            {watch("birthDate") &&
+              (() => {
+                const iso = resolveGregorianISO(watch("birthDate"));
+                return (
+                  <div className="flex items-center gap-2 text-sm text-grey-500 mt-1 text-right">
+                    <span>{gregorianISOToGregorianDisplay(iso)}</span>
+                    <span className="text-grey-300">|</span>
+                    <span>{gregorianISOToHijriDisplay(iso)}</span>
+                  </div>
+                );
+              })()}
             <Input
               label={profileData.fields.workEmail}
               type="email"
