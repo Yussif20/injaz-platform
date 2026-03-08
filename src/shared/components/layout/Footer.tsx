@@ -36,12 +36,13 @@ async function fetchSocials(): Promise<Map<string, string>> {
 }
 
 const SOCIAL_ICONS = [
-  { key: "instagram", src: "icons/social/instagram.svg", alt: "Instagram" },
-  { key: "tiktok",    src: "icons/social/tiktok.svg",    alt: "TikTok"    },
-  { key: "snapchat",  src: "icons/social/snapchat.svg",  alt: "Snapchat"  },
-  { key: "x",         src: "icons/social/x.svg",         alt: "X"         },
-  { key: "facebook",  src: "icons/social/facebook.svg",  alt: "Facebook"  },
-  { key: "youtube",   src: "icons/social/youtube.svg",   alt: "YouTube"   },
+  { key: "instagram", src: "/icons/social/instagram.svg", alt: "Instagram" },
+  { key: "tiktok",    src: "/icons/social/tiktok.svg",    alt: "TikTok"    },
+  { key: "snapchat",  src: "/icons/social/snapchat.svg",  alt: "Snapchat"  },
+  { key: "x",         src: "/icons/social/x.svg",         alt: "X"         },
+  { key: "facebook",  src: "/icons/social/facebook.svg",  alt: "Facebook"  },
+  { key: "youtube",   src: "/icons/social/youtube.svg",   alt: "YouTube"   },
+  { key: "whatsapp",  src: "/icons/social/whatsapp.svg",  alt: "WhatsApp"  },
 ];
 
 export const Footer = async () => {
@@ -167,7 +168,7 @@ export const Footer = async () => {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <Image
-                          src="icons/social/phone.svg"
+                          src="/icons/social/phone.svg"
                           alt="Phone"
                           width={20}
                           height={20}
@@ -190,7 +191,7 @@ export const Footer = async () => {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <Image
-                          src="icons/social/email.svg"
+                          src="/icons/social/email.svg"
                           alt="Email"
                           width={20}
                           height={20}

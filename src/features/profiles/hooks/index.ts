@@ -34,3 +34,6 @@ export * from "./useDeleteImage";
 export * from "./useShareLinks";
 export * from "./useCreateShareLink";
 export * from "./useDeleteShareLink";
+
+// Capabilities
+export * from "./useProfileCapabilities";

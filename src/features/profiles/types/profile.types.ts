@@ -110,6 +110,7 @@ export interface ProfileDetails {
   careerJobs: CareerJob[] | null;
   sections: ProfileSection[] | null;
   status: string | null;
+  isPasswordProtected?: boolean;
   publishedAt: string | null;
 }
 

@@ -4,8 +4,32 @@ import React from "react";
 import Image from "next/image";
 import { dashboardContent } from "@/content";
 
-export const HowToUseContent: React.FC = () => {
+/**
+ * Extract YouTube video ID from various URL formats.
+ */
+function getYoutubeEmbedId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    // youtu.be/VIDEO_ID
+    if (u.hostname === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+    // youtube.com/watch?v=VIDEO_ID
+    if (u.searchParams.has("v")) return u.searchParams.get("v");
+    // youtube.com/embed/VIDEO_ID
+    const embedMatch = u.pathname.match(/\/embed\/([^/?]+)/);
+    if (embedMatch) return embedMatch[1];
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+interface HowToUseContentProps {
+  youtubeUrl?: string | null;
+}
+
+export const HowToUseContent: React.FC<HowToUseContentProps> = ({ youtubeUrl }) => {
   const { howToUse } = dashboardContent;
+  const embedId = youtubeUrl ? getYoutubeEmbedId(youtubeUrl) : null;
 
   const steps = [
     {
@@ -42,24 +66,38 @@ export const HowToUseContent: React.FC = () => {
         {howToUse.pageTitle}
       </h1>
 
-      {/* Video Thumbnail Image */}
+      {/* Video Section */}
       <div className="w-full">
-        {/* Mobile version */}
-        <Image
-          src="/images/dashboard/how-to-use/video-thumbnail-mobile.svg"
-          alt="video thumbnail"
-          width={800}
-          height={450}
-          className="w-full h-auto rounded-xl lg:rounded-2xl md:hidden"
-        />
-        {/* Desktop/Tablet version */}
-        <Image
-          src="/images/dashboard/how-to-use/video-thumbnail.svg"
-          alt="video thumbnail"
-          width={800}
-          height={450}
-          className="w-full h-auto rounded-xl lg:rounded-2xl hidden md:block"
-        />
+        {embedId ? (
+          <div className="relative w-full overflow-hidden rounded-xl lg:rounded-2xl" style={{ paddingBottom: "56.25%" }}>
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${embedId}`}
+              title={howToUse.pageTitle}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <>
+            {/* Mobile fallback */}
+            <Image
+              src="/images/dashboard/how-to-use/video-thumbnail-mobile.svg"
+              alt="video thumbnail"
+              width={800}
+              height={450}
+              className="w-full h-auto rounded-xl lg:rounded-2xl md:hidden"
+            />
+            {/* Desktop fallback */}
+            <Image
+              src="/images/dashboard/how-to-use/video-thumbnail.svg"
+              alt="video thumbnail"
+              width={800}
+              height={450}
+              className="w-full h-auto rounded-xl lg:rounded-2xl hidden md:block"
+            />
+          </>
+        )}
       </div>
 
       {/* Steps */}

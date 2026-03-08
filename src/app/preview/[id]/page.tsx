@@ -31,12 +31,13 @@ import {
   ArabicAchievementsSection,
   ArabicContactSection,
 } from "@/features/profiles";
-import { useProfileDetails, useMyProfiles } from "@/features/profiles/hooks";
+import { useProfileDetails, useMyProfiles, useProfileCapabilities } from "@/features/profiles/hooks";
 import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
 import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
+import { Watermark } from "@/shared/components/ui";
 
 function normalizeImageUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -65,6 +66,12 @@ export default function ProfilePreviewPage() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { previewPage } = dashboardContent;
+
+  // Capability checks
+  const capabilities = useProfileCapabilities();
+
+  // Toast for blocked actions
+  const [blockToast, setBlockToast] = useState<string | null>(null);
 
   // Download loading state
   const [isDownloading, setIsDownloading] = useState(false);
@@ -97,8 +104,32 @@ export default function ProfilePreviewPage() {
     router.back();
   };
 
+  // Show blocked action toast
+  const showBlockedToast = (action: "download" | "share" | "publish") => {
+    let message: string;
+    if (capabilities.blockedReason === "not_subscribed") {
+      message = action === "download"
+        ? previewPage.subscribeToDownload
+        : action === "publish"
+        ? previewPage.subscribeToPublish
+        : previewPage.subscribeToShare;
+    } else {
+      message = action === "download"
+        ? previewPage.completeProfileToDownload
+        : action === "publish"
+        ? previewPage.completeProfileToPublish
+        : previewPage.completeProfileToShare;
+    }
+    setBlockToast(message);
+    setTimeout(() => setBlockToast(null), 3000);
+  };
+
   // Download as PDF via server-side Puppeteer
   const handleDownload = async () => {
+    if (!capabilities.canDownload) {
+      showBlockedToast("download");
+      return;
+    }
     setIsDownloading(true);
     try {
       const res = await fetch(`/api/export/pdf?profileId=${profileId}&templateId=${selectedTemplateId}`);
@@ -120,6 +151,10 @@ export default function ProfilePreviewPage() {
 
   // Download as image (PNG) via server-side Puppeteer
   const handleDownloadAsImage = async () => {
+    if (!capabilities.canDownload) {
+      showBlockedToast("download");
+      return;
+    }
     setIsDownloading(true);
     try {
       const res = await fetch(`/api/export/image?profileId=${profileId}&templateId=${selectedTemplateId}`);
@@ -141,6 +176,10 @@ export default function ProfilePreviewPage() {
 
   // Share handler
   const handleShare = async () => {
+    if (!capabilities.canShare) {
+      showBlockedToast("share");
+      return;
+    }
     const shareUrl = `${window.location.origin}/p/${profileId}`;
     const shareData = {
       title: `ملف إنجاز ${profileDetails?.userName || "المعلم"}`,
@@ -231,6 +270,9 @@ export default function ProfilePreviewPage() {
         }
       `}</style>
 
+      {/* Watermark for unsubscribed users */}
+      {capabilities.showWatermark && <Watermark text={previewPage.watermarkText} />}
+
       {/* Portfolio Content */}
       <div
         ref={contentRef}
@@ -268,139 +310,139 @@ export default function ProfilePreviewPage() {
         {/* Main content constrained to max width */}
         <div className="max-w-300 mx-auto">
           {/* Personal Info Section - Template-aware */}
-          {selectedTemplateId === TemplateId.Default ? (
-            <DefaultPersonalInfoSection
-              personalInfo={profileDetails.personalInfo}
-              content={previewPage.personalInfo}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritagePersonalInfoSection
-              personalInfo={profileDetails.personalInfo}
-              content={previewPage.personalInfo}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Arabic ? (
-            <ArabicPersonalInfoSection
-              personalInfo={profileDetails.personalInfo}
-              content={previewPage.personalInfo}
-              theme={theme}
-            />
-          ) : (
-            <DarkPersonalInfoSection
-              personalInfo={profileDetails.personalInfo}
-              content={previewPage.personalInfo}
-              theme={theme}
-            />
-          )}
+{selectedTemplateId === TemplateId.Default ? (
+              <DefaultPersonalInfoSection
+                personalInfo={profileDetails.personalInfo}
+                content={previewPage.personalInfo}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Heritage ? (
+              <HeritagePersonalInfoSection
+                personalInfo={profileDetails.personalInfo}
+                content={previewPage.personalInfo}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Arabic ? (
+              <ArabicPersonalInfoSection
+                personalInfo={profileDetails.personalInfo}
+                content={previewPage.personalInfo}
+                theme={theme}
+              />
+            ) : (
+              <DarkPersonalInfoSection
+                personalInfo={profileDetails.personalInfo}
+                content={previewPage.personalInfo}
+                theme={theme}
+              />
+            )}
 
           {/* Education Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
-            <DefaultEducationSection
-              qualifications={profileDetails.qualifications}
-              content={previewPage.education}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Dark ? (
-            <DarkEducationSection
-              qualifications={profileDetails.qualifications}
-              content={previewPage.education}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritageEducationSection
-              qualifications={profileDetails.qualifications}
-              content={previewPage.education}
-              theme={theme}
-            />
-          ) : (
-            <ArabicEducationSection
-              qualifications={profileDetails.qualifications}
-              content={previewPage.education}
-              theme={theme}
-            />
-          )}
+              <DefaultEducationSection
+                qualifications={profileDetails.qualifications}
+                content={previewPage.education}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Dark ? (
+              <DarkEducationSection
+                qualifications={profileDetails.qualifications}
+                content={previewPage.education}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Heritage ? (
+              <HeritageEducationSection
+                qualifications={profileDetails.qualifications}
+                content={previewPage.education}
+                theme={theme}
+              />
+            ) : (
+              <ArabicEducationSection
+                qualifications={profileDetails.qualifications}
+                content={previewPage.education}
+                theme={theme}
+              />
+            )}
 
           {/* Career Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
-            <DefaultCareerSection
-              careerJobs={profileDetails.careerJobs}
-              content={previewPage.career}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Dark ? (
-            <DarkCareerSection
-              careerJobs={profileDetails.careerJobs}
-              content={previewPage.career}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritageCareerSection
-              careerJobs={profileDetails.careerJobs}
-              content={previewPage.career}
-              theme={theme}
-            />
-          ) : (
-            <ArabicCareerSection
-              careerJobs={profileDetails.careerJobs}
-              content={previewPage.career}
-              theme={theme}
-            />
-          )}
+              <DefaultCareerSection
+                careerJobs={profileDetails.careerJobs}
+                content={previewPage.career}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Dark ? (
+              <DarkCareerSection
+                careerJobs={profileDetails.careerJobs}
+                content={previewPage.career}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Heritage ? (
+              <HeritageCareerSection
+                careerJobs={profileDetails.careerJobs}
+                content={previewPage.career}
+                theme={theme}
+              />
+            ) : (
+              <ArabicCareerSection
+                careerJobs={profileDetails.careerJobs}
+                content={previewPage.career}
+                theme={theme}
+              />
+            )}
 
           {/* Achievements Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
-            <DefaultAchievementsSection
-              sections={profileDetails.sections}
-              content={previewPage.achievements}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Dark ? (
-            <DarkAchievementsSection
-              sections={profileDetails.sections}
-              content={previewPage.achievements}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritageAchievementsSection
-              sections={profileDetails.sections}
-              content={previewPage.achievements}
-              theme={theme}
-            />
-          ) : (
-            <ArabicAchievementsSection
-              sections={profileDetails.sections}
-              content={previewPage.achievements}
-              theme={theme}
-            />
-          )}
+              <DefaultAchievementsSection
+                sections={profileDetails.sections}
+                content={previewPage.achievements}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Dark ? (
+              <DarkAchievementsSection
+                sections={profileDetails.sections}
+                content={previewPage.achievements}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Heritage ? (
+              <HeritageAchievementsSection
+                sections={profileDetails.sections}
+                content={previewPage.achievements}
+                theme={theme}
+              />
+            ) : (
+              <ArabicAchievementsSection
+                sections={profileDetails.sections}
+                content={previewPage.achievements}
+                theme={theme}
+              />
+            )}
 
           {/* Contact Section - Template-aware */}
           {selectedTemplateId === TemplateId.Default ? (
-            <DefaultContactSection
-              content={previewPage.contact}
-              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Dark ? (
-            <DarkContactSection
-              content={previewPage.contact}
-              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-              theme={theme}
-            />
-          ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritageContactSection
-              content={previewPage.contact}
-              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-              theme={theme}
-            />
-          ) : (
-            <ArabicContactSection
-              content={previewPage.contact}
-              whatsappNumber={profileDetails.personalInfo?.phoneNumber}
-              theme={theme}
-            />
-          )}
+              <DefaultContactSection
+                content={previewPage.contact}
+                whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Dark ? (
+              <DarkContactSection
+                content={previewPage.contact}
+                whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+                theme={theme}
+              />
+            ) : selectedTemplateId === TemplateId.Heritage ? (
+              <HeritageContactSection
+                content={previewPage.contact}
+                whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+                theme={theme}
+              />
+            ) : (
+              <ArabicContactSection
+                content={previewPage.contact}
+                whatsappNumber={profileDetails.personalInfo?.phoneNumber}
+                theme={theme}
+              />
+            )}
         </div>
       </div>
 
@@ -412,6 +454,13 @@ export default function ProfilePreviewPage() {
           content={previewPage.themeSelector}
         />
       </div>
+
+      {/* Blocked action toast */}
+      {blockToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-warning-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm text-center">
+          {blockToast}
+        </div>
+      )}
     </div>
   );
 }

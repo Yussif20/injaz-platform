@@ -44,6 +44,7 @@ export const dashboardContent = {
     editMyData: "تعديل بياناتي",
     createPassword: "إنشاء كلمة مرور للملف",
     changePassword: "إعدادات كلمة المرور",
+    publish: "نشر الملف",
     unpublish: "إلغاء النشر",
     deleteFile: "حذف الملف",
   },
@@ -383,6 +384,19 @@ export const dashboardContent = {
     loading: "جاري التحميل...",
     notFound: "لم يتم العثور على الملف",
     backHome: "العودة للرئيسية",
+
+    // Watermark
+    watermarkText: "إنجاز المعلم\nغير مدفوع",
+
+    // Capability messages
+    subscribeToPublish: "يجب الاشتراك أولاً لنشر الملف",
+    subscribeToShare: "يجب الاشتراك أولاً لمشاركة الملف",
+    subscribeToDownload: "يجب الاشتراك أولاً لتحميل الملف",
+    completeProfileToPublish: "يجب إكمال بياناتك الشخصية والمؤهلات والسيرة المهنية لنشر الملف",
+    completeProfileToShare: "يجب إكمال بياناتك أولاً لمشاركة الملف",
+    completeProfileToDownload: "يجب إكمال بياناتك أولاً لتحميل الملف",
+    goToSubscription: "اشترك الآن",
+    goToCompleteProfile: "إكمال البيانات",
   },
 
   // Subscription pages

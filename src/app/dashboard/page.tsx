@@ -19,9 +19,11 @@ import {
   useMyProfiles,
   useAcademicYears,
   useUnpublishProfile,
+  usePublishProfile,
   useDeleteProfile,
   useSetProfilePassword,
   useRemoveProfilePassword,
+  useProfileCapabilities,
 } from "@/features/profiles";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
@@ -76,7 +78,9 @@ export default function DashboardPage() {
   } = useMyProfiles();
   const { academicYears } = useAcademicYears();
   const { unpublish } = useUnpublishProfile();
+  const { publishAsync } = usePublishProfile();
   const { deleteProfileAsync, isLoading: isDeleting } = useDeleteProfile();
+  const capabilities = useProfileCapabilities();
   const { setPasswordAsync, isLoading: isSettingPassword } = useSetProfilePassword();
   const { removePasswordAsync, isLoading: isRemovingPassword } = useRemoveProfilePassword();
 
@@ -285,9 +289,48 @@ export default function DashboardPage() {
     setFileToEdit(null);
   };
 
+  // Publish / capability toast
+  const [capabilityToast, setCapabilityToast] = useState<string | null>(null);
+
+  const showCapabilityToast = (msg: string) => {
+    setCapabilityToast(msg);
+    setTimeout(() => setCapabilityToast(null), 3500);
+  };
+
+  const handlePublish = async (fileId: string) => {
+    // Check subscription first
+    if (!capabilities.isSubscribed) {
+      showCapabilityToast(dashboardContent.previewPage.subscribeToPublish);
+      return;
+    }
+    // Check profile completeness
+    if (!capabilities.isProfileComplete) {
+      showCapabilityToast(dashboardContent.previewPage.completeProfileToPublish);
+      return;
+    }
+    // Check file-level completeness
+    const file = fileData.find((f) => f.id === fileId);
+    if (file?.status === "incomplete") {
+      showCapabilityToast("يجب إكمال بيانات الملف أولاً قبل النشر");
+      return;
+    }
+    try {
+      await publishAsync(Number(fileId));
+      refetchProfiles();
+    } catch (error: unknown) {
+      console.error("Error publishing profile:", error);
+      let msg = "فشل في نشر الملف";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosErr = error as { response?: { data?: { message?: string } } };
+        msg = axiosErr.response?.data?.message || msg;
+      }
+      showCapabilityToast(msg);
+    }
+  };
+
   const handleUnpublish = async (fileId: string) => {
     try {
-      const response = await unpublish(Number(fileId));
+      await unpublish(Number(fileId));
       // Refetch profiles after unpublishing
       refetchProfiles();
     } catch (error) {
@@ -482,8 +525,10 @@ export default function DashboardPage() {
                   onEditMyData={() =>
                     router.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL)
                   }
-                  onSetPassword={handleSetPassword}
-                  onChangePassword={handleChangePassword}
+                  onSetPassword={capabilities.canSetPassword ? handleSetPassword : undefined}
+                  onChangePassword={capabilities.canSetPassword ? handleChangePassword : undefined}
+                  onPublish={handlePublish}
+                  canPublish={capabilities.canPublish}
                   onUnpublish={handleUnpublish}
                   onDelete={handleDeleteClick}
                 />
@@ -581,6 +626,13 @@ export default function DashboardPage() {
       {showPasswordToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-green-600 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
           {showPasswordToast}
+        </div>
+      )}
+
+      {/* Capability blocked toast */}
+      {capabilityToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-warning-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm text-center">
+          {capabilityToast}
         </div>
       )}
     </div>

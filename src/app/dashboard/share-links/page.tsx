@@ -11,6 +11,7 @@ import {
   useShareLinks,
   useCreateShareLink,
   useDeleteShareLink,
+  useProfileCapabilities,
 } from "@/features/profiles";
 import type { ShareLink } from "@/features/profiles/types";
 
@@ -26,6 +27,7 @@ export default function ShareLinksPage() {
   const { shareLinks, isLoading: linksLoading, refetch: refetchLinks } = useShareLinks(selectedProfileId);
   const { createShareLinkAsync, isLoading: createLoading } = useCreateShareLink();
   const { deleteShareLinkAsync, isLoading: deleteLoading } = useDeleteShareLink();
+  const capabilities = useProfileCapabilities();
 
   // Handle profile selection
   const handleProfileSelect = (profileId: number) => {
@@ -163,7 +165,7 @@ export default function ShareLinksPage() {
           )}
 
           {/* Create Link Form */}
-          {selectedProfileId && selectedProfile?.status === "Published" && (
+          {selectedProfileId && selectedProfile?.status === "Published" && capabilities.canShare && (
             <div className="mt-6 pt-4 border-t border-grey-200">
               <h3 className="text-sm font-medium mb-3">إنشاء رابط جديد</h3>
 
@@ -189,7 +191,19 @@ export default function ShareLinksPage() {
             </div>
           )}
 
-          {selectedProfileId && selectedProfile?.status !== "Published" && (
+          {selectedProfileId && !capabilities.canShare && (
+            <div className="mt-6 pt-4 border-t border-grey-200">
+              <p className="text-sm text-orange-600">
+                {capabilities.blockedReason === "not_subscribed"
+                  ? "يجب الاشتراك أولاً لمشاركة الملف"
+                  : capabilities.blockedReason === "profile_incomplete"
+                  ? "يجب إكمال بياناتك أولاً لمشاركة الملف"
+                  : "يجب نشر الملف أولاً قبل إمكانية إنشاء روابط مشاركة"}
+              </p>
+            </div>
+          )}
+
+          {selectedProfileId && capabilities.canShare && selectedProfile?.status !== "Published" && (
             <div className="mt-6 pt-4 border-t border-grey-200">
               <p className="text-sm text-orange-600">
                 يجب نشر الملف أولاً قبل إمكانية إنشاء روابط مشاركة

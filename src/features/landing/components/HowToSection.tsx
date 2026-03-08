@@ -1,10 +1,51 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { ROUTES } from "@/config/routes";
 import { landingContent } from "@/content";
+import { clientApi } from "@/shared/lib/api";
+
+interface SystemParameterDto {
+  id: number;
+  key: string;
+  value: string;
+  dataType: string;
+  category: string;
+  isActive: boolean;
+}
+
+function getYoutubeEmbedId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+    if (u.searchParams.has("v")) return u.searchParams.get("v");
+    const embedMatch = u.pathname.match(/\/embed\/([^/?]+)/);
+    if (embedMatch) return embedMatch[1];
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export const HowToSection = () => {
   const { howToSection } = landingContent;
+
+  const { data: youtubeUrl } = useQuery({
+    queryKey: ["systemParameters", "socials", "youtube"],
+    queryFn: async () => {
+      const res = await clientApi.get<{ status: string; data: SystemParameterDto[] }>(
+        "/api/system-parameters/socials",
+      );
+      const params = res.data.data ?? [];
+      const youtube = params.find((p) => p.key === "youtube");
+      return youtube?.value || null;
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const embedId = youtubeUrl ? getYoutubeEmbedId(youtubeUrl) : null;
 
   return (
     <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-0">
@@ -77,26 +118,25 @@ export const HowToSection = () => {
             </div>
           </div>
 
-          {/* Video - Right Side - aligned to bottom */}
+          {/* Video - Right Side */}
           <div className="flex-1 min-h-96 self-end">
             <div className="bg-card-bg rounded-3xl relative w-full min-h-96 overflow-hidden">
-              {/* Thumbnail Image */}
-              <Image
-                src="/images/landing/how/video-thumbnail.png"
-                alt="How to tutorial thumbnail"
-                fill
-                className="object-cover"
-              />
-
-              {/* Video (Commented Out) */}
-              {/* <video
-                controls
-                className="w-full h-full object-cover"
-                poster="/sections/how/video-thumbnail.png"
-              >
-                <source src="/sections/how/how-to.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video> */}
+              {embedId ? (
+                <iframe
+                  className="absolute inset-0 w-full h-full rounded-3xl"
+                  src={`https://www.youtube.com/embed/${embedId}`}
+                  title={howToSection.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <Image
+                  src="/images/landing/how/video-thumbnail.png"
+                  alt="How to tutorial thumbnail"
+                  fill
+                  className="object-cover"
+                />
+              )}
             </div>
           </div>
         </div>

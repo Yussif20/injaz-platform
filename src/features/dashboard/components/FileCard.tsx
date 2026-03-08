@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { CirclePlus } from "lucide-react";
 import { dashboardContent } from "@/content";
@@ -25,8 +26,11 @@ interface FileCardProps {
   onEditMyData?: (fileId: string) => void;
   onSetPassword?: (fileId: string) => void;
   onChangePassword?: (fileId: string) => void;
+  onPublish?: (fileId: string) => void;
   onUnpublish?: (fileId: string) => void;
   onDelete?: (fileId: string) => void;
+  /** Whether the user can publish (subscription + profile complete) */
+  canPublish?: boolean;
   /** When set, show a single primary button with this label instead of Add Evidence + Preview */
   singleActionLabel?: string;
   /** Icon path for the single action button (e.g. /icons/ui/white-lock.svg) */
@@ -42,21 +46,28 @@ export const FileCard: React.FC<FileCardProps> = ({
   onEditMyData,
   onSetPassword,
   onChangePassword,
+  onPublish,
   onUnpublish,
   onDelete,
+  canPublish = false,
   singleActionLabel,
   singleActionIcon,
   onSingleAction,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { filesSection, fileStatus, fileOptions } = dashboardContent;
   const useSingleAction = Boolean(singleActionLabel && onSingleAction);
 
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current && !menuRef.current.contains(event.target as Node) &&
+        triggerRef.current && !triggerRef.current.contains(event.target as Node)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -64,6 +75,31 @@ export const FileCard: React.FC<FileCardProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Reposition menu on scroll/resize
+  useEffect(() => {
+    if (!isMenuOpen || !triggerRef.current) return;
+    const update = () => {
+      if (!triggerRef.current) return;
+      const rect = triggerRef.current.getBoundingClientRect();
+      const menuWidth = 220;
+      const menuHeight = 340; // approximate max height
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+      // If the menu would overflow the bottom, open upward
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow < menuHeight
+        ? Math.max(8, rect.top - menuHeight)
+        : rect.bottom + 4;
+      setMenuPos({ top, left });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [isMenuOpen]);
 
   const getStatusConfig = (status: FileStatus) => {
     switch (status) {
@@ -101,8 +137,9 @@ export const FileCard: React.FC<FileCardProps> = ({
       {!useSingleAction && (
       <div className="flex flex-row justify-between items-center mb-3 sm:mb-4">
         <span />
-        <div className="relative" ref={menuRef}>
+        <div className="relative">
           <button
+            ref={triggerRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="p-2 hover:bg-grey-100 rounded-lg transition-colors"
             aria-label="خيارات الملف"
@@ -118,9 +155,13 @@ export const FileCard: React.FC<FileCardProps> = ({
             </svg>
           </button>
 
-          {/* Dropdown menu */}
-          {isMenuOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-grey-200 py-2 min-w-[220px] z-10">
+          {/* Dropdown menu — rendered in portal with fixed position */}
+          {isMenuOpen && menuPos && typeof window !== "undefined" && createPortal(
+            <div
+              ref={menuRef}
+              className="bg-white rounded-xl shadow-lg border border-grey-200 py-2 min-w-[220px] z-[9999]"
+              style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
+            >
             <button
               onClick={() => handleMenuOption(() => onEditBasicData?.(file.id))}
               className="w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-grey-50 transition-colors"
@@ -191,6 +232,28 @@ export const FileCard: React.FC<FileCardProps> = ({
               </span>
             </button>
 
+            {file.status !== "published" && (
+              <button
+                onClick={() => handleMenuOption(() => onPublish?.(file.id))}
+                className="w-full flex items-center gap-3 px-4 py-3 text-right transition-colors hover:bg-grey-50"
+              >
+                <svg
+                  className="w-5 h-5 text-success-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span className="text-success-500">{fileOptions.publish || "نشر الملف"}</span>
+              </button>
+            )}
+
             {file.status === "published" && (
               <button
                 onClick={() => handleMenuOption(() => onUnpublish?.(file.id))}
@@ -236,7 +299,8 @@ export const FileCard: React.FC<FileCardProps> = ({
               </svg>
               <span className="text-warning-500">{fileOptions.deleteFile}</span>
             </button>
-          </div>
+          </div>,
+          document.body
         )}
         </div>
       </div>
@@ -249,7 +313,7 @@ export const FileCard: React.FC<FileCardProps> = ({
         </p>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className={`w-2.5 h-2.5 rounded-full ${statusConfig.dotColor}`} />
-          <p className="text-[#B1363E] font-normal text-xs md:text-lg whitespace-nowrap">
+          <p className={`font-normal text-xs md:text-lg whitespace-nowrap ${statusConfig.textColor}`}>
             {statusConfig.label}
           </p>
         </div>
