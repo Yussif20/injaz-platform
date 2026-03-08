@@ -42,7 +42,7 @@ export function LoginForm() {
           dir="rtl"
           type="tel"
           placeholder={loginT.phonePlaceholder}
-          className="text-right w-full rounded-2xl border border-grey-300 bg-white px-3 py-2 text-sm text-text-dark placeholder:text-grey-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+          className="text-right w-full rounded-2xl border border-grey-300 bg-white px-3 py-2 text-sm text-text-dark placeholder:text-grey-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
           {...register("phoneNumber")}
         />
         {errors.phoneNumber?.message && (
@@ -64,7 +64,7 @@ export function LoginForm() {
           id="password"
           type="password"
           placeholder={loginT.passwordPlaceholder}
-          className="w-full rounded-2xl border border-grey-300 bg-white px-3 py-2 text-sm text-text-dark placeholder:text-grey-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+          className="w-full rounded-2xl border border-grey-300 bg-white px-3 py-2 text-sm text-text-dark placeholder:text-grey-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
           {...register("password")}
         />
         {errors.password?.message && (

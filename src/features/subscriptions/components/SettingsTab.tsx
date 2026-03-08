@@ -177,7 +177,7 @@ export function SettingsTab() {
               onChange={(e) => setLocalFee(Number(e.target.value))}
               placeholder={settingsT.feePlaceholder}
               min={0}
-              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 pe-16 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 pe-16 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
             />
             <span className="absolute end-4 top-1/2 -translate-y-1/2 text-sm text-grey-500">
               {settingsT.sar}
@@ -194,7 +194,7 @@ export function SettingsTab() {
             type="date"
             value={localEndDate ?? endDate}
             onChange={(e) => setLocalEndDate(e.target.value)}
-            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
           />
         </div>
 
@@ -210,7 +210,7 @@ export function SettingsTab() {
                 e.target.value ? Number(e.target.value) : null,
               )
             }
-            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
           >
             <option value="">{settingsT.noDiscount}</option>
             {(discounts ?? [])

@@ -111,7 +111,7 @@ export function AddUserModal({
           </label>
           <select
             {...register("role")}
-            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
           >
             <option value="Teacher">{modalT.teacher}</option>
             <option value="Admin">{modalT.admin}</option>

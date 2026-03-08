@@ -389,7 +389,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         className={`flex w-full items-center justify-between rounded-lg border bg-[#f6f6f6] px-3 py-2.5 text-sm transition-colors duration-200 focus:outline-none ${
           error
             ? "border-warning-500"
-            : "border-grey-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            : "border-grey-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30"
         } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
       >
         <svg

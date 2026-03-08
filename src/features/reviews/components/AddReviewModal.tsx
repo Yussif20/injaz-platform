@@ -115,22 +115,22 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
       onClick={handleClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="relative mb-8 flex items-center justify-center">
           <h2 className="text-lg font-medium text-text-dark">{modalT.title}</h2>
           <button
             onClick={handleClose}
-            className="rounded-lg p-1 text-grey-400 hover:bg-grey-100"
+            className="absolute start-0 rounded-lg p-1 text-grey-400 hover:bg-grey-100"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Client Name */}
           <div>
             <label className="mb-2 block text-sm font-medium text-text-dark">
@@ -140,7 +140,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               required
-              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              className={`w-full rounded-lg border border-grey-200 py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none ${clientName ? "bg-white" : "bg-[#f6f6f6]"}`}
               placeholder={modalT.clientNamePlaceholder}
             />
           </div>
@@ -154,7 +154,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               <button
                 type="button"
                 onClick={() => setJobTitleOpen(!jobTitleOpen)}
-                className="flex w-full items-center justify-between rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+                className={`flex w-full items-center justify-between rounded-lg border border-grey-200 py-2.5 px-4 text-sm font-light text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none ${selectedJobTitle ? "bg-white" : "bg-[#f6f6f6]"}`}
               >
                 <span
                   className={
@@ -197,7 +197,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
-              className="w-full resize-none rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              className={`w-full resize-none rounded-lg border border-grey-200 py-2.5 px-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none ${content ? "bg-white" : "bg-[#f6f6f6]"}`}
               placeholder={modalT.contentPlaceholder}
             />
           </div>

@@ -201,7 +201,7 @@ export function FilesContent() {
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="ابحث هنا باسم الملف"
-              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
             />
           </div>
           {/* Date Range Filter */}

@@ -46,19 +46,19 @@ export function Sidebar({ open }: SidebarProps) {
 
   return (
     <aside
-      className={`z-50 flex h-full flex-col border-[#F1F1F1] bg-white transition-all duration-200 border-e ${
-        open ? "w-64" : "w-0 overflow-hidden"
+      className={`z-50 flex h-full shrink-0 flex-col border-[#F1F1F1] bg-white transition-all duration-200 border-e ${
+        open ? "min-w-fit" : "w-0 overflow-hidden"
       }`}
     >
       {/* Logo */}
-      <div className="flex items-center px-5 py-4">
+      <div className="flex items-center px-8 py-5">
         <Link href={ROUTES.DASHBOARD} className="flex items-center gap-2">
           <Image src="/logo.svg" alt="إنجاز المعلم" width={126} height={42} />
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-5 px-3">
+      <nav className="flex-1 flex flex-col gap-5 px-7">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
 
@@ -80,7 +80,7 @@ export function Sidebar({ open }: SidebarProps) {
       </nav>
 
       {/* Logout */}
-      <div className="p-3">
+      <div className="px-7 py-5">
         <button
           onClick={() => logoutMutation.mutate()}
           disabled={logoutMutation.isPending}

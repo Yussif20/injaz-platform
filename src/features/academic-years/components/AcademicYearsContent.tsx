@@ -6,11 +6,9 @@ import {
   Search,
   ExternalLink,
   MoreHorizontal,
-  Pencil,
   Trash2,
-  Power,
-  PowerOff,
-  Lock,
+  ChevronLeft,
+  CheckCircle,
 } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import {
@@ -76,7 +74,10 @@ export function AcademicYearsContent() {
     null,
   );
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+  const [showStatusSubmenu, setShowStatusSubmenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
@@ -84,6 +85,7 @@ export function AcademicYearsContent() {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setOpenMenuId(null);
+        setShowStatusSubmenu(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -112,6 +114,7 @@ export function AcademicYearsContent() {
   const handleDelete = (year: AcademicYearDto) => {
     setDeleteTarget(year);
     setOpenMenuId(null);
+    setShowStatusSubmenu(false);
   };
 
   const confirmDelete = () => {
@@ -127,28 +130,19 @@ export function AcademicYearsContent() {
     });
   };
 
-  const handleActivate = (id: number) => {
-    activateYear.mutate(id, {
+  const handleStatusChange = (id: number, status: string) => {
+    const action =
+      status === "active"
+        ? activateYear
+        : status === "inactive"
+          ? deactivateYear
+          : closeYear;
+    action.mutate(id, {
       onSuccess: () => toast({ type: "success", message: toastT.saved }),
       onError: () => toast({ type: "error", message: toastT.error }),
     });
     setOpenMenuId(null);
-  };
-
-  const handleDeactivate = (id: number) => {
-    deactivateYear.mutate(id, {
-      onSuccess: () => toast({ type: "success", message: toastT.saved }),
-      onError: () => toast({ type: "error", message: toastT.error }),
-    });
-    setOpenMenuId(null);
-  };
-
-  const handleClose = (id: number) => {
-    closeYear.mutate(id, {
-      onSuccess: () => toast({ type: "success", message: toastT.saved }),
-      onError: () => toast({ type: "error", message: toastT.error }),
-    });
-    setOpenMenuId(null);
+    setShowStatusSubmenu(false);
   };
 
   const handleModalClose = () => {
@@ -185,7 +179,7 @@ export function AcademicYearsContent() {
   return (
     <>
       {/* Add Year Button */}
-      <div className="mb-6 flex items-center justify-end">
+      <div className="mb-6 flex items-center justify-start">
         <Button onClick={() => setIsModalOpen(true)} className="rounded-full!">
           <Plus className="h-5 w-5" />
           {ayT.addYear as string}
@@ -210,7 +204,7 @@ export function AcademicYearsContent() {
                 setCurrentPage(1);
               }}
               placeholder={ayT.searchPlaceholder as string}
-              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
             />
           </div>
         </div>
@@ -283,10 +277,22 @@ export function AcademicYearsContent() {
                     <button
                       onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
-                        const menuWidth = 176;
-                        const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+                        const menuWidth = 208;
+                        const left = Math.max(
+                          8,
+                          Math.min(
+                            rect.left,
+                            window.innerWidth - menuWidth - 8,
+                          ),
+                        );
                         setMenuPos({ top: rect.bottom + 4, left });
-                        setOpenMenuId(openMenuId === year.id ? null : year.id);
+                        if (openMenuId === year.id) {
+                          setOpenMenuId(null);
+                          setShowStatusSubmenu(false);
+                        } else {
+                          setOpenMenuId(year.id);
+                          setShowStatusSubmenu(false);
+                        }
                       }}
                       className="rounded-lg p-1.5 text-grey-400 hover:bg-grey-100"
                     >
@@ -295,49 +301,62 @@ export function AcademicYearsContent() {
                     {openMenuId === year.id && menuPos && (
                       <div
                         ref={menuRef}
-                        style={{ position: "fixed", top: menuPos.top, left: menuPos.left }}
-                        className="z-[9999] w-44 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
+                        style={{
+                          position: "fixed",
+                          top: menuPos.top,
+                          left: menuPos.left,
+                        }}
+                        className="z-[9999] w-52 rounded-lg border border-grey-200 bg-white py-1 shadow-lg"
                       >
+                        {/* Status Change */}
                         <button
-                          onClick={() => handleEdit(year)}
-                          className="flex w-full items-center gap-2 px-4 py-2 text-sm text-grey-700 hover:bg-grey-50"
+                          onClick={() =>
+                            setShowStatusSubmenu(!showStatusSubmenu)
+                          }
+                          className="flex w-full items-center justify-between px-4 py-2 text-sm text-grey-700 hover:bg-grey-50"
                         >
-                          <Pencil className="h-4 w-4" />
-                          {actionsT.edit}
+                          <span>تعديل حالة السنة</span>
+                          <ChevronLeft
+                            className={`h-4 w-4 transition-transform ${showStatusSubmenu ? "-rotate-90" : ""}`}
+                          />
                         </button>
-                        {year.status.toLowerCase() !== "active" && (
-                          <button
-                            onClick={() => handleActivate(year.id)}
-                            className="flex w-full items-center gap-2 px-4 py-2 text-sm text-grey-700 hover:bg-grey-50"
-                          >
-                            <Power className="h-4 w-4" />
-                            {statusT.active}
-                          </button>
+                        {showStatusSubmenu && (
+                          <div className="border-t border-grey-100 bg-grey-50 py-1">
+                            {[
+                              { key: "active", label: "مفعلة" },
+                              { key: "inactive", label: "غير مفعلة" },
+                              { key: "closed", label: "منتهية" },
+                            ].map((opt) => (
+                              <button
+                                key={opt.key}
+                                onClick={() =>
+                                  handleStatusChange(year.id, opt.key)
+                                }
+                                className="flex w-full items-center gap-2 px-6 py-2 text-sm text-grey-700 hover:bg-grey-100"
+                              >
+                                <CheckCircle
+                                  className={`h-4 w-4 ${
+                                    year.status.toLowerCase() === opt.key
+                                      ? "text-success-500"
+                                      : "text-grey-300"
+                                  }`}
+                                />
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
                         )}
-                        {year.status.toLowerCase() === "active" && (
-                          <button
-                            onClick={() => handleDeactivate(year.id)}
-                            className="flex w-full items-center gap-2 px-4 py-2 text-sm text-grey-700 hover:bg-grey-50"
-                          >
-                            <PowerOff className="h-4 w-4" />
-                            {statusT.inactive}
-                          </button>
-                        )}
-                        {year.status.toLowerCase() !== "closed" && (
-                          <button
-                            onClick={() => handleClose(year.id)}
-                            className="flex w-full items-center gap-2 px-4 py-2 text-sm text-grey-700 hover:bg-grey-50"
-                          >
-                            <Lock className="h-4 w-4" />
-                            {statusT.expired ?? "مغلقة"}
-                          </button>
-                        )}
+
+                        {/* Divider */}
+                        <div className="border-t border-grey-100" />
+
+                        {/* Delete */}
                         <button
                           onClick={() => handleDelete(year)}
                           className="flex w-full items-center gap-2 px-4 py-2 text-sm text-warning-500 hover:bg-grey-50"
                         >
                           <Trash2 className="h-4 w-4" />
-                          {actionsT.delete}
+                          حذف السنة
                         </button>
                       </div>
                     )}
@@ -373,10 +392,9 @@ export function AcademicYearsContent() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
-        title={confirmT.title}
-        message={confirmT.message}
+        message="هل انت متأكد من حذف السنة الدراسية؟"
         isLoading={deleteYear.isPending}
-        confirmLabel={actionsT.delete}
+        confirmLabel="حذف السنة"
         cancelLabel={actionsT.cancel}
       />
     </>

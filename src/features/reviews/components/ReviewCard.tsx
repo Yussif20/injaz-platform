@@ -65,7 +65,11 @@ export function ReviewCard({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <User className="h-6 w-6 text-grey-400" />
+              <img
+                src="/logos/logo-cyan.svg"
+                alt="Logo"
+                className="h-7 w-7 object-contain"
+              />
             )}
           </div>
           <div>
@@ -108,27 +112,8 @@ export function ReviewCard({
 
       {/* Actions: publish/unpublish + delete */}
       <div className="mt-4 flex items-center justify-between">
-        {/* Delete button (left in RTL) */}
-        <button
-          onClick={() => onDelete(review.id)}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-warning-50 text-warning-500 hover:bg-warning-100"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-
         {/* Publish / Unpublish buttons (right in RTL) */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => review.isActive && onTogglePublish(review.id)}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm transition-colors ${
-              !review.isActive
-                ? "border-primary-500 text-primary-500"
-                : "border-grey-200 text-grey-400 hover:border-grey-300"
-            }`}
-          >
-            {!review.isActive && <Check className="h-4 w-4" />}
-            {reviewsT.unpublish}
-          </button>
           <button
             onClick={() => !review.isActive && onTogglePublish(review.id)}
             className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm transition-colors ${
@@ -140,7 +125,26 @@ export function ReviewCard({
             {review.isActive && <Check className="h-4 w-4" />}
             {reviewsT.publish}
           </button>
+          <button
+            onClick={() => review.isActive && onTogglePublish(review.id)}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 text-sm transition-colors ${
+              !review.isActive
+                ? "border-primary-500 text-primary-500"
+                : "border-grey-200 text-grey-400 hover:border-grey-300"
+            }`}
+          >
+            {!review.isActive && <Check className="h-4 w-4" />}
+            {reviewsT.unpublish}
+          </button>
         </div>
+
+        {/* Delete button (left in RTL) */}
+        <button
+          onClick={() => onDelete(review.id)}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-warning-50 text-warning-500 hover:bg-warning-100"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );

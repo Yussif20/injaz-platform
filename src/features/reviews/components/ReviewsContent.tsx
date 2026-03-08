@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Calendar, ChevronDown } from "lucide-react";
+import { PlusCircle, Calendar, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
@@ -80,7 +80,7 @@ export function ReviewsContent() {
             onClick={() => setIsModalOpen(true)}
             className="rounded-full!"
           >
-            <Plus className="h-5 w-5" />
+            <PlusCircle className="h-5 w-5" />
             {reviewsT.addReview}
           </Button>
         )}
@@ -100,7 +100,7 @@ export function ReviewsContent() {
             className="rounded-full! px-16!"
             size="lg"
           >
-            <Plus className="h-5 w-5" />
+            <PlusCircle className="h-5 w-5" />
             {reviewsT.addReviewShort}
           </Button>
         </div>

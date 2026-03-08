@@ -73,7 +73,7 @@ export function TermsContent() {
           contentEditable
           suppressContentEditableWarning
           dir="rtl"
-          className="min-h-[400px] w-full rounded-lg border border-grey-200 bg-white p-4 text-sm leading-relaxed text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+          className="min-h-[400px] w-full rounded-lg border border-grey-200 bg-white p-4 text-sm leading-relaxed text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
         />
       </div>
 
