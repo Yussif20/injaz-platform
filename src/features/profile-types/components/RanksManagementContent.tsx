@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Plus } from "lucide-react";
+import { Plus, PlusCircle } from "lucide-react";
 import { Button, ConfirmDialog } from "@/shared/components/ui";
 import {
   useProfileTypes,
@@ -129,19 +129,21 @@ export function RanksManagementContent() {
                 <h2 className="text-lg font-medium text-text-dark">
                   البنود الخاصة برتبة {selectedType.typeName}
                 </h2>
-                <div className="flex items-center gap-3">
-                  <Button onClick={() => setIsAddSectionModalOpen(true)}>
-                    <Plus className="h-4 w-4" />
-                    إضافة بند جديد
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => duplicateProfileType.mutate(selectedTypeId!)}
-                    loading={duplicateProfileType.isPending}
-                  >
-                    نسخ الرتبة
-                  </Button>
-                </div>
+                {sections.length > 0 && (
+                  <div className="flex items-center gap-3">
+                    <Button onClick={() => setIsAddSectionModalOpen(true)}>
+                      <Plus className="h-4 w-4" />
+                      إضافة بند جديد
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => duplicateProfileType.mutate(selectedTypeId!)}
+                      loading={duplicateProfileType.isPending}
+                    >
+                      نسخ الرتبة
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Section cards */}
@@ -150,8 +152,18 @@ export function RanksManagementContent() {
                   <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
                 </div>
               ) : sections.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-grey-200 py-10 text-center">
-                  <p className="text-grey-400">لا توجد بنود لهذه الرتبة</p>
+                <div className="space-y-4 py-4">
+                  <p className="text-center text-base text-text-dark">
+                    لا يوجد بنود خاصة بالرتبة
+                  </p>
+                  <Button
+                    onClick={() => setIsAddSectionModalOpen(true)}
+                    className="w-full rounded-[20px]! font-light!"
+                    size="lg"
+                  >
+                    <PlusCircle className="h-5 w-5" />
+                    إضافة بنود
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-3">

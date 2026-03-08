@@ -15,16 +15,18 @@ export function TermsContent() {
   const { toast } = useToast();
 
   const editorRef = useRef<HTMLDivElement>(null);
+  const hasPopulated = useRef(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
 
   const { data, isLoading } = useTermsContent();
   const saveTerms = useSaveTerms();
 
-  // Populate editor once data loads (not via dangerouslySetInnerHTML to avoid React overwriting user edits)
+  // Populate editor only on initial load — never overwrite user edits after save
   useEffect(() => {
-    if (data && editorRef.current) {
+    if (data && editorRef.current && !hasPopulated.current) {
       editorRef.current.innerHTML = data.content;
+      hasPopulated.current = true;
     }
   }, [data]);
 

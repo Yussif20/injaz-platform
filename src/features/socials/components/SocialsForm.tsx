@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { useForm } from "react-hook-form";
 import { Instagram, Facebook, Youtube, Phone, Mail } from "lucide-react";
-import { SnapchatIcon, TikTokIcon, XIcon } from "@/shared/components/icons";
+import { SnapchatIcon, TikTokIcon, WhatsAppIcon, XIcon } from "@/shared/components/icons";
 import { Button } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
 import { getErrorMessage } from "@/shared/lib/api-helpers";
@@ -17,6 +17,7 @@ const EMPTY_DEFAULTS: SocialsFormData = {
   tiktok: "",
   x: "",
   facebook: "",
+  whatsapp: "",
   phone: "",
   email: "",
   youtube: "",
@@ -109,6 +110,12 @@ export function SocialsForm() {
                 placeholder={socialsT.enterAccountLink}
                 icon={<Facebook className="h-5 w-5 text-grey-400" />}
                 {...register("facebook")}
+              />
+              <FormField
+                label={socialsT.whatsapp}
+                placeholder={socialsT.enterAccountLink}
+                icon={<WhatsAppIcon className="h-5 w-5 text-grey-400" />}
+                {...register("whatsapp")}
               />
             </div>
           </div>

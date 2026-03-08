@@ -84,7 +84,7 @@ export function LoginForm() {
 
       <button
         type="button"
-        className="text-sm text-primary-500 hover:text-primary-700 ml-auto"
+        className="text-sm text-primary-500 hover:text-primary-800 ml-auto"
       >
         {loginT.forgotPassword}
       </button>

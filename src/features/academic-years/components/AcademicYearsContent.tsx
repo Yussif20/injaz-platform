@@ -268,7 +268,7 @@ export function AcademicYearsContent() {
                     {year.activeDeal ?? (ayT.noOffers as string)}
                   </td>
                   <td className="px-6 py-4">
-                    <button className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-4 py-1.5 text-xs text-white hover:bg-primary-700">
+                    <button className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-4 py-1.5 text-xs text-white hover:bg-primary-500/80">
                       {ayT.viewFiles as string}
                       <ExternalLink className="h-3.5 w-3.5" />
                     </button>

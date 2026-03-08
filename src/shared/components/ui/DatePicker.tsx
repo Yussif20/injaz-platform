@@ -116,6 +116,7 @@ interface DatePickerProps {
   defaultMode?: CalendarMode;
   disabled?: boolean;
   showModeToggle?: boolean;
+  inputBg?: string;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -127,6 +128,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   defaultMode = "gregorian",
   disabled = false,
   showModeToggle = true,
+  inputBg,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<CalendarMode>(defaultMode);
@@ -364,8 +366,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             ? "bg-primary-500 font-medium text-white"
             : isCurrentMonth
               ? today
-                ? "bg-primary-200 font-medium text-primary-800"
-                : "bg-[#E8F4F4] text-[#333] hover:bg-primary-200"
+                ? "bg-[#E3EFEF] font-medium text-primary-500"
+                : "bg-[#E8F4F4] text-[#333] hover:bg-[#E3EFEF]"
               : "text-grey-300"
         }`}
       >
@@ -386,7 +388,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         type="button"
         onClick={openCalendar}
         disabled={disabled}
-        className={`flex w-full items-center justify-between rounded-lg border bg-[#f6f6f6] px-3 py-2.5 text-sm transition-colors duration-200 focus:outline-none ${
+        className={`flex w-full items-center justify-between rounded-lg border ${inputBg ?? "bg-[#f6f6f6]"} px-3 py-2.5 text-sm transition-colors duration-200 focus:outline-none ${
           error
             ? "border-warning-500"
             : "border-grey-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30"

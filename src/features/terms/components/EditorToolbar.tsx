@@ -29,7 +29,21 @@ export function EditorToolbar({ editorRef }: EditorToolbarProps) {
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
 
   const execCmd = (command: string, value?: string) => {
+    // Save the current selection before focusing — focus() can collapse it in some browsers
+    const selection = window.getSelection();
+    const range =
+      selection && selection.rangeCount > 0
+        ? selection.getRangeAt(0).cloneRange()
+        : null;
+
     editorRef.current?.focus();
+
+    // Restore selection if it was lost during focus()
+    if (range && selection) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
     document.execCommand(command, false, value ?? "");
     updateActiveFormats();
   };
@@ -65,7 +79,7 @@ export function EditorToolbar({ editorRef }: EditorToolbarProps) {
       case "alignRight":  execCmd("justifyRight"); break;
       case "alignCenter": execCmd("justifyCenter"); break;
       case "alignLeft":   execCmd("justifyLeft"); break;
-      case "quote":      execCmd("formatBlock", "blockquote"); break;
+      case "quote":      execCmd("formatBlock", "<blockquote>"); break;
       case "list":       execCmd("insertUnorderedList"); break;
       case "link": {
         const url = window.prompt("أدخل رابط URL:");
@@ -103,7 +117,10 @@ export function EditorToolbar({ editorRef }: EditorToolbarProps) {
       <div className="relative">
         <button
           type="button"
-          onClick={() => setShowSizeMenu((v) => !v)}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setShowSizeMenu((v) => !v);
+          }}
           className="flex items-center gap-1 rounded-lg border border-grey-200 px-3 py-1.5 text-sm text-text-dark"
         >
           {fontSize}

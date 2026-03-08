@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronUp, ChevronDown, Plus, CheckCircle, Pencil, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Plus, PlusCircle, CheckCircle, Pencil, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/shared/components/ui";
 import { queryKeys } from "@/shared/lib/query-keys";
 import {
   useCreateSubsection,
   useUpdateSubsection,
-  useDeleteSubsection,
 } from "../hooks";
 import type { SectionDto } from "../types/profile-types.types";
 
@@ -26,14 +25,13 @@ type LocalSubsection = {
 
 export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardProps) {
   const [expanded, setExpanded] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [rows, setRows] = useState<LocalSubsection[]>([]);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const queryClient = useQueryClient();
   const createSubsection = useCreateSubsection();
   const updateSubsection = useUpdateSubsection();
-  const deleteSubsection = useDeleteSubsection();
 
   useEffect(() => {
     setRows(
@@ -43,25 +41,20 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
         maxImageCount: s.maxImageCount,
       })),
     );
-    setDeletedIds([]);
   }, [section.id]);
 
   const handleAddRow = () => {
     setRows((prev) => [...prev, { title: "", maxImageCount: null }]);
   };
 
-  const handleRemoveRow = (index: number) => {
-    const row = rows[index];
-    if (row.id) setDeletedIds((prev) => [...prev, row.id!]);
-    setRows((prev) => prev.filter((_, i) => i !== index));
+  const handleStartEditing = () => {
+    setIsEditing(true);
+    setExpanded(true);
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      for (const id of deletedIds) {
-        await deleteSubsection.mutateAsync({ id, sectionId: section.id });
-      }
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (row.id) {
@@ -85,10 +78,10 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
           });
         }
       }
-      setDeletedIds([]);
       queryClient.invalidateQueries({
         queryKey: [...queryKeys.profileTypes.detail(section.profileTypeId), "withSections"],
       });
+      setIsEditing(false);
     } finally {
       setIsSaving(false);
     }
@@ -100,39 +93,35 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
   };
 
   return (
-    <div className="rounded-2xl border border-grey-200 bg-white p-4">
-      {/* Header row — RTL order: text right, buttons middle, chevron left */}
+    <div className="rounded-2xl border border-grey-200 bg-white p-6">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        {/* 1st in DOM = rightmost in RTL */}
         <div className="flex flex-1 flex-col text-right">
-          <span className="text-sm text-grey-500">
+          <span className="text-lg font-light" style={{ color: "#4D4D4D" }}>
             الوزن النسبي: {section.weightPercent}%
           </span>
-          <span className="font-medium text-text-dark">{section.title}</span>
+          <span className="text-xl font-normal text-text-dark">{section.title}</span>
         </div>
 
-        {/* 2nd = middle */}
         <div className="flex gap-2">
+          <Button size="sm" onClick={handleStartEditing} className="text-xs! font-light!">
+            <Pencil className="h-3.5 w-3.5 ml-1" />
+            تعديل
+          </Button>
           <Button
             size="sm"
             variant="outline"
-            className="border-warning-500 text-warning-500 hover:bg-warning-50"
+            className="border-warning-500 text-warning-500 hover:bg-warning-50 text-xs! font-light!"
             onClick={onDelete}
           >
-            <Trash2 className="h-4 w-4 ml-1" />
+            <Trash2 className="h-3.5 w-3.5 ml-1" />
             حذف
-          </Button>
-          <Button size="sm" onClick={onEdit}>
-            <Pencil className="h-4 w-4 ml-1" />
-            تعديل
           </Button>
         </div>
 
-        {/* 3rd = leftmost */}
         <button
           onClick={() => setExpanded(!expanded)}
           className="flex-shrink-0 text-grey-400 hover:text-grey-600"
-          aria-label={expanded ? "طي القسم" : "توسيع القسم"}
         >
           {expanded ? (
             <ChevronUp className="h-5 w-5" />
@@ -142,98 +131,126 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
         </button>
       </div>
 
-      {/* Expanded body — inline editable subsection form */}
+      {/* Expanded body */}
       {expanded && (
         <div className="mt-4">
-          <div className="space-y-4">
-            {rows.map((row, index) => (
-              <div key={index} className="grid grid-cols-2 gap-4">
-                {/* Right col: title input with per-row label */}
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-text-dark text-right">
-                    {getRowLabel("اسم البند الفرعي", index, rows.length)}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleRemoveRow(index)}
-                      className="h-4 w-4 flex-shrink-0 rounded-full border border-grey-300 text-grey-300 hover:border-warning-500 hover:text-warning-500 flex items-center justify-center text-xs"
-                    >
-                      ×
-                    </button>
-                    <input
-                      type="text"
-                      value={row.title}
-                      onChange={(e) =>
-                        setRows((prev) =>
-                          prev.map((r, i) =>
-                            i === index ? { ...r, title: e.target.value } : r,
-                          ),
-                        )
-                      }
-                      placeholder="اسم البند الفرعي"
-                      className="flex-1 rounded-lg border border-grey-200 px-3 py-2 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                    />
-                  </div>
+          {/* Read-only list of subsections */}
+          {!isEditing && section.subsections.length > 0 && (
+            <div className="space-y-2">
+              {section.subsections.map((sub) => (
+                <div key={sub.id} className="flex items-center justify-between rounded-lg border border-grey-100 px-4 py-3">
+                  <span className="text-sm text-text-dark">{sub.title}</span>
+                  {sub.maxImageCount != null && (
+                    <span className="text-xs text-grey-400">
+                      عدد الشواهد: {sub.maxImageCount}
+                    </span>
+                  )}
                 </div>
+              ))}
+            </div>
+          )}
 
-                {/* Left col: maxImageCount select with per-row label */}
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-text-dark text-right">
-                    {getRowLabel("عدد الشواهد المسموح بها للبند الفرعي", index, rows.length)}
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={row.maxImageCount ?? ""}
-                      onChange={(e) =>
-                        setRows((prev) =>
-                          prev.map((r, i) =>
-                            i === index
-                              ? {
-                                  ...r,
-                                  maxImageCount:
-                                    e.target.value === ""
-                                      ? null
-                                      : Number(e.target.value),
-                                }
-                              : r,
-                          ),
-                        )
-                      }
-                      className="w-full appearance-none rounded-lg border border-grey-200 py-2 pe-8 ps-3 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                    >
-                      <option value="">غير محدود</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-grey-400" />
+          {!isEditing && section.subsections.length === 0 && (
+            <p className="text-center text-sm text-grey-400">لا يوجد بنود فرعية</p>
+          )}
+
+          {!isEditing && (
+            <div className="mt-4">
+              <Button
+                className="w-full rounded-[20px]! font-light!"
+                size="lg"
+                onClick={handleStartEditing}
+              >
+                <PlusCircle className="h-5 w-5" />
+                {section.subsections.length > 0 ? "إضافة بند فرعي آخر" : "إضافة بند فرعي"}
+              </Button>
+            </div>
+          )}
+
+          {/* Editable fields — only when editing */}
+          {isEditing && (
+            <>
+              <div className="space-y-4">
+                {rows.map((row, index) => (
+                  <div key={index} className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-text-dark text-right">
+                        {getRowLabel("اسم البند الفرعي", index, rows.length)}
+                      </label>
+                      <input
+                        type="text"
+                        value={row.title}
+                        onChange={(e) =>
+                          setRows((prev) =>
+                            prev.map((r, i) =>
+                              i === index ? { ...r, title: e.target.value } : r,
+                            ),
+                          )
+                        }
+                        placeholder="اسم البند الفرعي"
+                        className="w-full rounded-lg border border-grey-200 px-3 py-2 text-right text-sm outline-none focus:ring-2 focus:ring-primary-500/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-text-dark text-right">
+                        {getRowLabel("عدد الشواهد المسموح بها للبند الفرعي", index, rows.length)}
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={row.maxImageCount ?? ""}
+                          onChange={(e) =>
+                            setRows((prev) =>
+                              prev.map((r, i) =>
+                                i === index
+                                  ? {
+                                      ...r,
+                                      maxImageCount:
+                                        e.target.value === ""
+                                          ? null
+                                          : Number(e.target.value),
+                                    }
+                                  : r,
+                              ),
+                            )
+                          }
+                          className="w-full appearance-none rounded-lg border border-grey-200 py-2 pe-8 ps-3 text-right text-sm outline-none focus:ring-2 focus:ring-primary-500/30"
+                        >
+                          <option value="">غير محدود</option>
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-grey-400" />
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Footer — full-width grid: "إضافة بند فرعي آخر" right, "حفظ" left */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <Button
-              className="w-full"
-              onClick={handleAddRow}
-            >
-              <Plus className="h-4 w-4" />
-              إضافة بند فرعي آخر
-            </Button>
-            <Button
-              className="w-full"
-              variant="outline"
-              onClick={handleSave}
-              loading={isSaving}
-            >
-              <CheckCircle className="h-4 w-4" />
-              حفظ
-            </Button>
-          </div>
+              {/* Footer buttons */}
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <Button className="w-full" onClick={handleAddRow}>
+                  {rows.length === 0 ? (
+                    <PlusCircle className="h-5 w-5" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                  {rows.length === 0 ? "إضافة بند فرعي" : "إضافة بند فرعي آخر"}
+                </Button>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleSave}
+                  loading={isSaving}
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  حفظ
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

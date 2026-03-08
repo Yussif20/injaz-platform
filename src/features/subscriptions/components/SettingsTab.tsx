@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Save, ToggleLeft, ToggleRight } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
-import { Button, StatusBadge } from "@/shared/components/ui";
+import { Button, StatusBadge, DatePicker } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
 import {
   useSubscriptionSettings,
@@ -186,17 +186,14 @@ export function SettingsTab() {
         </div>
 
         {/* Subscription End Date */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-text-dark">
-            {settingsT.subscriptionEndDate}
-          </label>
-          <input
-            type="date"
-            value={localEndDate ?? endDate}
-            onChange={(e) => setLocalEndDate(e.target.value)}
-            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
-          />
-        </div>
+        <DatePicker
+          label={settingsT.subscriptionEndDate}
+          value={localEndDate ?? endDate}
+          onChange={(v) => setLocalEndDate(v)}
+          placeholder="اختر التاريخ"
+          defaultMode="gregorian"
+          showModeToggle={true}
+        />
 
         {/* Active Discount */}
         <div>

@@ -3,9 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save } from "lucide-react";
 import { z } from "zod";
-import { useTranslation } from "@/i18n/TranslationContext";
 import { Button, Modal, Input } from "@/shared/components/ui";
 import { useCreateSection, useUpdateSection } from "../hooks";
 import type { SectionDto } from "../types/profile-types.types";
@@ -38,19 +36,13 @@ export function AddSectionModal({
   initialData,
   existingSections = [],
 }: AddSectionModalProps) {
-  const { t } = useTranslation();
-  const commonT = t("common") as Record<string, unknown>;
-  const actionsT = commonT.actions as Record<string, string>;
-
   const modalT = {
-    addTitle: "إضافة قسم",
-    editTitle: "تعديل القسم",
-    title: "عنوان القسم",
-    titlePlaceholder: "مثال: البيانات الشخصية",
-    weight: "النسبة المئوية",
-    weightPlaceholder: "مثال: 25",
-    weightHint: "يجب أن يكون مجموع النسب 100%",
-    add: "إضافة",
+    addTitle: "إضافة بند",
+    editTitle: "تعديل البند",
+    title: "اسم البند الرئيسي",
+    titlePlaceholder: "ادخل اسم البند الرئيسي",
+    weight: "الوزن النسبي",
+    weightPlaceholder: "ادخل الوزن النسبي",
   };
 
   const isEditMode = !!initialData;
@@ -132,17 +124,16 @@ export function AddSectionModal({
       isOpen={isOpen}
       onClose={onClose}
       title={isEditMode ? modalT.editTitle : modalT.addTitle}
-      maxWidth="max-w-md"
+      maxWidth="max-w-2xl"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <Input
-          label={modalT.title}
-          placeholder={modalT.titlePlaceholder}
-          error={errors.title?.message}
-          {...register("title")}
-        />
-
-        <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-4">
+        <div className="grid grid-cols-2 gap-6">
+          <Input
+            label={modalT.title}
+            placeholder={modalT.titlePlaceholder}
+            error={errors.title?.message}
+            {...register("title")}
+          />
           <Input
             type="number"
             step="0.1"
@@ -151,27 +142,15 @@ export function AddSectionModal({
             error={errors.weightPercent?.message}
             {...register("weightPercent", { valueAsNumber: true })}
           />
-          <p className="mt-1 text-xs text-grey-500">{modalT.weightHint}</p>
         </div>
 
-        {/* Submit */}
         <Button
           type="submit"
           className="w-full rounded-[20px]! font-light!"
           size="lg"
           loading={isPending}
         >
-          {isEditMode ? (
-            <>
-              <Save className="h-5 w-5" />
-              {actionsT.save}
-            </>
-          ) : (
-            <>
-              <Plus className="h-5 w-5" />
-              {modalT.add}
-            </>
-          )}
+          حفظ
         </Button>
       </form>
     </Modal>

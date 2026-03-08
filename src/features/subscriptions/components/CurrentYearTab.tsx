@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, PlusCircle, ChevronLeft } from "lucide-react";
 import { Button, DatePicker } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
 import {
@@ -13,7 +13,7 @@ import {
 import { AddDiscountModal } from "./AddDiscountModal";
 import type { SubscriptionDiscountDto } from "../types/subscriptions.types";
 
-export function CurrentYearTab() {
+export function CurrentYearTab({ onViewAllDiscounts }: { onViewAllDiscounts?: () => void }) {
   const { toast } = useToast();
 
   const { data: settings, isLoading } = useSubscriptionSettings();
@@ -74,8 +74,8 @@ export function CurrentYearTab() {
   return (
     <div className="space-y-5">
       {/* Settings Card */}
-      <div className="rounded-2xl border border-grey-200 bg-white p-6">
-        <div className="mb-5 flex items-center justify-between">
+      <div className="rounded-2xl border border-grey-200 bg-white p-8">
+        <div className="mb-6 flex items-center justify-between">
           <h3 className="text-base font-medium text-text-dark">
             إشتراك السنة الدراسية الحالي
           </h3>
@@ -87,7 +87,7 @@ export function CurrentYearTab() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {/* Start Date */}
           <DatePicker
             label="تاريخ البداية"
@@ -95,8 +95,9 @@ export function CurrentYearTab() {
             onChange={setStartDate}
             placeholder="ادخل تاريخ بداية السنة الدراسية"
             defaultMode="gregorian"
-            showModeToggle={false}
+            showModeToggle={true}
             disabled={!isEditing}
+            inputBg={isEditing ? "bg-white" : undefined}
           />
 
           {/* End Date */}
@@ -106,8 +107,9 @@ export function CurrentYearTab() {
             onChange={setEndDate}
             placeholder="ادخل تاريخ انتهاء السنة الدراسية"
             defaultMode="gregorian"
-            showModeToggle={false}
+            showModeToggle={true}
             disabled={!isEditing}
+            inputBg={isEditing ? "bg-white" : undefined}
           />
 
           {/* Subscription Fee */}
@@ -126,38 +128,38 @@ export function CurrentYearTab() {
                 disabled={!isEditing}
                 placeholder="ادخل تكلفة الإشتراك"
                 min={0}
-                className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                className={`w-full rounded-lg border border-grey-200 py-2.5 ps-10 pe-4 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${isEditing ? "bg-white" : "bg-[#f6f6f6]"}`}
               />
             </div>
           </div>
 
           {/* Accept New Subscribers */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-grey-700">
+            <label className="mb-4 block text-sm font-medium text-text-dark">
               استقبال مشتركين جدد
             </label>
-            <div className="flex items-center gap-6 rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="radio"
                   name="acceptNew"
                   checked={isEditing ? acceptNew : currentAcceptNew}
                   onChange={() => setAcceptNew(true)}
                   disabled={!isEditing}
-                  className="accent-primary-500"
+                  className="h-4 w-4 accent-primary-500"
                 />
-                <span className="text-sm text-grey-700">تفعيل</span>
+                <span className="text-sm text-text-dark">تفعيل</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="radio"
                   name="acceptNew"
                   checked={isEditing ? !acceptNew : !currentAcceptNew}
                   onChange={() => setAcceptNew(false)}
                   disabled={!isEditing}
-                  className="accent-primary-500"
+                  className="h-4 w-4 accent-primary-500"
                 />
-                <span className="text-sm text-grey-700">إيقاف</span>
+                <span className="text-sm text-text-dark">إيقاف</span>
               </label>
             </div>
           </div>
@@ -177,29 +179,54 @@ export function CurrentYearTab() {
 
       {/* Current Discounts */}
       <div className="rounded-2xl border border-grey-200 bg-white p-6">
-        <h3 className="mb-5 text-base font-medium text-text-dark">
-          العروض الحالية
-        </h3>
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="text-base font-medium text-text-dark">
+            العروض الحالية
+          </h3>
+          <button
+            onClick={onViewAllDiscounts}
+            className="flex cursor-pointer items-center gap-1 text-lg font-light text-primary-500 transition-colors hover:text-primary-800"
+          >
+            عرض الكل
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        </div>
 
         {(!discounts || discounts.filter((d) => d.isActive).length === 0) ? (
           <p className="py-6 text-center text-sm text-grey-400">
             لا يوجد عروض حالية
           </p>
         ) : (
-          <div className="mb-4 space-y-2">
+          <div className="mb-6 space-y-4">
             {discounts
               .filter((d) => d.isActive)
               .map((d) => (
                 <div
                   key={d.id}
-                  className="flex items-center justify-between rounded-lg border border-grey-100 bg-grey-50 px-4 py-3"
+                  className="rounded-xl border-2 border-grey-200 bg-white px-8 py-6"
                 >
-                  <span className="text-sm font-medium text-text-dark">
-                    {d.title}
-                  </span>
-                  <span className="text-sm text-primary-500">
-                    {d.discountPercentage}%
-                  </span>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                    <div className="flex items-center gap-3 text-lg">
+                      <span className="font-normal text-text-dark">اسم العرض:</span>
+                      <span className="font-light text-text-dark">{d.title}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-lg">
+                      <span className="font-normal text-text-dark">تاريخ البداية:</span>
+                      <span className="font-light text-text-dark">
+                        {new Date(d.createdAt).toLocaleDateString("en-GB")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-lg">
+                      <span className="font-normal text-text-dark">نسبة الخصم:</span>
+                      <span className="font-light text-text-dark">{d.discountPercentage}%</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-lg">
+                      <span className="font-normal text-text-dark">تاريخ الإنتهاء:</span>
+                      <span className="font-light text-text-dark">
+                        {new Date(d.endDate).toLocaleDateString("en-GB")}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))}
           </div>
@@ -213,7 +240,7 @@ export function CurrentYearTab() {
           className="w-full rounded-[20px]! font-light!"
           size="lg"
         >
-          <Plus className="h-5 w-5" />
+          <PlusCircle className="h-5 w-5" />
           إنشاء عرض
         </Button>
       </div>

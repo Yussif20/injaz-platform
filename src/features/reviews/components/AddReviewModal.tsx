@@ -255,7 +255,7 @@ export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
                     <p className="mt-2 text-xs text-grey-400">
                       {modalT.imageMaxSize}
                     </p>
-                    <span className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-700">
+                    <span className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-800">
                       <Upload className="h-4 w-4" />
                       {modalT.uploadImage}
                     </span>

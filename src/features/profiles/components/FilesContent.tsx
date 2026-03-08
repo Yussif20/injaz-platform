@@ -17,8 +17,12 @@ import { useUsers } from "@/features/users/hooks/useUsers";
 
 const PAGE_SIZE = 10;
 
-function getStatusLabel(status: ProfileStatus): string {
-  if (status === ProfileStatus.Published) return "ملف منشور";
+function isProfilePublished(status: ProfileStatus | string): boolean {
+  return status === ProfileStatus.Published || status === "Published";
+}
+
+function getStatusLabel(status: ProfileStatus | string): string {
+  if (isProfilePublished(status)) return "ملف منشور";
   return "ملف غير منشور";
 }
 
@@ -89,6 +93,23 @@ export function FilesContent() {
     AcademicYearId: selectedYearId,
   });
 
+  // Stats queries — small page size, we only need totalCount
+  const { data: allData } = useFilteredProfiles({
+    PageNumber: 1,
+    PageSize: 1,
+    AcademicYearId: selectedYearId,
+  });
+  const { data: publishedData } = useFilteredProfiles({
+    PageNumber: 1,
+    PageSize: 1,
+    AcademicYearId: selectedYearId,
+    Status: ProfileStatus.Published,
+  });
+
+  const totalAll = allData?.totalCount ?? 0;
+  const totalPublished = publishedData?.totalCount ?? 0;
+  const totalUnpublished = totalAll - totalPublished;
+
   const profiles = paginatedData?.items ?? [];
   const totalPages = paginatedData?.totalPages ?? 1;
   const currentPage = paginatedData?.pageNumber ?? 1;
@@ -132,6 +153,37 @@ export function FilesContent() {
 
   return (
     <div className="space-y-4">
+      {/* Stats Cards */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-grey-200 bg-white px-7 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E3EFEF]">
+            <img src="/icons/user-all.svg" alt="" className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-primary-500">{totalAll}</p>
+            <p className="text-sm text-grey-500">ملف</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-grey-200 bg-white px-7 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E3EFEF]">
+            <img src="/icons/user-published.svg" alt="" className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-primary-500">{totalPublished}</p>
+            <p className="text-sm text-grey-500">ملف منشور</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-grey-200 bg-white px-7 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E3EFEF]">
+            <img src="/icons/user-unpublished.svg" alt="" className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-primary-500">{totalUnpublished}</p>
+            <p className="text-sm text-grey-500">ملف غير منشور</p>
+          </div>
+        </div>
+      </div>
+
       {/* Header: Title + Search + Date Range */}
       <div className="grid grid-cols-3 items-center gap-4">
         {/* Right: Title */}
@@ -224,7 +276,7 @@ export function FilesContent() {
           </div>
         )}
         {profiles.map((profile) => {
-          const isPublished = profile.status === ProfileStatus.Published;
+          const isPublished = isProfilePublished(profile.status);
           return (
             <div
               key={profile.id}
@@ -288,7 +340,7 @@ export function FilesContent() {
                       <span
                         className={`text-sm font-light ${
                           isPublished
-                            ? "text-primary-500"
+                            ? "text-success-500"
                             : "text-grey-500"
                         }`}
                       >
@@ -296,7 +348,7 @@ export function FilesContent() {
                       </span>
                       <span
                         className={`h-2.5 w-2.5 rounded-full ${
-                          isPublished ? "bg-primary-500" : "bg-grey-400"
+                          isPublished ? "bg-success-500" : "bg-grey-400"
                         }`}
                       />
                     </div>

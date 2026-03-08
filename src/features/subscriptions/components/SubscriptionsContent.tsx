@@ -20,14 +20,14 @@ export function SubscriptionsContent() {
     <div className="flex gap-6">
       {/* Secondary Sidebar — first in RTL = renders on the right, next to main sidebar */}
       <div className="w-52 shrink-0">
-        <nav className="space-y-1 rounded-2xl border border-grey-200 bg-white p-2">
+        <nav className="min-h-[calc(100vh-14rem)] space-y-1 rounded-2xl border border-grey-200 bg-white p-2">
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
               onClick={() => setActiveSection(item.key)}
               className={`w-full rounded-lg px-4 py-3 text-right text-sm transition-colors ${
                 activeSection === item.key
-                  ? "bg-primary-50 font-medium text-primary-600"
+                  ? "font-medium text-primary-500"
                   : "text-grey-600 hover:bg-grey-50"
               }`}
             >
@@ -39,7 +39,7 @@ export function SubscriptionsContent() {
 
       {/* Main Content */}
       <div className="flex-1">
-        {activeSection === "currentYear" && <CurrentYearTab />}
+        {activeSection === "currentYear" && <CurrentYearTab onViewAllDiscounts={() => setActiveSection("discounts")} />}
         {activeSection === "discounts" && <DiscountsTab />}
         {activeSection === "invoices" && <SubscriptionsTab />}
       </div>

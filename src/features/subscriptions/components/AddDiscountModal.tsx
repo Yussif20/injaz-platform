@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save } from "lucide-react";
-import { Button, Modal, Input } from "@/shared/components/ui";
-import { useCreateDiscount, useUpdateDiscount } from "../hooks";
+import { Button, Modal, DatePicker } from "@/shared/components/ui";
+import { useCreateDiscount, useUpdateDiscount, useSubscriptionSettings } from "../hooks";
 import {
   createDiscountSchema,
   type CreateDiscountFormData,
@@ -25,28 +24,20 @@ export function AddDiscountModal({
   onSuccess,
   discount,
 }: AddDiscountModalProps) {
-  // Translations (fallback inline)
-  const modalT = {
-    titleAdd: "إضافة خصم",
-    titleEdit: "تعديل الخصم",
-    title: "العنوان",
-    titlePlaceholder: "أدخل عنوان الخصم",
-    percentage: "نسبة الخصم",
-    percentagePlaceholder: "أدخل نسبة الخصم",
-    endDate: "تاريخ الانتهاء",
-    add: "إضافة",
-    save: "حفظ",
-  };
-
   const isEdit = !!discount;
 
   const createDiscount = useCreateDiscount();
   const updateDiscount = useUpdateDiscount();
+  const { data: settings } = useSubscriptionSettings();
+
+  const currentFee = settings?.subscriptionFee ?? 0;
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateDiscountFormData>({
     resolver: zodResolver(createDiscountSchema),
@@ -57,6 +48,11 @@ export function AddDiscountModal({
     },
   });
 
+  const [startDate, setStartDate] = useState("");
+
+  const discountPercentage = watch("discountPercentage");
+  const discountedPrice = currentFee - (currentFee * (discountPercentage || 0)) / 100;
+
   // Reset form when modal opens or discount changes
   useEffect(() => {
     if (isOpen) {
@@ -64,21 +60,24 @@ export function AddDiscountModal({
         reset({
           title: discount.title,
           discountPercentage: discount.discountPercentage,
-          endDate: discount.endDate.split("T")[0], // Convert ISO to date input format
+          endDate: discount.endDate.split("T")[0],
         });
+        setStartDate(discount.createdAt?.split("T")[0] ?? "");
       } else {
         reset({
           title: "",
           discountPercentage: 0,
           endDate: "",
         });
+        setStartDate("");
       }
     }
   }, [isOpen, discount, reset]);
 
   const onSubmit = (data: CreateDiscountFormData) => {
     const payload = {
-      ...data,
+      title: data.title,
+      discountPercentage: data.discountPercentage,
       endDate: new Date(data.endDate).toISOString(),
     };
 
@@ -104,62 +103,94 @@ export function AddDiscountModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? modalT.titleEdit : modalT.titleAdd}
-      maxWidth="max-w-md"
+      title="إنشاء عرض"
+      maxWidth="max-w-2xl"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <Input
-          label={modalT.title}
-          placeholder={modalT.titlePlaceholder}
-          error={errors.title?.message}
-          {...register("title")}
-        />
-
-        <Input
-          label={modalT.percentage}
-          placeholder={modalT.percentagePlaceholder}
-          type="number"
-          min={0}
-          max={100}
-          error={errors.discountPercentage?.message}
-          {...register("discountPercentage", { valueAsNumber: true })}
-        />
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-text-dark">
-            {modalT.endDate}
-          </label>
-          <input
-            type="date"
-            {...register("endDate")}
-            className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm text-text-dark focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
-          />
-          {errors.endDate && (
-            <p className="mt-1 text-xs text-warning-500">
-              {errors.endDate.message}
-            </p>
-          )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pt-4">
+        {/* Row 1: Name + Percentage */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              ادخل اسم العرض
+            </label>
+            <input
+              {...register("title")}
+              placeholder="ادخل اسم العرض"
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
+            />
+            {errors.title && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.title.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-dark">
+              ادخل نسبة الخصم
+            </label>
+            <input
+              type="number"
+              {...register("discountPercentage", { valueAsNumber: true })}
+              placeholder="ادخل نسبة الخصم"
+              min={0}
+              max={100}
+              onInput={(e) => {
+                const input = e.currentTarget;
+                if (Number(input.value) > 100) input.value = "100";
+                if (Number(input.value) < 0) input.value = "0";
+              }}
+              className="w-full rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5 text-sm font-light text-text-dark placeholder:text-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none"
+            />
+            {errors.discountPercentage && (
+              <p className="mt-1 text-xs text-warning-500">
+                {errors.discountPercentage.message}
+              </p>
+            )}
+          </div>
         </div>
 
-        {/* Submit */}
-        <Button
-          type="submit"
-          className="w-full rounded-[20px]! font-light!"
-          size="lg"
-          loading={isPending}
-        >
-          {isEdit ? (
-            <>
-              <Save className="h-5 w-5" />
-              {modalT.save}
-            </>
-          ) : (
-            <>
-              <Plus className="h-5 w-5" />
-              {modalT.add}
-            </>
-          )}
-        </Button>
+        {/* Row 2: Start Date + End Date */}
+        <div className="grid grid-cols-2 gap-6">
+          <DatePicker
+            label="حدد تاريخ البداية"
+            value={startDate}
+            onChange={setStartDate}
+            placeholder="تاريخ بداية العرض"
+            defaultMode="gregorian"
+            showModeToggle={true}
+          />
+          <DatePicker
+            label="حدد تاريخ الإنتهاء"
+            value={watch("endDate")}
+            onChange={(v) => setValue("endDate", v)}
+            placeholder="تاريخ إنتهاء العرض"
+            defaultMode="gregorian"
+            showModeToggle={true}
+            error={errors.endDate?.message}
+          />
+        </div>
+
+        {/* Discounted Price + Submit */}
+        <div className="pt-4">
+          <p className="mb-2 text-sm font-medium text-warning-500">
+            سعر الإشتراك بعد الخصم
+          </p>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex items-center rounded-lg border border-grey-200 bg-[#f6f6f6] px-4 py-2.5">
+              <span className="text-sm font-medium text-text-dark">
+                {Math.round(discountedPrice)} ريال
+              </span>
+            </div>
+            <Button
+              type="submit"
+              className="rounded-3xl! font-light!"
+              size="lg"
+              loading={isPending}
+            >
+              تفعيل العرض
+            </Button>
+          </div>
+        </div>
       </form>
     </Modal>
   );

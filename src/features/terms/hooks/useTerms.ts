@@ -17,8 +17,9 @@ export function useSaveTerms() {
 
   return useMutation({
     mutationFn: (html: string) => saveTermsContent(html),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TERMS_QUERY_KEY });
+    onSuccess: (savedData) => {
+      // Update cache directly instead of refetching — prevents editor overwrite
+      queryClient.setQueryData(TERMS_QUERY_KEY, savedData);
     },
   });
 }

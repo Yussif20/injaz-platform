@@ -14,6 +14,7 @@ export type SocialKey =
   | "tiktok"
   | "x"
   | "facebook"
+  | "whatsapp"
   | "phone"
   | "email"
   | "youtube";
@@ -24,6 +25,7 @@ export interface SocialsFormData {
   tiktok: string;
   x: string;
   facebook: string;
+  whatsapp: string;
   phone: string;
   email: string;
   youtube: string;

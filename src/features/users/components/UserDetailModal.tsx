@@ -86,7 +86,7 @@ export function UserDetailModal({
               className="h-16 w-16 rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 text-2xl text-primary-600">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 text-2xl text-primary-500">
               {user.fullName.charAt(0)}
             </div>
           )}

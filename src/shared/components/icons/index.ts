@@ -1,1 +1,1 @@
-export { SnapchatIcon, TikTokIcon, XIcon } from "./SocialIcons";
+export { SnapchatIcon, TikTokIcon, WhatsAppIcon, XIcon } from "./SocialIcons";
