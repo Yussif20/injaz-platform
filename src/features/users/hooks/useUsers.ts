@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/lib/query-keys";
 import type {
   CreateUserDto,
@@ -27,6 +27,7 @@ export function useFilteredUsers(params?: UserFilterParams) {
   return useQuery({
     queryKey: queryKeys.users.filtered(params),
     queryFn: () => getFilteredUsers(params),
+    placeholderData: keepPreviousData,
   });
 }
 

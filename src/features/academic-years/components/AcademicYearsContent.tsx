@@ -369,13 +369,11 @@ export function AcademicYearsContent() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="border-t border-grey-200 px-6 pb-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
 

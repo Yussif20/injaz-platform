@@ -206,9 +206,9 @@ export function UserDetailModal({
                   <div className="grid grid-cols-3 gap-2">
                     <InfoRow
                       label={detailT.degreeType}
-                      value={qual.degreeType}
+                      value={qual.degreeType ?? "—"}
                     />
-                    <InfoRow label={detailT.qualTitle} value={qual.title} />
+                    <InfoRow label={detailT.qualTitle} value={qual.major || qual.title || "—"} />
                     <InfoRow
                       label={detailT.graduationDate}
                       value={new Date(qual.graduationDate).toLocaleDateString(

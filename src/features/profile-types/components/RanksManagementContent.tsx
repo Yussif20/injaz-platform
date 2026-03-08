@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { Button, ConfirmDialog } from "@/shared/components/ui";
 import {
@@ -9,6 +9,7 @@ import {
   useDeleteSection,
   useDuplicateProfileType,
 } from "../hooks";
+import { useFilteredProfiles } from "@/features/profiles/hooks/useProfiles";
 import type { SectionDto } from "../types/profile-types.types";
 import { AddProfileTypeModal } from "./AddProfileTypeModal";
 import { AddSectionModal } from "./AddSectionModal";
@@ -39,8 +40,23 @@ export function RanksManagementContent() {
   const { data: selectedTypeData, isLoading: isLoadingSections } =
     useProfileTypeWithSections(selectedTypeId ?? undefined);
 
+  const { data: profilesData } = useFilteredProfiles({ PageSize: 1000 });
+
   const deleteSection = useDeleteSection();
   const duplicateProfileType = useDuplicateProfileType();
+
+  // Count profiles (files) per profile type
+  const userCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    if (profilesData?.items) {
+      for (const profile of profilesData.items) {
+        if (profile.profileTypeId) {
+          counts[profile.profileTypeId] = (counts[profile.profileTypeId] || 0) + 1;
+        }
+      }
+    }
+    return counts;
+  }, [profilesData]);
 
   // Auto-select first type on load
   useEffect(() => {
@@ -96,16 +112,19 @@ export function RanksManagementContent() {
         </div>
       ) : (
         <>
-          {/* Tabs row */}
-          <ProfileTypeTabs
-            profileTypes={profileTypes}
-            selectedId={selectedTypeId}
-            onSelect={setSelectedTypeId}
-          />
+          {/* Tabs + content — no gap between them */}
+          <div>
+            <ProfileTypeTabs
+              profileTypes={profileTypes}
+              selectedId={selectedTypeId}
+              onSelect={setSelectedTypeId}
+              userCounts={userCounts}
+            />
 
-          {/* Sections area */}
+          {/* White container starting from title — flush with tabs */}
           {selectedType && (
-            <div className="space-y-4">
+            <div className="rounded-b-2xl bg-white p-5 space-y-4">
+              {/* Section header + action buttons */}
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-medium text-text-dark">
                   البنود الخاصة برتبة {selectedType.typeName}
@@ -125,6 +144,7 @@ export function RanksManagementContent() {
                 </div>
               </div>
 
+              {/* Section cards */}
               {isLoadingSections ? (
                 <div className="flex h-32 items-center justify-center">
                   <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
@@ -154,6 +174,7 @@ export function RanksManagementContent() {
               )}
             </div>
           )}
+          </div>
         </>
       )}
 

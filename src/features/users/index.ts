@@ -1,4 +1,9 @@
-export { UsersContent, AddUserModal, UserDetailModal } from "./components";
+export {
+  UsersContent,
+  AddUserModal,
+  UserDetailModal,
+  UserDetailPage,
+} from "./components";
 export * from "./hooks";
 export type {
   UserDto,

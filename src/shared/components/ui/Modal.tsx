@@ -38,11 +38,11 @@ export function Modal({
         className={`max-h-[90vh] w-full ${maxWidth} overflow-y-auto rounded-2xl bg-white p-6`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="relative mb-4 flex items-center justify-center">
           <h2 className="text-lg font-semibold text-grey-900">{title}</h2>
           <button
             onClick={onClose}
-            className="cursor-pointer rounded-lg p-1 text-grey-400 transition-colors hover:bg-grey-100 hover:text-grey-600"
+            className="absolute right-0 cursor-pointer rounded-lg p-1 text-grey-400 transition-colors hover:bg-grey-100 hover:text-grey-600"
           >
             <X className="h-5 w-5" />
           </button>

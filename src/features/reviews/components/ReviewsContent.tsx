@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { PlusCircle, Calendar, ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
-import { Button } from "@/shared/components/ui";
+import { Button, Pagination } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
 import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { ReviewCard } from "./ReviewCard";
 import { AddReviewModal } from "./AddReviewModal";
-import { Pagination } from "./Pagination";
 import { useReviews, useUpdateReview, useDeleteReview } from "../hooks/useReviews";
 
 const PAGE_SIZE = 10;

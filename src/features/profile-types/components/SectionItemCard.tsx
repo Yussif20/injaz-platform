@@ -94,8 +94,13 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
     }
   };
 
+  const getRowLabel = (baseLabel: string, index: number, total: number) => {
+    if (total <= 1) return baseLabel;
+    return index === 0 ? baseLabel : `${baseLabel} ${index + 1}`;
+  };
+
   return (
-    <div className="rounded-2xl border border-grey-100 bg-white p-4">
+    <div className="rounded-2xl border border-grey-200 bg-white p-4">
       {/* Header row — RTL order: text right, buttons middle, chevron left */}
       <div className="flex items-center gap-3">
         {/* 1st in DOM = rightmost in RTL */}
@@ -140,80 +145,91 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
       {/* Expanded body — inline editable subsection form */}
       {expanded && (
         <div className="mt-4">
-          {rows.length > 0 && (
-            <div className="mb-2 grid grid-cols-2 gap-4 px-2 text-sm font-medium text-text-dark">
-              <span className="text-right">اسم البند الفرعي</span>
-              <span className="text-right">عدد الشواهد المسموح بها للبند الفرعي</span>
-            </div>
-          )}
-
-          <div className="space-y-3">
+          <div className="space-y-4">
             {rows.map((row, index) => (
-              <div key={index} className="grid grid-cols-2 gap-4 items-center">
-                {/* Right col: remove button + title input */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleRemoveRow(index)}
-                    className="h-4 w-4 flex-shrink-0 rounded-full border border-grey-300 text-grey-300 hover:border-warning-500 hover:text-warning-500 flex items-center justify-center text-xs"
-                  >
-                    ×
-                  </button>
-                  <input
-                    type="text"
-                    value={row.title}
-                    onChange={(e) =>
-                      setRows((prev) =>
-                        prev.map((r, i) =>
-                          i === index ? { ...r, title: e.target.value } : r,
-                        ),
-                      )
-                    }
-                    placeholder="اسم البند الفرعي"
-                    className="flex-1 rounded-lg border border-grey-200 px-3 py-2 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                  />
+              <div key={index} className="grid grid-cols-2 gap-4">
+                {/* Right col: title input with per-row label */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-text-dark text-right">
+                    {getRowLabel("اسم البند الفرعي", index, rows.length)}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleRemoveRow(index)}
+                      className="h-4 w-4 flex-shrink-0 rounded-full border border-grey-300 text-grey-300 hover:border-warning-500 hover:text-warning-500 flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                    <input
+                      type="text"
+                      value={row.title}
+                      onChange={(e) =>
+                        setRows((prev) =>
+                          prev.map((r, i) =>
+                            i === index ? { ...r, title: e.target.value } : r,
+                          ),
+                        )
+                      }
+                      placeholder="اسم البند الفرعي"
+                      className="flex-1 rounded-lg border border-grey-200 px-3 py-2 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                    />
+                  </div>
                 </div>
 
-                {/* Left col: maxImageCount select */}
-                <div className="relative">
-                  <select
-                    value={row.maxImageCount ?? ""}
-                    onChange={(e) =>
-                      setRows((prev) =>
-                        prev.map((r, i) =>
-                          i === index
-                            ? {
-                                ...r,
-                                maxImageCount:
-                                  e.target.value === ""
-                                    ? null
-                                    : Number(e.target.value),
-                              }
-                            : r,
-                        ),
-                      )
-                    }
-                    className="w-full appearance-none rounded-lg border border-grey-200 py-2 pe-8 ps-3 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                  >
-                    <option value="">غير محدود</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-grey-400" />
+                {/* Left col: maxImageCount select with per-row label */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-text-dark text-right">
+                    {getRowLabel("عدد الشواهد المسموح بها للبند الفرعي", index, rows.length)}
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={row.maxImageCount ?? ""}
+                      onChange={(e) =>
+                        setRows((prev) =>
+                          prev.map((r, i) =>
+                            i === index
+                              ? {
+                                  ...r,
+                                  maxImageCount:
+                                    e.target.value === ""
+                                      ? null
+                                      : Number(e.target.value),
+                                }
+                              : r,
+                          ),
+                        )
+                      }
+                      className="w-full appearance-none rounded-lg border border-grey-200 py-2 pe-8 ps-3 text-right text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                    >
+                      <option value="">غير محدود</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-grey-400" />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Footer — RTL order: "إضافة بند فرعي آخر" right, "حفظ" left */}
-          <div className="mt-4 flex items-center gap-3">
-            <Button onClick={handleAddRow}>
+          {/* Footer — full-width grid: "إضافة بند فرعي آخر" right, "حفظ" left */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Button
+              className="w-full"
+              onClick={handleAddRow}
+            >
               <Plus className="h-4 w-4" />
               إضافة بند فرعي آخر
             </Button>
-            <Button variant="outline" onClick={handleSave} loading={isSaving}>
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={handleSave}
+              loading={isSaving}
+            >
               <CheckCircle className="h-4 w-4" />
               حفظ
             </Button>

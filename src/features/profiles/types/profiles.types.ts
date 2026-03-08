@@ -11,7 +11,9 @@ export interface AdminProfileDto {
   id: number;
   userId: number;
   userName: string;
+  fullName?: string | null;
   userPhone?: string | null;
+  profileTypeId: number;
   profileTypeName: string;
   academicYearId: number;
   academicYearName: string;

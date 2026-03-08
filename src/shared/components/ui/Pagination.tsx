@@ -63,65 +63,72 @@ export function Pagination({
   const visiblePages = getVisiblePages();
 
   const navBtnClass =
-    "flex cursor-pointer items-center gap-1 rounded-lg border border-grey-200 px-3 py-1.5 text-sm text-grey-600 transition-colors hover:bg-grey-50 disabled:cursor-not-allowed disabled:opacity-40";
+    "flex cursor-pointer items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm text-grey-500 transition-colors hover:text-text-dark disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
-    <div className="flex items-center justify-center gap-2">
-      <button
-        className={navBtnClass}
-        onClick={() => onPageChange(1)}
-        disabled={currentPage === 1}
-      >
-        <ChevronsRight className="h-4 w-4" />
-        {labels.first}
-      </button>
+    <div className="bg-[#F6F6F6] px-6 py-4">
+      <div className="flex items-center justify-center gap-1">
+        {/* First (RTL: appears on right) */}
+        <button
+          className={navBtnClass}
+          onClick={() => onPageChange(1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronsRight className="h-4 w-4" />
+          {labels.first}
+        </button>
 
-      <button
-        className={navBtnClass}
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        <ChevronRight className="h-4 w-4" />
-        {labels.previous}
-      </button>
+        {/* Previous */}
+        <button
+          className={navBtnClass}
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+          {labels.previous}
+        </button>
 
-      {visiblePages.map((page, idx) =>
-        page === "ellipsis" ? (
-          <span key={`ellipsis-${idx}`} className="px-1 text-grey-400">
-            ...
-          </span>
-        ) : (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-sm transition-colors ${
-              page === currentPage
-                ? "bg-primary-600 text-white"
-                : "text-grey-600 hover:bg-grey-100"
-            }`}
-          >
-            {page}
-          </button>
-        ),
-      )}
+        {/* Page numbers */}
+        {visiblePages.map((page, idx) =>
+          page === "ellipsis" ? (
+            <span key={`ellipsis-${idx}`} className="px-1 text-sm text-grey-400">
+              ...
+            </span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-sm transition-colors ${
+                page === currentPage
+                  ? "bg-primary-500 text-white"
+                  : "bg-white text-grey-500 hover:bg-grey-100"
+              }`}
+            >
+              {page}
+            </button>
+          ),
+        )}
 
-      <button
-        className={navBtnClass}
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        {labels.next}
-        <ChevronLeft className="h-4 w-4" />
-      </button>
+        {/* Next */}
+        <button
+          className={navBtnClass}
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          {labels.next}
+          <ChevronLeft className="h-4 w-4" />
+        </button>
 
-      <button
-        className={navBtnClass}
-        onClick={() => onPageChange(totalPages)}
-        disabled={currentPage === totalPages}
-      >
-        {labels.last}
-        <ChevronsLeft className="h-4 w-4" />
-      </button>
+        {/* Last (RTL: appears on left) */}
+        <button
+          className={navBtnClass}
+          onClick={() => onPageChange(totalPages)}
+          disabled={currentPage === totalPages}
+        >
+          {labels.last}
+          <ChevronsLeft className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }

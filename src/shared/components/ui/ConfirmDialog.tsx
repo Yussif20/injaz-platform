@@ -43,7 +43,7 @@ export function ConfirmDialog({
         className="w-full max-w-md rounded-2xl bg-white px-6 py-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="mb-8 text-center text-xl font-normal ">
+        <p className="mb-8 text-center text-xl font-normal text-text-dark">
           {message}
         </p>
         <div className="flex gap-3">

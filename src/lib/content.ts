@@ -223,6 +223,8 @@ export const content = {
         title: "أحدث الإشتراكات",
         timeAgo: "منذ",
         minutes: "دقيقة",
+        hours: "ساعة",
+        days: "يوم",
       },
       files: {
         title: "أحدث الملفات المنشئة",
@@ -453,6 +455,8 @@ export const content = {
         title: "Latest Subscriptions",
         timeAgo: "ago",
         minutes: "min",
+        hours: "hours",
+        days: "days",
       },
       files: {
         title: "Latest Created Files",

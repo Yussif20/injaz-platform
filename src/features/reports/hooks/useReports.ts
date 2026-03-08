@@ -7,6 +7,7 @@ import {
   getLatestSubscriptions,
   getProfitChartData,
   getFilesChartData,
+  getLatestFiles,
 } from "../services/reports.service";
 
 /**
@@ -50,5 +51,16 @@ export function useFilesChartData() {
     queryKey: queryKeys.reports.filesChart(),
     queryFn: getFilesChartData,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+/**
+ * Fetch latest files/profiles for dashboard
+ */
+export function useLatestFiles(limit: number = 4) {
+  return useQuery({
+    queryKey: queryKeys.reports.latestFiles(limit),
+    queryFn: () => getLatestFiles(limit),
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

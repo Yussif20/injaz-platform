@@ -317,13 +317,11 @@ export function SubscriptionsTab() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="border-t border-grey-200 px-6 pb-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

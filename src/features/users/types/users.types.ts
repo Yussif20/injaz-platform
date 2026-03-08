@@ -14,8 +14,11 @@ export interface PersonalInfoDto {
 
 export interface QualificationDto {
   id: number;
-  degreeType: string;
-  title: string;
+  degreeType: string | null;
+  title?: string | null;
+  major?: string | null;
+  institution?: string | null;
+  grade?: string | null;
   graduationDate: string;
 }
 

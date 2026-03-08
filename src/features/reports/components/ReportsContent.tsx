@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CircleDollarSign,
-  Users,
-  CreditCard,
-  FileText,
-} from "lucide-react";
+import { CircleDollarSign, Users, CreditCard, FileText } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { StatCard } from "./StatCard";
 import { ProfitChart } from "./ProfitChart";
@@ -69,9 +64,7 @@ export function ReportsContent() {
     return (
       <div className="space-y-6">
         <div className="rounded-2xl border border-grey-200 bg-white p-8 text-center">
-          <p className="text-grey-600">
-            {reportsT.error}
-          </p>
+          <p className="text-grey-600">{reportsT.error}</p>
         </div>
       </div>
     );
@@ -96,19 +89,33 @@ export function ReportsContent() {
         ))}
       </div>
 
-      {/* Charts + Subscriptions Sidebar */}
-      <div className="flex flex-col gap-4 xl:flex-row">
-        <div className="min-w-0 flex-1 space-y-4">
+      {/* Charts + Subscriptions + Latest Files Grid */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {/* ProfitChart: full on mobile/tablet, 3/4 on desktop (right side in RTL) */}
+        <div className="order-1 md:order-1 md:col-span-2 xl:col-span-3">
           <ProfitChart />
+        </div>
+
+        {/* FilesChart: full on mobile/tablet, 3/4 on desktop (right side in RTL) */}
+        <div className="order-2 md:order-2 md:col-span-2 xl:col-span-3">
           <FilesChart />
         </div>
-        <div className="w-full shrink-0 xl:w-1/5">
-          <LatestSubscriptions />
+
+        {/* Subscriptions: desktop 1/4 on the LEFT (col 4 in RTL), row-span-2; tablet left half */}
+        <div className="order-4 md:order-4 xl:col-start-4 xl:row-start-1 xl:row-span-2">
+          <LatestSubscriptions
+            trendValue={Math.abs(stats?.subscribersChange ?? 0)}
+            trendDirection={
+              (stats?.subscribersChange ?? 0) >= 0 ? "up" : "down"
+            }
+          />
+        </div>
+
+        {/* LatestFiles: tablet right half, desktop full width */}
+        <div className="order-3 md:order-3 xl:col-span-4">
+          <LatestFiles />
         </div>
       </div>
-
-      {/* Latest Files */}
-      <LatestFiles />
     </div>
   );
 }
