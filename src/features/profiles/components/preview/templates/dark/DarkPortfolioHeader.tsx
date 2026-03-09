@@ -8,6 +8,7 @@ interface DarkHeaderBarProps {
   onBack: () => void;
   onPublish: () => void;
   publishLabel: string;
+  isPublished?: boolean;
   textColor: string;
   primaryColor: string;
 }
@@ -20,6 +21,8 @@ interface DarkPortfolioHeaderProps {
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
+  onPublish?: () => void;
+  isPublished?: boolean;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
@@ -36,6 +39,7 @@ const DarkHeaderBar = ({
   onBack,
   onPublish,
   publishLabel,
+  isPublished = false,
   textColor,
   primaryColor,
 }: DarkHeaderBarProps) => (
@@ -65,8 +69,11 @@ const DarkHeaderBar = ({
     <button
       data-share-button
       onClick={onPublish}
-      className="bg-white text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl hover:bg-gray-100 transition-colors"
-      style={{ color: primaryColor, border: `2px solid ${primaryColor}` }}
+      className="text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl transition-colors"
+      style={isPublished
+        ? { backgroundColor: "#B1363E", color: "#ffffff", border: "2px solid #B1363E" }
+        : { backgroundColor: "#ffffff", color: primaryColor, border: `2px solid ${primaryColor}` }
+      }
     >
       {publishLabel}
     </button>
@@ -80,6 +87,8 @@ export const DarkPortfolioHeader = ({
   onDownload,
   onDownloadAsImage,
   onShare,
+  onPublish,
+  isPublished = false,
   onBack,
   isDownloading = false,
   content,
@@ -104,8 +113,9 @@ export const DarkPortfolioHeader = ({
       <div className="relative max-w-300 mx-auto">
         <DarkHeaderBar
           onBack={onBack}
-          onPublish={onShare}
+          onPublish={onPublish ?? onShare}
           publishLabel={publishLabel}
+          isPublished={isPublished}
           textColor="#FFFFFF"
           primaryColor={theme.primary}
         />
@@ -114,7 +124,7 @@ export const DarkPortfolioHeader = ({
         <div className="flex flex-col items-center gap-6 md:gap-8 lg:gap-10">
           {/* Avatar on top */}
           <div className="flex justify-center">
-            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden">
+            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden" style={{ borderRadius: "15px" }}>
               <div className="relative w-full h-full overflow-hidden">
                 {profileImageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element

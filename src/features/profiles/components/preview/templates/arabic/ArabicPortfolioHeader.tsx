@@ -8,6 +8,7 @@ interface ArabicHeaderBarProps {
   onBack: () => void;
   onPublish: () => void;
   publishLabel: string;
+  isPublished?: boolean;
   textColor: string;
   primaryColor: string;
 }
@@ -20,6 +21,8 @@ interface ArabicPortfolioHeaderProps {
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
+  onPublish?: () => void;
+  isPublished?: boolean;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
@@ -36,6 +39,7 @@ const ArabicHeaderBar = ({
   onBack,
   onPublish,
   publishLabel,
+  isPublished = false,
   textColor,
   primaryColor,
 }: ArabicHeaderBarProps) => (
@@ -65,8 +69,11 @@ const ArabicHeaderBar = ({
     <button
       data-share-button
       onClick={onPublish}
-      className="bg-white text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl hover:bg-gray-100 transition-colors"
-      style={{ color: primaryColor, border: `2px solid ${primaryColor}` }}
+      className="text-sm md:text-base font-normal px-4 py-2 md:px-6 md:py-3 rounded-2xl md:rounded-3xl transition-colors"
+      style={isPublished
+        ? { backgroundColor: "#B1363E", color: "#ffffff", border: "2px solid #B1363E" }
+        : { backgroundColor: "#ffffff", color: primaryColor, border: `2px solid ${primaryColor}` }
+      }
     >
       {publishLabel}
     </button>
@@ -80,6 +87,8 @@ export const ArabicPortfolioHeader = ({
   onDownload,
   onDownloadAsImage,
   onShare,
+  onPublish,
+  isPublished = false,
   onBack,
   isDownloading = false,
   content,
@@ -92,8 +101,9 @@ export const ArabicPortfolioHeader = ({
       <div className="max-w-300 mx-auto">
         <ArabicHeaderBar
           onBack={onBack}
-          onPublish={onShare}
+          onPublish={onPublish ?? onShare}
           publishLabel={publishLabel}
+          isPublished={isPublished}
           textColor={theme.text}
           primaryColor={theme.primary}
         />
@@ -169,7 +179,7 @@ export const ArabicPortfolioHeader = ({
           {/* Avatar */}
           {/* Avatar */}
           <div className="flex justify-center md:justify-start">
-            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden">
+            <div className="relative w-50.5 h-50.5 md:w-89.5 md:h-89.5 overflow-hidden" style={{ borderRadius: "15px" }}>
               <div className="relative w-full h-full overflow-hidden">
                 {profileImageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element

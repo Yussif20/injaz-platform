@@ -525,8 +525,8 @@ export default function DashboardPage() {
                   onEditMyData={() =>
                     router.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL)
                   }
-                  onSetPassword={capabilities.canSetPassword ? handleSetPassword : undefined}
-                  onChangePassword={capabilities.canSetPassword ? handleChangePassword : undefined}
+                  onSetPassword={handleSetPassword}
+                  onChangePassword={handleChangePassword}
                   onPublish={handlePublish}
                   canPublish={capabilities.canPublish}
                   onUnpublish={handleUnpublish}

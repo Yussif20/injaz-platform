@@ -106,10 +106,10 @@ const careerJobSchema = z
       const start = parseInt(data.startYear, 10);
       const end = parseInt(data.endYear, 10);
       if (Number.isNaN(start) || Number.isNaN(end)) return true;
-      return end >= start;
+      return end > start;
     },
     {
-      message: "سنة النهاية يجب أن تكون بعد أو تساوي سنة البداية",
+      message: "سنة النهاية يجب أن تكون بعد سنة البداية",
       path: ["endYear"],
     },
   );

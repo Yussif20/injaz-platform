@@ -113,7 +113,6 @@ export const DefaultPersonalInfoSection = ({
           marginRight: "max(-30vw, -390px)",
           marginBottom: "max(-25vw, -325px)",
           width: "min(52vw, 676px)",
-          // transform: "scaleX(-1)",
         }}
       />
 

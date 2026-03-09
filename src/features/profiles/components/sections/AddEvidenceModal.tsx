@@ -243,7 +243,7 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
                   type="button"
                   onClick={handleUploadClick}
                   disabled={isLoading}
-                  className="flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 text-primary-500 hover:text-primary-800 transition-colors disabled:opacity-50"
                 >
                   <svg
                     className="w-5 h-5"
@@ -270,7 +270,7 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
               type="button"
               onClick={handleUploadClick}
               disabled={isLoading}
-              className="mt-2 flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors disabled:opacity-50 mx-auto"
+              className="mt-2 flex items-center gap-2 text-primary-500 hover:text-primary-800 transition-colors disabled:opacity-50 mx-auto"
             >
               <svg
                 className="w-5 h-5"

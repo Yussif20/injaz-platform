@@ -42,10 +42,22 @@ export const DarkPersonalInfoSection = ({
 
   const cards = [
     {
+      id: "origin",
+      label: content.origin,
+      value: personalInfo.address || "—",
+      icon: "place-card.svg",
+    },
+    {
       id: "nationalId",
       label: content.nationalId,
       value: personalInfo.nationalId || "—",
       icon: "id-card.svg",
+    },
+    {
+      id: "email",
+      label: content.email,
+      value: personalInfo.email || "—",
+      icon: "email-card.svg",
     },
     {
       id: "birthday",
@@ -53,18 +65,6 @@ export const DarkPersonalInfoSection = ({
       value: formatDate(personalInfo.birthDate),
       icon: "birthday-card.svg",
       isDateField: true,
-    },
-    {
-      id: "origin",
-      label: content.origin,
-      value: personalInfo.address || "—",
-      icon: "place-card.svg",
-    },
-    {
-      id: "email",
-      label: content.email,
-      value: personalInfo.email || "—",
-      icon: "email-card.svg",
     },
   ];
 
@@ -90,49 +90,51 @@ export const DarkPersonalInfoSection = ({
         {cards.map((card) => (
           <div
             key={card.id}
-            className="relative flex h-23 md:h-40.5 items-center gap-3 md:gap-4 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl bg-[url('/images/profiles/dark/card-bg.svg')] bg-cover bg-center overflow-hidden"
+            className="relative flex h-23 md:h-40.5 items-center gap-3 md:gap-4 p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl overflow-hidden border-2"
+            style={{
+              backgroundImage: "url('/images/profiles/dark/bg-card.svg')",
+              backgroundColor: "#1B1F2B",
+              borderColor: "#2A2E3A",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              transform: "scaleX(-1)",
+            }}
           >
-            {/* Radial gradient overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(50% 50% at 50% 50%, rgba(10, 16, 31, 0) 0%, #161A24 83.33%)",
-              }}
-            ></div>
-
-            {/* Text Content - Right Side */}
-            <div className="flex-1 text-right relative z-10">
-              <p className="text-[#F8F8F8] text-sm lg:text-2xl font-medium">
-                {card.label}
-              </p>
-              {(card as { isDateField?: boolean }).isDateField && card.value ? (
-                <div className="text-[#F8F8F8] text-xs md:text-xl font-light">
-                  <p>
-                    {
-                      (card.value as { gregorian: string; hijri: string })
-                        .gregorian
-                    }
-                  </p>
-                  <p>
-                    {(card.value as { gregorian: string; hijri: string }).hijri}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-[#F8F8F8] text-xs md:text-xl break-all font-light">
-                  {card.value as string}
+            {/* Inner wrapper to reverse the flip so content reads normally */}
+            <div className="flex items-center gap-3 md:gap-4 w-full" style={{ transform: "scaleX(-1)" }}>
+              {/* Text Content - Right Side */}
+              <div className="flex-1 text-right relative z-10 flex flex-col" style={{ gap: "14px" }}>
+                <p className="text-[#F8F8F8] text-sm lg:text-2xl font-medium">
+                  {card.label}
                 </p>
-              )}
-            </div>
+                {(card as { isDateField?: boolean }).isDateField && card.value ? (
+                  <div className="text-[#F8F8F8] text-xs md:text-xl font-light">
+                    <p>
+                      {
+                        (card.value as { gregorian: string; hijri: string })
+                          .gregorian
+                      }
+                    </p>
+                    <p>
+                      {(card.value as { gregorian: string; hijri: string }).hijri}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[#F8F8F8] text-xs md:text-xl break-all font-light">
+                    {card.value as string}
+                  </p>
+                )}
+              </div>
 
-            {/* Card Image - Left Side */}
-            <div className="w-18 h-16 md:w-34.5 md:h-28.5 lg:w-32 lg:h-32 shrink-0 relative z-10">
-              <Image
-                src={`/images/profiles/dark/${card.icon}`}
-                alt={card.label}
-                fill
-                className="object-contain"
-              />
+              {/* Card Image - Left Side */}
+              <div className="w-18 h-16 md:w-34.5 md:h-28.5 lg:w-32 lg:h-32 shrink-0 relative z-10">
+                <Image
+                  src={`/images/profiles/dark/${card.icon}`}
+                  alt={card.label}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
         ))}

@@ -26,6 +26,8 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [countryCode, setCountryCode] = useState("+966");
 
+  const phoneMaxLength = countryCode === "+20" ? 10 : 9;
+
   const {
     register,
     handleSubmit,
@@ -47,16 +49,15 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
     });
   };
 
-  // Handle phone input - only allow digits
+  // Handle phone input - only allow digits, enforce max length
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const sanitized = value.replace(/\D/g, "");
-    e.target.value = sanitized;
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, phoneMaxLength);
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
+      autoComplete="off"
       className="flex flex-col gap-5 sm:gap-6 lg:gap-8 text-right"
     >
       {/* API Error */}
@@ -78,6 +79,8 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
           <input
             id="phone"
             type="tel"
+            autoComplete="off"
+            maxLength={phoneMaxLength}
             placeholder={signIn.phonePlaceholder}
             {...register("phone", {
               onChange: handlePhoneInput,
@@ -96,7 +99,7 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
           <CountryCodePicker
             value={countryCode}
             onChange={setCountryCode}
-              className="absolute right-2 -top-11 z-10"
+            className="absolute right-2 -top-11 z-10"
           />
         </div>
         {errors.phone && (
@@ -118,6 +121,7 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
           <input
             id="password"
             type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
             placeholder={signIn.passwordPlaceholder}
             {...register("password")}
             className={`
@@ -159,14 +163,14 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
             <button
               type="button"
               onClick={onForgotPassword}
-              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-600 hover:underline transition-colors"
+              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-800 hover:underline transition-colors"
             >
               {signIn.forgotPassword}
             </button>
           ) : (
             <Link
               href={ROUTES.FORGOT_PASSWORD}
-              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-600 hover:underline transition-colors"
+              className="text-sm sm:text-base font-light text-primary-500 hover:text-primary-800 hover:underline transition-colors"
             >
               {signIn.forgotPassword}
             </Link>

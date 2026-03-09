@@ -8,6 +8,7 @@ interface HeritageHeaderBarProps {
   onBack: () => void;
   onPublish: () => void;
   publishLabel: string;
+  isPublished?: boolean;
 }
 
 interface HeritagePortfolioHeaderProps {
@@ -18,6 +19,8 @@ interface HeritagePortfolioHeaderProps {
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
+  onPublish?: () => void;
+  isPublished?: boolean;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
@@ -38,6 +41,8 @@ export const HeritagePortfolioHeader = ({
   onDownload,
   onDownloadAsImage,
   onShare,
+  onPublish,
+  isPublished = false,
   onBack,
   isDownloading = false,
   content,
@@ -60,8 +65,9 @@ export const HeritagePortfolioHeader = ({
           {/* Header Bar - Nav */}
           <HeritageHeaderBar
             onBack={onBack}
-            onPublish={onShare}
+            onPublish={onPublish ?? onShare}
             publishLabel={publishLabel}
+            isPublished={isPublished}
           />
 
           {/* Main Content */}
@@ -177,6 +183,7 @@ const HeritageHeaderBar = ({
   onBack,
   onPublish,
   publishLabel,
+  isPublished = false,
 }: HeritageHeaderBarProps) => (
   <div data-preview-bar className="flex items-center justify-between mb-6 md:mb-10 lg:mb-12">
     {/* Back Arrow */}
@@ -211,7 +218,10 @@ const HeritageHeaderBar = ({
       data-share-button
       onClick={onPublish}
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base transition-opacity hover:opacity-90"
-      style={{ backgroundColor: "#F5E6E8", color: "#52161E" }}
+      style={isPublished
+        ? { backgroundColor: "#B1363E", color: "#ffffff" }
+        : { backgroundColor: "#F5E6E8", color: "#52161E" }
+      }
     >
       {publishLabel}
     </button>

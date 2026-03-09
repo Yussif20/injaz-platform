@@ -46,7 +46,7 @@ export const AccountInfoForm: React.FC = () => {
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | React.ReactNode | null>(null);
 
   const {
     accountInfo,
@@ -141,6 +141,20 @@ export const AccountInfoForm: React.FC = () => {
       // Send current personal info along with new email so backend receives required fields (birthDate, address, etc.)
       if (data.email !== displayData.email) {
         const personalInfo = profile?.personalInfo;
+
+        // Guard: backend requires nationalId, birthDate, address — if missing, guide user
+        if (!personalInfo?.nationalId || !personalInfo?.birthDate || !personalInfo?.address) {
+          setErrorMessage(
+            <>
+              يرجى إكمال البيانات الشخصية أولاً (رقم الهوية، تاريخ الميلاد، العنوان) من{" "}
+              <Link href={ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL} className="underline font-medium">
+                صفحة بيانات الملف الشخصي
+              </Link>
+            </>
+          );
+          return;
+        }
+
         const personalInfoPayload = {
           ...(personalInfo && {
             nationalId: personalInfo.nationalId ?? undefined,

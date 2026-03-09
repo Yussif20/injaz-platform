@@ -5,9 +5,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { logout } from "../services/auth.service";
-import { AUTH_QUERY_KEY } from "./useAuth";
 import { ROUTES } from "@/config";
 
 interface UseLogoutOptions {
@@ -17,7 +15,6 @@ interface UseLogoutOptions {
 }
 
 export function useLogout(options: UseLogoutOptions = {}) {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { redirectTo = ROUTES.HOME } = options;
 
@@ -30,15 +27,14 @@ export function useLogout(options: UseLogoutOptions = {}) {
       return response;
     },
     onSuccess: () => {
-      // Clear auth query cache
-      queryClient.setQueryData(AUTH_QUERY_KEY, null);
-      queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
+      // Clear ALL query cache to prevent stale data leaking into next session
+      queryClient.clear();
 
       // Call custom success handler
       options.onSuccess?.();
 
-      // Redirect to home
-      router.push(redirectTo);
+      // Hard navigation to destroy all in-memory state (React Query, context, etc.)
+      window.location.href = redirectTo;
     },
     onError: (error: Error) => {
       options.onError?.(error);

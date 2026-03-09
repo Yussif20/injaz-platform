@@ -10,7 +10,10 @@ import { Input, Select } from "@/shared/components/ui";
 import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
 import { GraduationYearPicker } from "@/features/auth/components/GraduationYearPicker";
 import { QualificationCard } from "@/features/auth/components/QualificationCard";
+import Link from "next/link";
+import { ROUTES } from "@/config";
 import {
+  useMyProfile,
   useCareerJobs,
   useAddCareerJob,
   useUpdateCareerJob,
@@ -32,10 +35,10 @@ const jobSchema = z
       const start = parseInt(data.startYear, 10);
       const end = parseInt(data.endYear, 10);
       if (Number.isNaN(start) || Number.isNaN(end)) return true;
-      return end >= start;
+      return end > start;
     },
     {
-      message: "سنة النهاية يجب أن تكون بعد أو تساوي سنة البداية",
+      message: "سنة النهاية يجب أن تكون بعد سنة البداية",
       path: ["endYear"],
     },
   );
@@ -84,6 +87,8 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   // Hooks
+  const { profile } = useMyProfile();
+  const personalInfoIncomplete = !profile?.personalInfo?.nationalId || !profile?.personalInfo?.birthDate || !profile?.personalInfo?.address;
   const { careerJobs, isLoading } = useCareerJobs();
   const { addCareerJobAsync, isLoading: isAdding } = useAddCareerJob();
   const { updateCareerJobAsync, isLoading: isUpdating } = useUpdateCareerJob();
@@ -235,6 +240,15 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
 
   return (
     <div className="flex flex-col gap-4">
+      {personalInfoIncomplete && (
+        <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
+          يرجى إكمال البيانات الشخصية أولاً (رقم الهوية، تاريخ الميلاد، العنوان) من{" "}
+          <Link href={ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL} className="underline font-medium">
+            صفحة بيانات الملف الشخصي
+          </Link>
+        </div>
+      )}
+
       {error && (
         <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
           {error}

@@ -67,15 +67,9 @@ function PaymentMethodOption({
         ${disabled ? "opacity-50 cursor-not-allowed" : ""}
       `}
     >
+      {/* Right side (RTL): logo + label */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        <div
-          className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
-          ${selected ? "border-primary-500" : "border-grey-300"}`}
-        >
-          {selected && (
-            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary-500" />
-          )}
-        </div>
+        <span className="flex-shrink-0">{logo}</span>
         <span className="text-sm sm:text-base text-secondary-800 truncate">
           {label}
         </span>
@@ -85,7 +79,15 @@ function PaymentMethodOption({
           </span>
         )}
       </div>
-      <span className="flex-shrink-0">{logo}</span>
+      {/* Left side (RTL): radio toggle */}
+      <div
+        className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+        ${selected ? "border-primary-500" : "border-grey-300"}`}
+      >
+        {selected && (
+          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary-500" />
+        )}
+      </div>
     </button>
   );
 }
@@ -464,7 +466,7 @@ function ManageSubscriptionContent() {
           <div className="mt-4 sm:mt-6 text-center">
             <Link
               href="/dashboard/account/subscription/history"
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium underline"
+              className="text-primary-500 hover:text-primary-800 text-sm font-medium underline"
             >
               {content.viewHistoryLink}
             </Link>
@@ -539,14 +541,14 @@ function ManageSubscriptionContent() {
       : "—";
 
     return (
-      <div className="min-h-[60vh] bg-[#FAFAFA] rounded-xl sm:rounded-2xl px-4 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10 space-y-6 sm:space-y-8">
+      <div className="min-h-[60vh] bg-[#FAFAFA] rounded-xl sm:rounded-2xl px-5 py-8 sm:px-10 sm:py-10 md:px-12 md:py-12 space-y-8 sm:space-y-10">
         <h2 className="text-lg sm:text-xl font-bold text-secondary-800 text-right">
           {content.form.title}
         </h2>
 
         {/* Subscription summary - white box */}
-        <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 text-right">
-          <div className="flex flex-row justify-between items-center gap-4 mb-3">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 text-right">
+          <div className="flex flex-row justify-between items-center gap-4 mb-4">
             <span className="text-sm sm:text-base text-grey-600">
               {content.form.subscriptionValue}
             </span>
@@ -565,7 +567,7 @@ function ManageSubscriptionContent() {
         </div>
 
         {/* Remaining content */}
-        <div className="min-w-0 overflow-hidden pt-2">
+        <div className="min-w-0 overflow-hidden pt-4">
           {/* Error message */}
           {paymentError && (
             <div className="mb-5 p-3 bg-warning-50 border border-warning-200 rounded-lg text-sm text-warning-700 text-center">
@@ -574,13 +576,13 @@ function ManageSubscriptionContent() {
           )}
 
           {/* Two column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12">
             {/* Payment methods */}
             <div className="order-2 lg:order-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-right">
+              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-4 sm:mb-5 text-right">
                 {content.form.paymentMethodTitle}
               </h3>
-              <div className="space-y-2 sm:space-y-3">
+              <div className="space-y-3 sm:space-y-4">
                 <PaymentMethodOption
                   method="visa"
                   label={content.form.visa}
@@ -588,7 +590,7 @@ function ManageSubscriptionContent() {
                   onSelect={setSelectedPaymentMethod}
                   logo={
                     <Image
-                      src="/images/landing/subscription/visa.png"
+                      src="/images/dashboard/visa.svg"
                       alt="Visa"
                       width={50}
                       height={16}
@@ -637,7 +639,7 @@ function ManageSubscriptionContent() {
 
             {/* Card details / Apple Pay panel */}
             <div className="order-1 lg:order-2 min-w-0">
-              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-3 sm:mb-4 text-right">
+              <h3 className="text-base sm:text-lg font-medium text-secondary-800 mb-4 sm:mb-5 text-right">
                 {content.form.cardDetailsTitle}
               </h3>
               {selectedPaymentMethod === "apple_pay" ? (
@@ -652,7 +654,7 @@ function ManageSubscriptionContent() {
                   <p className="text-sm text-grey-500">{content.applePayHint}</p>
                 </div>
               ) : (
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-4 sm:space-y-5">
                   <div>
                     <label className="block text-sm text-secondary-800 mb-2">
                       {content.form.cardNameLabel}
@@ -743,7 +745,7 @@ function ManageSubscriptionContent() {
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-8 sm:mt-10">
+        <div className="flex flex-col sm:flex-row gap-4 mt-10 sm:mt-12">
           {selectedPaymentMethod === "apple_pay" ? (
             <Button
               variant="primary"

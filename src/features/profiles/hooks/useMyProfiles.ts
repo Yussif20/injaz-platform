@@ -20,7 +20,7 @@ export function useMyProfiles() {
       }
       return response.data ?? [];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Always refetch when returning to dashboard
     retry: 1,
   });
 

@@ -39,6 +39,7 @@ export const DarkAchievementsSection = ({
         sections={sections}
         content={content}
         theme={theme}
+        imageRadius="15px"
       />
     </div>
   );

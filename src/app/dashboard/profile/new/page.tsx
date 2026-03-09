@@ -118,21 +118,32 @@ function CreateFileContent() {
 
     try {
       if (isEditMode && fileIdParam) {
-        // Edit mode: call update APIs for year and profile type
+        // Edit mode: only call update APIs for fields that actually changed
         const profileId = Number(fileIdParam);
+        const originalProfileTypeId = Number(searchParams.get("profileTypeId"));
+        const originalYearName = searchParams.get("year");
+        const originalYearId = academicYears.find((y) => y.yearName === originalYearName)?.id;
 
-        const [yearRes, typeRes] = await Promise.all([
-          updateAcademicYearAsync({ profileId, academicYearId: selectedYear! }),
-          updateProfileTypeAsync({ profileId, profileTypeId: selectedProfileType! }),
-        ]);
+        const updates: Promise<{ status: boolean; message: string }>[] = [];
 
-        if (!yearRes.status) {
-          setError(yearRes.message || "فشل تحديث السنة الدراسية");
-          return;
+        const yearChanged = selectedYear !== originalYearId;
+        const typeChanged = selectedProfileType !== originalProfileTypeId;
+
+        if (yearChanged) {
+          updates.push(updateAcademicYearAsync({ profileId, academicYearId: selectedYear! }));
         }
-        if (!typeRes.status) {
-          setError(typeRes.message || "فشل تحديث نوع الملف");
-          return;
+        if (typeChanged) {
+          updates.push(updateProfileTypeAsync({ profileId, profileTypeId: selectedProfileType! }));
+        }
+
+        if (updates.length > 0) {
+          const results = await Promise.all(updates);
+          for (const res of results) {
+            if (!res.status) {
+              setError(res.message || "فشل تحديث البيانات");
+              return;
+            }
+          }
         }
 
         // Upload image if changed (non-fatal)

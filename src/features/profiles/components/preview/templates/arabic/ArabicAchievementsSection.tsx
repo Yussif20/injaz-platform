@@ -47,6 +47,7 @@ export const ArabicAchievementsSection = ({
         sections={sections}
         content={content}
         theme={theme}
+        imageRadius="15px"
       />
     </div>
   );

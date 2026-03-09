@@ -13,12 +13,14 @@ interface AchievementsContentProps {
     attachmentLabel?: string;
   };
   theme: ThemeColors;
+  imageRadius?: string;
 }
 
 export const AchievementsContent = ({
   sections,
   content,
   theme,
+  imageRadius,
 }: AchievementsContentProps) => {
   if (!sections || sections.length === 0) return null;
 
@@ -95,6 +97,7 @@ export const AchievementsContent = ({
                   subsectionTitle={subsection.title}
                   attachmentLabel={content.attachmentLabel}
                   theme={theme}
+                  imageRadius={imageRadius}
                 />
               ))}
           </div>

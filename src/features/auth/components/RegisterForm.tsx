@@ -26,6 +26,8 @@ export function RegisterForm() {
   const { signUp, otp, buttons } = authContent;
   const [step, setStep] = useState<RegistrationStep>("details");
   const [countryCode, setCountryCode] = useState("+966");
+
+  const phoneMaxLength = countryCode === "+20" ? 10 : 9;
   const [phone, setPhone] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpError, setOtpError] = useState("");
@@ -107,11 +109,9 @@ export function RegisterForm() {
       text
     );
 
-  // Handle phone input - only allow digits
+  // Handle phone input - only allow digits, enforce max length
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const sanitized = value.replace(/\D/g, "");
-    e.target.value = sanitized;
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, phoneMaxLength);
   };
 
   return (
@@ -184,6 +184,7 @@ export function RegisterForm() {
                 <input
                   id="phone"
                   type="tel"
+                  maxLength={phoneMaxLength}
                   placeholder={signUp.phonePlaceholder}
                   {...detailsForm.register("phone", {
                     onChange: handlePhoneInput,

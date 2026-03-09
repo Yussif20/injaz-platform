@@ -10,6 +10,7 @@ interface SubsectionGalleryProps {
   subsectionTitle: string | null;
   attachmentLabel?: string;
   theme: ThemeColors;
+  imageRadius?: string;
 }
 
 export const SubsectionGallery = ({
@@ -17,6 +18,7 @@ export const SubsectionGallery = ({
   subsectionTitle,
   attachmentLabel,
   theme,
+  imageRadius,
 }: SubsectionGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedImage = images[selectedIndex];
@@ -87,7 +89,10 @@ export const SubsectionGallery = ({
       </p>
 
       {/* Featured Image - full width with rounded corners */}
-      <div className="relative h-33.5 md:h-80 lg:h-125 w-full rounded-2xl md:rounded-3xl overflow-hidden bg-black/5">
+      <div
+        className={`relative h-33.5 md:h-80 lg:h-125 w-full overflow-hidden bg-black/5 ${imageRadius ? "" : "rounded-2xl md:rounded-3xl"}`}
+        style={imageRadius ? { borderRadius: imageRadius } : undefined}
+      >
         <img
           src={
             selectedImage?.publicUrl

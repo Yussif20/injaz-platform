@@ -13,6 +13,7 @@ import {
   useUploadSubsectionImage,
   useUpdateImage,
   useDeleteImage,
+  useValidateProfile,
 } from "@/features/profiles/hooks";
 import type { SubsectionImage } from "@/features/profiles/types/profile.types";
 import { dashboardContent } from "@/content";
@@ -29,6 +30,7 @@ export default function ProfileSectionsPage() {
 
   // Fetch profile details with sections
   const { profileDetails, isLoading, refetch } = useProfileDetails(Number(profileId));
+  const { validation, refetch: refetchValidation } = useValidateProfile(Number(profileId));
   const { uploadImageAsync, isLoading: isAddingImage } = useUploadSubsectionImage();
   const { updateImageAsync, isLoading: isUpdatingImage } = useUpdateImage();
   const { deleteImageAsync, isLoading: isDeletingImage } = useDeleteImage();
@@ -77,6 +79,7 @@ export default function ProfileSectionsPage() {
       });
 
       refetch();
+      refetchValidation();
       handleAddModalClose();
     } catch (error) {
       const msg =
@@ -114,6 +117,7 @@ export default function ProfileSectionsPage() {
       });
 
       refetch();
+      refetchValidation();
       handleEditModalClose();
     } catch (error) {
       const msg =
@@ -146,6 +150,7 @@ export default function ProfileSectionsPage() {
       });
 
       refetch();
+      refetchValidation();
       handleDeleteModalClose();
     } catch (error) {
       console.error("Error deleting evidence:", error);
@@ -157,14 +162,25 @@ export default function ProfileSectionsPage() {
     setSaveDraftError(null);
     setIsSavingDraft(true);
     try {
+      // Pre-validate before attempting save
+      const { data: freshValidation } = await refetchValidation();
+      if (freshValidation && !freshValidation.canSave) {
+        setSaveDraftError(freshValidation.message || "لا يمكن حفظ الملف، يرجى استكمال البيانات المطلوبة");
+        setIsSavingDraft(false);
+        return;
+      }
+
       const result = await saveDraft(Number(profileId));
       if (result.status) {
         router.push(ROUTES.DASHBOARD);
       } else {
         setSaveDraftError(result.message);
       }
-    } catch {
-      setSaveDraftError("حدث خطأ أثناء الحفظ");
+    } catch (error) {
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "حدث خطأ أثناء الحفظ";
+      setSaveDraftError(msg);
     } finally {
       setIsSavingDraft(false);
     }
@@ -188,7 +204,7 @@ export default function ProfileSectionsPage() {
         <p className="text-grey-500">لم يتم العثور على الملف</p>
         <Link
           href={ROUTES.DASHBOARD}
-          className="text-primary-500 hover:text-primary-600 mt-4 inline-block"
+          className="text-primary-500 hover:text-primary-800 mt-4 inline-block"
         >
           العودة للرئيسية
         </Link>
@@ -220,8 +236,9 @@ export default function ProfileSectionsPage() {
             <Button
               variant="primary"
               onClick={handleSaveAsDraft}
-              disabled={isSavingDraft}
+              disabled={isSavingDraft || (validation !== null && !validation.canSave)}
               className="!w-auto px-6"
+              title={validation && !validation.canSave ? (validation.message || "يرجى استكمال البيانات المطلوبة") : undefined}
             >
               {isSavingDraft ? "جاري الحفظ..." : sectionsPage.saveAsDraft}
             </Button>
@@ -231,6 +248,35 @@ export default function ProfileSectionsPage() {
           )}
         </div>
       </div>
+
+      {/* Validation Banner */}
+      {validation && !validation.canSave && (
+        <div className="bg-warning-50 border border-warning-300 rounded-lg p-4 mb-6">
+          <p className="text-warning-700 font-medium mb-2">
+            {validation.message || "لا يمكن حفظ الملف، يرجى استكمال البيانات المطلوبة"}
+          </p>
+          {validation.subsectionsWithoutImages && validation.subsectionsWithoutImages.length > 0 && (
+            <div className="mt-2">
+              <p className="text-warning-600 text-sm mb-1">الأقسام الفرعية التي تحتاج إلى شواهد:</p>
+              <ul className="list-disc list-inside text-sm text-warning-600 space-y-1 ps-2">
+                {validation.subsectionsWithoutImages.map((name, i) => (
+                  <li key={i}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {validation.missingUserDataFields && validation.missingUserDataFields.length > 0 && (
+            <div className="mt-2">
+              <p className="text-warning-600 text-sm mb-1">بيانات مفقودة:</p>
+              <ul className="list-disc list-inside text-sm text-warning-600 space-y-1 ps-2">
+                {validation.missingUserDataFields.map((field, i) => (
+                  <li key={i}>{field}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Sections List */}
       <div className="space-y-4">

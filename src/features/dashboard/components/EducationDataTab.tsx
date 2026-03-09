@@ -10,7 +10,10 @@ import { Input, Select } from "@/shared/components/ui";
 import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
 import { GraduationYearPicker } from "@/features/auth/components/GraduationYearPicker";
 import { QualificationCard } from "@/features/auth/components/QualificationCard";
+import Link from "next/link";
+import { ROUTES } from "@/config";
 import {
+  useMyProfile,
   useQualifications,
   useAddQualification,
   useUpdateQualification,
@@ -63,6 +66,8 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
   const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   // Hooks
+  const { profile } = useMyProfile();
+  const personalInfoIncomplete = !profile?.personalInfo?.nationalId || !profile?.personalInfo?.birthDate || !profile?.personalInfo?.address;
   const { qualifications, isLoading } = useQualifications();
   const { addQualificationAsync, isLoading: isAdding } = useAddQualification();
   const { updateQualificationAsync, isLoading: isUpdating } =
@@ -218,6 +223,15 @@ export const EducationDataTab: React.FC<EducationDataTabProps> = ({
 
   return (
     <div className="flex flex-col gap-4">
+      {personalInfoIncomplete && (
+        <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
+          يرجى إكمال البيانات الشخصية أولاً (رقم الهوية، تاريخ الميلاد، العنوان) من{" "}
+          <Link href={ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA_PERSONAL} className="underline font-medium">
+            صفحة بيانات الملف الشخصي
+          </Link>
+        </div>
+      )}
+
       {error && (
         <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-right">
           {error}

@@ -8,6 +8,7 @@ interface DefaultHeaderBarProps {
   onBack: () => void;
   onPublish: () => void;
   publishLabel: string;
+  isPublished?: boolean;
   textColor: string;
   primaryColor: string;
 }
@@ -20,6 +21,8 @@ interface DefaultPortfolioHeaderProps {
   onDownload: () => void;
   onDownloadAsImage?: () => void;
   onShare: () => void;
+  onPublish?: () => void;
+  isPublished?: boolean;
   onBack: () => void;
   isDownloading?: boolean;
   content: {
@@ -40,6 +43,8 @@ export const DefaultPortfolioHeader = ({
   onDownload,
   onDownloadAsImage,
   onShare,
+  onPublish,
+  isPublished = false,
   onBack,
   isDownloading = false,
   content,
@@ -49,14 +54,15 @@ export const DefaultPortfolioHeader = ({
 
   return (
     <div
-      className="relative overflow-hidden px-4 pt-4 pb-8 md:pt-6 md:pb-10 lg:pt-8 lg:pb-12 bg-[url('/images/profiles/default/bg-mobile.svg')] md:bg-[url('/images/profiles/default/bg-tablet.svg')] lg:bg-[url('/images/profiles/default/bg-desktop.svg')] bg-cover bg-center"
+      className="relative overflow-hidden px-4 pt-4 pb-8 md:pt-6 md:pb-10 lg:pt-8 lg:pb-12 bg-[url('/images/profiles/default/elipse-mobile.svg')] md:bg-[url('/images/profiles/default/elipse-desktop.svg')] bg-cover bg-center"
       style={{ backgroundColor: theme.background }}
     >
       <div className="max-w-300 mx-auto">
         <DefaultHeaderBar
           onBack={onBack}
-          onPublish={onShare}
+          onPublish={onPublish ?? onShare}
           publishLabel={publishLabel}
+          isPublished={isPublished}
           textColor={theme.text}
           primaryColor={theme.primary}
         />
@@ -162,6 +168,7 @@ const DefaultHeaderBar = ({
   onBack,
   onPublish,
   publishLabel,
+  isPublished = false,
   textColor,
   primaryColor,
 }: DefaultHeaderBarProps) => (
@@ -199,7 +206,7 @@ const DefaultHeaderBar = ({
       data-share-button
       onClick={onPublish}
       className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-2xl md:rounded-3xl font-light text-xs md:text-base"
-      style={{ backgroundColor: primaryColor, color: "#ffffff" }}
+      style={{ backgroundColor: isPublished ? "#B1363E" : primaryColor, color: "#ffffff" }}
     >
       {publishLabel}
     </button>

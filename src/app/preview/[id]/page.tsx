@@ -31,7 +31,7 @@ import {
   ArabicAchievementsSection,
   ArabicContactSection,
 } from "@/features/profiles";
-import { useProfileDetails, useMyProfiles, useProfileCapabilities } from "@/features/profiles/hooks";
+import { useProfileDetails, useMyProfiles, useProfileCapabilities, usePublishProfile, useUnpublishProfile } from "@/features/profiles/hooks";
 import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
@@ -70,8 +70,12 @@ export default function ProfilePreviewPage() {
   // Capability checks
   const capabilities = useProfileCapabilities();
 
+  // Publish/unpublish hooks
+  const { publishAsync, isLoading: isPublishing } = usePublishProfile();
+  const { unpublishAsync, isLoading: isUnpublishing } = useUnpublishProfile();
+
   // Toast for blocked actions
-  const [blockToast, setBlockToast] = useState<string | null>(null);
+  const [blockToast, setBlockToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
 
   // Download loading state
   const [isDownloading, setIsDownloading] = useState(false);
@@ -120,7 +124,7 @@ export default function ProfilePreviewPage() {
         ? previewPage.completeProfileToPublish
         : previewPage.completeProfileToShare;
     }
-    setBlockToast(message);
+    setBlockToast({ message, type: "warning" });
     setTimeout(() => setBlockToast(null), 3000);
   };
 
@@ -207,6 +211,47 @@ export default function ProfilePreviewPage() {
     }
   };
 
+  // Determine if profile is currently published
+  const isPublished = profileDetails?.status === "Published";
+
+  // Publish handler
+  const handlePublish = async () => {
+    if (!capabilities.canPublish) {
+      showBlockedToast("publish");
+      return;
+    }
+    try {
+      const result = await publishAsync(Number(profileId));
+      if (result.status) {
+        setBlockToast({ message: "تم نشر الملف بنجاح", type: "success" });
+        setTimeout(() => setBlockToast(null), 3000);
+      } else {
+        setBlockToast({ message: result.message || "فشل نشر الملف", type: "warning" });
+        setTimeout(() => setBlockToast(null), 3000);
+      }
+    } catch {
+      setBlockToast({ message: "حدث خطأ أثناء نشر الملف", type: "warning" });
+      setTimeout(() => setBlockToast(null), 3000);
+    }
+  };
+
+  // Unpublish handler
+  const handleUnpublish = async () => {
+    try {
+      const result = await unpublishAsync(Number(profileId));
+      if (result.status) {
+        setBlockToast({ message: "تم إلغاء نشر الملف بنجاح", type: "success" });
+        setTimeout(() => setBlockToast(null), 3000);
+      } else {
+        setBlockToast({ message: result.message || "فشل إلغاء نشر الملف", type: "warning" });
+        setTimeout(() => setBlockToast(null), 3000);
+      }
+    } catch {
+      setBlockToast({ message: "حدث خطأ أثناء إلغاء نشر الملف", type: "warning" });
+      setTimeout(() => setBlockToast(null), 3000);
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -229,7 +274,7 @@ export default function ProfilePreviewPage() {
         <p className="text-grey-500 mb-4">{previewPage.notFound}</p>
         <Link
           href={ROUTES.DASHBOARD}
-          className="text-primary-500 hover:text-primary-600"
+          className="text-primary-500 hover:text-primary-800"
         >
           {previewPage.backHome}
         </Link>
@@ -290,6 +335,8 @@ export default function ProfilePreviewPage() {
             onDownload: handleDownload,
             onDownloadAsImage: handleDownloadAsImage,
             onShare: handleShare,
+            onPublish: isPublished ? handleUnpublish : handlePublish,
+            isPublished,
             onBack: handleGoBack,
             isDownloading,
             content: {
@@ -297,7 +344,7 @@ export default function ProfilePreviewPage() {
               downloadAsImage: previewPage.downloadAsImage,
               shareFile: previewPage.shareFile,
               fileTitle: previewPage.fileTitle,
-              publishFile: previewPage.publishFile ?? "نشر الملف",
+              publishFile: isPublished ? "إلغاء النشر" : (previewPage.publishFile ?? "نشر الملف"),
             },
             theme,
           };
@@ -455,10 +502,10 @@ export default function ProfilePreviewPage() {
         />
       </div>
 
-      {/* Blocked action toast */}
+      {/* Action toast */}
       {blockToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-warning-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm text-center">
-          {blockToast}
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm text-center ${blockToast.type === "success" ? "bg-success-500" : "bg-warning-500"}`}>
+          {blockToast.message}
         </div>
       )}
     </div>

@@ -21,7 +21,7 @@ export const FAQSection: React.FC = () => {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary-500 underline hover:text-primary-600"
+                className="text-primary-500 underline hover:text-primary-800"
                 dir="ltr"
               >
                 +{faqSection.whatsappNumber}
