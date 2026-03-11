@@ -34,6 +34,11 @@ import type { ProfileDetails } from "@/features/profiles/types/profile.types";
 import { dashboardContent } from "@/content";
 import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
 
+/** The backend share endpoint may return extra fields not in ProfileDetails type */
+interface SharedProfileData extends ProfileDetails {
+  userFullName?: string | null;
+}
+
 function normalizeImageUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
   const s = raw.trim();
@@ -57,25 +62,29 @@ type PageState = "loading" | "password_gate" | "profile" | "error";
 
 export default function PublicProfilePage() {
   const params = useParams();
-  const profileId = params.id as string;
+  const token = params.token as string;
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { previewPage } = dashboardContent;
 
   const [pageState, setPageState] = useState<PageState>("loading");
-  const [profileDetails, setProfileDetails] = useState<ProfileDetails | null>(null);
-  const [isPasswordProtected, setIsPasswordProtected] = useState(false);
+  const [profileDetails, setProfileDetails] = useState<SharedProfileData | null>(null);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch profile on mount
+  // Fetch profile on mount via ShareLinks token endpoint
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await fetch(`/api/public/profiles/${profileId}`);
+        const res = await fetch(`/api/public/shared/${token}`);
         const data = await res.json();
+
+        if (res.status === 403 && data.passwordRequired) {
+          setPageState("password_gate");
+          return;
+        }
 
         if (!res.ok || !data.status) {
           setErrorMessage(data.message || "الملف غير موجود");
@@ -83,22 +92,7 @@ export default function PublicProfilePage() {
           return;
         }
 
-        const profile = data.data as ProfileDetails & { isPasswordProtected?: boolean };
-
-        if (profile.isPasswordProtected) {
-          setIsPasswordProtected(true);
-          setPageState("password_gate");
-          return;
-        }
-
-        // Check if profile is published
-        if (profile.status !== "Published") {
-          setErrorMessage("هذا الملف غير منشور");
-          setPageState("error");
-          return;
-        }
-
-        setProfileDetails(profile);
+        setProfileDetails(data.data as SharedProfileData);
         setPageState("profile");
       } catch {
         setErrorMessage("حدث خطأ أثناء تحميل الملف");
@@ -106,9 +100,9 @@ export default function PublicProfilePage() {
       }
     }
     fetchProfile();
-  }, [profileId]);
+  }, [token]);
 
-  // Handle password submit
+  // Handle password submit — single request with ?password= param
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password.trim()) return;
@@ -117,22 +111,14 @@ export default function PublicProfilePage() {
     setPasswordError(null);
 
     try {
-      const res = await fetch(`/api/public/profiles/${profileId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
+      const res = await fetch(
+        `/api/public/shared/${token}?password=${encodeURIComponent(password)}`
+      );
       const data = await res.json();
 
-      if (data.status && data.data?.isValid) {
-        // Password correct — reload profile data
-        const profileRes = await fetch(`/api/public/profiles/${profileId}`);
-        const profileData = await profileRes.json();
-
-        if (profileData.status && profileData.data) {
-          setProfileDetails(profileData.data);
-          setPageState("profile");
-        }
+      if (res.ok && data.status && data.data) {
+        setProfileDetails(data.data as SharedProfileData);
+        setPageState("profile");
       } else {
         setPasswordError(data.message || "كلمة المرور غير صحيحة");
       }
@@ -229,6 +215,11 @@ export default function PublicProfilePage() {
 
   const profileImageUrl = normalizeImageUrl(profileDetails.imageUrl);
 
+  // Resolve teacher name: prefer userFullName (display name) over userName (may be phone)
+  const resolvedTeacherName = profileDetails.userFullName
+    || (profileDetails.userName && !/^\+?\d[\d\s-]{7,}$/.test(profileDetails.userName) ? profileDetails.userName : null)
+    || "المعلم";
+
   // No-op handlers for header (public view has no download/share)
   const noop = () => {};
 
@@ -253,7 +244,7 @@ export default function PublicProfilePage() {
         {/* Header - public view (no download/share buttons) */}
         {(() => {
           const commonHeaderProps = {
-            teacherName: profileDetails.userName || "المعلم",
+            teacherName: resolvedTeacherName,
             teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
             academicYear: profileDetails.academicYearName || "",
             profileImageUrl,

@@ -188,17 +188,22 @@ export default function ProfilePreviewPage() {
       return;
     }
 
-    // Default fallback URL
-    const fallbackUrl = `${window.location.origin}/p/${profileId}`;
-    let shareUrl = fallbackUrl;
+    let shareUrl: string;
 
     try {
       const result = await createShareLinkAsync({ profileId: Number(profileId) });
-      if (result?.data?.shareUrl) {
-        shareUrl = result.data.shareUrl;
+      const shareToken = result?.data?.token;
+      if (!shareToken) {
+        setBlockToast({ message: "فشل في إنشاء رابط المشاركة", type: "warning" });
+        setTimeout(() => setBlockToast(null), 3000);
+        return;
       }
+      shareUrl = `${window.location.origin}/p/${shareToken}`;
     } catch (error) {
-      console.error("Error creating share link, using fallback URL:", error);
+      console.error("Error creating share link:", error);
+      setBlockToast({ message: "فشل في إنشاء رابط المشاركة", type: "warning" });
+      setTimeout(() => setBlockToast(null), 3000);
+      return;
     }
 
     const shareData = {
