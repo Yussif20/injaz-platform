@@ -164,22 +164,7 @@ function CreateFileContent() {
           templateId: 1,
         });
 
-        if (!response.status) {
-          const backendMsg =
-            (response as { debug?: { backendMessage?: string } }).debug
-              ?.backendMessage ?? (response as { message?: string }).message ?? "";
-          const isAlreadyHasProfile =
-            typeof backendMsg === "string" &&
-            backendMsg.includes("ملف لهذه السنة");
-          setError(
-            isAlreadyHasProfile
-              ? createFile.errorAlreadyHasProfileForYear
-              : response.message || "فشل في إنشاء الملف"
-          );
-          return;
-        }
-
-        const profileId = (response as { data?: { id?: number } }).data?.id;
+        const profileId = response.data?.id;
 
         // Upload image (non-fatal)
         if (selectedImage && profileId) {
@@ -195,14 +180,19 @@ function CreateFileContent() {
     } catch (err: unknown) {
       const errorObj = err as {
         message?: string;
-        response?: { data?: { message?: string } };
+        response?: { data?: { message?: string; debug?: { backendMessage?: string } } };
       };
+      const backendMsg =
+        errorObj?.response?.data?.debug?.backendMessage ??
+        errorObj?.response?.data?.message ??
+        "";
+      const isAlreadyHasProfile =
+        typeof backendMsg === "string" && backendMsg.includes("ملف لهذه السنة");
       setError(
-        errorObj?.response?.data?.message ||
-          errorObj?.message ||
-          "حدث خطأ غير متوقع"
+        isAlreadyHasProfile
+          ? createFile.errorAlreadyHasProfileForYear
+          : backendMsg || errorObj?.message || "حدث خطأ غير متوقع"
       );
-      console.error("Submit error:", err);
     } finally {
       setIsSubmitting(false);
     }

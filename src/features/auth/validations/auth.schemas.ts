@@ -9,7 +9,7 @@ import { Gender, VerificationPurpose } from "../types/auth.types";
 const phoneSchema = z
   .string()
   .min(1, "رقم الجوال مطلوب")
-  .regex(/^[0-9+]+$/, "رقم الجوال يجب أن يحتوي على أرقام فقط")
+  .regex(/^\+?[0-9]+$/, "رقم الجوال يجب أن يحتوي على أرقام فقط")
   .min(9, "رقم الجوال يجب أن يكون 9 أرقام على الأقل")
   .max(15, "رقم الجوال طويل جداً");
 
@@ -137,7 +137,6 @@ export const registerSchema = z.object({
   confirmPassword: z.string(),
   gender: z.nativeEnum(Gender),
   email: z.string().optional(),
-  verificationCode: otpSchema,
 });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;

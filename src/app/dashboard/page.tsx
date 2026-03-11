@@ -568,12 +568,7 @@ export default function DashboardPage() {
             selectedStatus={selectedStatus}
             onYearChange={setSelectedYear}
             onStatusChange={setSelectedStatus}
-            onApplyFilters={() => {
-              console.log("Applying filters:", {
-                selectedYear,
-                selectedStatus,
-              });
-            }}
+            onApplyFilters={() => {}}
           />
         </div>
       </div>

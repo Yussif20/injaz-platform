@@ -14,11 +14,8 @@ export function useCreateProfile() {
 
   const mutation = useMutation({
     mutationFn: (data: CreateProfileRequest) => createProfile(data),
-    onSuccess: (response) => {
-      if (response.status) {
-        // Invalidate profiles cache
-        queryClient.invalidateQueries({ queryKey: MY_PROFILES_QUERY_KEY });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MY_PROFILES_QUERY_KEY });
     },
   });
 

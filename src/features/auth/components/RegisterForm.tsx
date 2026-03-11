@@ -1,10 +1,10 @@
 /**
- * Register Form Component - Multi-step with OTP
+ * Register Form Component
  */
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -17,38 +17,20 @@ import {
   registerDetailsSchema,
   type RegisterDetailsFormValues,
 } from "../validations/auth.schemas";
-import { Gender, type RegistrationStep } from "../types/auth.types";
-import { OtpInput } from "./OtpInput";
-
-// Steps indicator removed per request
+import { Gender } from "../types/auth.types";
 
 export function RegisterForm() {
-  const { signUp, otp, buttons } = authContent;
-  const [step, setStep] = useState<RegistrationStep>("details");
+  const { signUp } = authContent;
   const [countryCode, setCountryCode] = useState("+966");
 
   const phoneMaxLength = countryCode === "+20" ? 10 : 9;
-  const [phone, setPhone] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [otpError, setOtpError] = useState("");
-  const [resendTimer, setResendTimer] = useState(0);
-  const [pendingDetails, setPendingDetails] =
-    useState<RegisterDetailsFormValues | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
-    sendOtp,
-    sendOtpAsync,
-    isSendingOtp,
-    sendOtpError,
-    verifyOtpAsync,
-    isVerifyingOtp,
-    verifyOtpError,
     register: registerUser,
     isRegistering,
     registerError,
-    reset: resetMutations,
   } = useRegister();
 
   // Step 1: Details + Phone form
@@ -71,7 +53,6 @@ export function RegisterForm() {
   });
 
 
-  // Direct register (OTP path commented out): submit form → register endpoint
   const handleDetailsSubmit = (data: RegisterDetailsFormValues) => {
     const normalizedPhone = `${countryCode}${data.phone.replace(/^\+/, "")}`;
     registerUser({
@@ -81,20 +62,8 @@ export function RegisterForm() {
       confirmPassword: data.confirmPassword,
       gender: Number(data.gender) as Gender,
       email: "",
-      verificationCode: "11111", // Fixed OTP for now (backend has no OTP path)
     });
   };
-
-  // --- OTP path (commented out for now) ---
-  // const [step, setStep] = useState<RegistrationStep>("details");
-  // const [phone, setPhone] = useState("");
-  // const [otpCode, setOtpCode] = useState("");
-  // const [otpError, setOtpError] = useState("");
-  // const [resendTimer, setResendTimer] = useState(0);
-  // const [pendingDetails, setPendingDetails] = useState<RegisterDetailsFormValues | null>(null);
-  // Step 1 used to: sendOtpAsync(phone) → setStep("otp")
-  // Step 2 used to: verifyOtpAsync({ phone, code }) → registerUser({ ...pendingDetails, verificationCode: otpCode })
-  // handleResendOtp, handleBack, handleOtpVerify — removed while OTP is disabled
 
   // Render label with required (*) in warning color (handles * anywhere, e.g. "إلى*:")
   const requiredLabel = (text: string) =>
@@ -115,13 +84,7 @@ export function RegisterForm() {
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
-      {/* OTP step commented out — direct register only
-      {step === "otp" && (
-        <div> ... OtpInput, resend, verify button, handleBack ... </div>
-      )}
-      */}
-
-      {/* Registration form — submits directly to register endpoint */}
+      {/* Registration form */}
       <form
         onSubmit={detailsForm.handleSubmit(handleDetailsSubmit)}
         className="flex flex-col gap-5 sm:gap-6 text-right"

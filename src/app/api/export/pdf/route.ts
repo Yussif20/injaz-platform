@@ -49,8 +49,6 @@ export async function GET(request: NextRequest) {
     // Set viewport to A4-ish width for consistent rendering
     await page.setViewport({ width: 1200, height: 1600 });
 
-    console.log("[PDF Export] Navigating to:", printUrl);
-
     // Use domcontentloaded — networkidle never settles in dev mode due to
     // HMR WebSocket. We rely on data-print-ready for actual readiness.
     await page.goto(printUrl, {
@@ -58,19 +56,13 @@ export async function GET(request: NextRequest) {
       timeout: 20000,
     });
 
-    console.log("[PDF Export] Page loaded, waiting for content...");
-
     // Wait for the print page to signal that content is ready
     await page.waitForSelector("[data-print-ready]", { timeout: 15000 });
-
-    console.log("[PDF Export] Content ready, waiting for render...");
 
     // Fixed delay for images to load and final rendering to settle.
     // page.evaluate for image onload is unreliable here because the auth
     // provider's failed requests can invalidate the page context.
     await new Promise((r) => setTimeout(r, 3000));
-
-    console.log("[PDF Export] Generating PDF...");
 
     // Measure actual content dimensions to create a single-page PDF
     const contentSize = await page.evaluate(() => ({

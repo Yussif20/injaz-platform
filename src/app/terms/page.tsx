@@ -1,3 +1,4 @@
+import DOMPurify from "isomorphic-dompurify";
 import { Navbar, Footer } from "@/shared/components/layout";
 import { BACKEND_API_URL } from "@/shared/lib/api";
 import { getAccessToken } from "@/shared/lib/cookies";
@@ -54,7 +55,7 @@ export default async function TermsPage() {
             <div
               className="prose prose-sm sm:prose max-w-none text-right leading-relaxed text-grey-700"
               dir="rtl"
-              dangerouslySetInnerHTML={{ __html: html }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
             />
           </div>
         )}

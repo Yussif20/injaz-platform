@@ -59,7 +59,7 @@ export interface LoginCredentials {
   password: string;
 }
 
-// Registration data (step 3 - complete form)
+// Registration data
 export interface RegisterCredentials {
   fullName: string;
   phone: string;
@@ -67,7 +67,6 @@ export interface RegisterCredentials {
   confirmPassword: string;
   gender: Gender;
   email: string;
-  verificationCode: string;
 }
 
 // Send OTP request

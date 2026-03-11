@@ -94,9 +94,6 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    
-    // Log the request body for debugging
-    console.log("Create profile request body:", JSON.stringify(body, null, 2));
 
     const response = await serverApi.post<ApiResponse<Profile>>(
       API_ENDPOINTS.MY_PROFILES,
