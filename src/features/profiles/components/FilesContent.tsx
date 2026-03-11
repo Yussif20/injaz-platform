@@ -66,6 +66,9 @@ export function FilesContent() {
     [academicYears, selectedYearId],
   );
 
+  // Status filter
+  const [statusFilter, setStatusFilter] = useState<ProfileStatus | undefined>(undefined);
+
   const [filters, setFilters] = useState<ProfileFilterParams>({
     PageNumber: 1,
     PageSize: PAGE_SIZE,
@@ -91,6 +94,7 @@ export function FilesContent() {
     ...filters,
     SearchTerm: debouncedSearch || undefined,
     AcademicYearId: selectedYearId,
+    Status: statusFilter,
   });
 
   // Stats queries — small page size, we only need totalCount
@@ -182,6 +186,40 @@ export function FilesContent() {
             <p className="text-sm text-grey-500">ملف غير منشور</p>
           </div>
         </div>
+      </div>
+
+      {/* Status Filter Buttons */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => { setStatusFilter(undefined); setFilters((prev) => ({ ...prev, PageNumber: 1 })); }}
+          className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+            statusFilter === undefined
+              ? "bg-primary-500 text-white"
+              : "border border-grey-200 bg-white text-grey-600 hover:bg-grey-50"
+          }`}
+        >
+          الكل
+        </button>
+        <button
+          onClick={() => { setStatusFilter(ProfileStatus.Published); setFilters((prev) => ({ ...prev, PageNumber: 1 })); }}
+          className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+            statusFilter === ProfileStatus.Published
+              ? "bg-primary-500 text-white"
+              : "border border-grey-200 bg-white text-grey-600 hover:bg-grey-50"
+          }`}
+        >
+          منشور
+        </button>
+        <button
+          onClick={() => { setStatusFilter(ProfileStatus.Unpublished); setFilters((prev) => ({ ...prev, PageNumber: 1 })); }}
+          className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+            statusFilter === ProfileStatus.Unpublished
+              ? "bg-primary-500 text-white"
+              : "border border-grey-200 bg-white text-grey-600 hover:bg-grey-50"
+          }`}
+        >
+          غير منشور
+        </button>
       </div>
 
       {/* Header: Title + Search + Date Range */}
