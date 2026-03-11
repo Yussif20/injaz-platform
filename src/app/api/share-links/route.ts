@@ -1,6 +1,10 @@
 /**
  * Share Links API route
- * POST /api/share-links - Create share link
+ * POST /api/share-links - Create (or get existing) share link
+ *
+ * Backend uses GET /api/ShareLinks/my-profile/{profileId} which
+ * auto-creates a link if none exists, so we translate the client-side
+ * POST into the backend's GET-or-create endpoint.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -21,14 +25,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    const { profileId } = body as { profileId: number };
 
-    const response = await serverApi.post<ApiResponse<ShareLink>>(
-      API_ENDPOINTS.SHARE_LINKS,
-      body,
+    if (!profileId) {
+      return NextResponse.json(
+        { status: "Failure", message: "معرف الملف مطلوب", data: null },
+        { status: 400 }
+      );
+    }
+
+    // Backend's GET endpoint returns existing link or auto-creates one
+    const response = await serverApi.get<ApiResponse<ShareLink>>(
+      `${API_ENDPOINTS.SHARE_LINKS}/my-profile/${profileId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
         },
       }
     );

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { profileId } = await params;
 
     const response = await serverApi.get<ApiResponse<ShareLink[]>>(
-      `${API_ENDPOINTS.SHARE_LINKS}/profile/${profileId}`,
+      `${API_ENDPOINTS.SHARE_LINKS}/my-profile/${profileId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

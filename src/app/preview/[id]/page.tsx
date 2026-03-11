@@ -31,7 +31,7 @@ import {
   ArabicAchievementsSection,
   ArabicContactSection,
 } from "@/features/profiles";
-import { useProfileDetails, useMyProfiles, useProfileCapabilities, usePublishProfile, useUnpublishProfile } from "@/features/profiles/hooks";
+import { useProfileDetails, useMyProfiles, useProfileCapabilities, usePublishProfile, useUnpublishProfile, useCreateShareLink } from "@/features/profiles/hooks";
 import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
@@ -73,6 +73,9 @@ export default function ProfilePreviewPage() {
   // Publish/unpublish hooks
   const { publishAsync, isLoading: isPublishing } = usePublishProfile();
   const { unpublishAsync, isLoading: isUnpublishing } = useUnpublishProfile();
+
+  // Share link creation
+  const { createShareLinkAsync } = useCreateShareLink();
 
   // Toast for blocked actions
   const [blockToast, setBlockToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
@@ -178,13 +181,26 @@ export default function ProfilePreviewPage() {
     }
   };
 
-  // Share handler
+  // Share handler — creates a tracked share link via the ShareLinks API
   const handleShare = async () => {
     if (!capabilities.canShare) {
       showBlockedToast("share");
       return;
     }
-    const shareUrl = `${window.location.origin}/p/${profileId}`;
+
+    // Default fallback URL
+    const fallbackUrl = `${window.location.origin}/p/${profileId}`;
+    let shareUrl = fallbackUrl;
+
+    try {
+      const result = await createShareLinkAsync({ profileId: Number(profileId) });
+      if (result?.data?.shareUrl) {
+        shareUrl = result.data.shareUrl;
+      }
+    } catch (error) {
+      console.error("Error creating share link, using fallback URL:", error);
+    }
+
     const shareData = {
       title: `ملف إنجاز ${profileDetails?.userName || "المعلم"}`,
       text: `شاهد ملف إنجاز ${profileDetails?.userName || "المعلم"}`,
@@ -194,17 +210,19 @@ export default function ProfilePreviewPage() {
     try {
       if (navigator.share && navigator.canShare(shareData)) {
         await navigator.share(shareData);
+        setBlockToast({ message: "تم مشاركة الرابط بنجاح", type: "success" });
+        setTimeout(() => setBlockToast(null), 3000);
       } else {
-        // Fallback: copy to clipboard
         await navigator.clipboard.writeText(shareUrl);
-        alert("تم نسخ الرابط!");
+        setBlockToast({ message: "تم نسخ الرابط!", type: "success" });
+        setTimeout(() => setBlockToast(null), 3000);
       }
     } catch (error) {
       console.error("Error sharing:", error);
-      // Fallback: copy to clipboard
       try {
         await navigator.clipboard.writeText(shareUrl);
-        alert("تم نسخ الرابط!");
+        setBlockToast({ message: "تم نسخ الرابط!", type: "success" });
+        setTimeout(() => setBlockToast(null), 3000);
       } catch {
         console.error("Error copying to clipboard");
       }

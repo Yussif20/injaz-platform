@@ -102,7 +102,7 @@ export async function DELETE(
     }
 
     const response = await serverApi.delete<ApiResponse<null>>(
-      `${API_ENDPOINTS.PROFILES}/${id}`,
+      `${API_ENDPOINTS.MY_PROFILES}/${id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

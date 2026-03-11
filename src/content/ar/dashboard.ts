@@ -491,6 +491,21 @@ export const dashboardContent = {
     successSubtitle: "يمكنك إنشاء ونشر أول ملف لك الآن",
     successBackHome: "العودة للرئيسية",
 
+    // Payment error page
+    errorTitle: "فشلت عملية الدفع",
+    errorReasons: {
+      invalid_request: "الطلب غير صالح. يرجى المحاولة مرة أخرى.",
+      payment_not_found:
+        "لم يتم العثور على عملية الدفع. يرجى المحاولة مرة أخرى.",
+      payment_failed:
+        "فشلت عملية الدفع. يرجى التحقق من بيانات البطاقة والمحاولة مرة أخرى.",
+      processing_error:
+        "حدث خطأ أثناء معالجة الدفع. يرجى المحاولة لاحقاً.",
+    },
+    errorDefaultReason: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+    errorRetry: "إعادة المحاولة",
+    errorBackHome: "العودة للرئيسية",
+
     // Subscription form
     form: {
       title: "تأكيد الإشتراك",

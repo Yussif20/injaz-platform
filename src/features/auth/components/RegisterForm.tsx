@@ -9,7 +9,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/shared/components/ui";
+import { Button, Select } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
 import { useRegister } from "../hooks/useRegister";
@@ -58,7 +58,6 @@ export function RegisterForm() {
       fullName: "",
       phone: "",
       gender: undefined,
-      email: "",
       password: "",
       confirmPassword: "",
       acceptTerms: false,
@@ -80,8 +79,8 @@ export function RegisterForm() {
       phone: normalizedPhone,
       password: data.password,
       confirmPassword: data.confirmPassword,
-      gender: data.gender as Gender,
-      email: data.email || "",
+      gender: Number(data.gender) as Gender,
+      email: "",
       verificationCode: "11111", // Fixed OTP for now (backend has no OTP path)
     });
   };
@@ -232,76 +231,16 @@ export function RegisterForm() {
             </div>
 
             {/* Gender */}
-            <div className="flex flex-col gap-2">
-              <label
-                className="text-sm sm:text-base font-medium text-text-dark"
-                htmlFor="gender"
-              >
-                {requiredLabel(signUp.genderLabel)}
-                <span className="text-warning-500 text-xs sm:text-sm font-normal">
-                  {" "}
-                  {signUp.genderRequired}
-                </span>
-              </label>
-              <select
-                id="gender"
-                {...detailsForm.register("gender", { valueAsNumber: true })}
-                className={`
-                  bg-grey-100 text-text-dark text-sm sm:text-base
-                  pr-4 pl-10 py-2.5 sm:py-3 rounded-xl outline-none text-right appearance-none cursor-pointer
-                  border-2 transition-colors duration-200 ${
-                    detailsForm.formState.errors.gender
-                      ? "border-warning-500"
-                      : "border-transparent focus:border-primary-500"
-                  }
-                `}
-                style={{
-                  backgroundImage: "url('/icons/ui/arrow-down.svg')",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "left 0.75rem center",
-                  backgroundSize: "16px 16px",
-                }}
-              >
-                <option value="">{signUp.genderPlaceholder}</option>
-                <option value={Gender.Male}>{signUp.genderMale}</option>
-                <option value={Gender.Female}>{signUp.genderFemale}</option>
-              </select>
-              {detailsForm.formState.errors.gender && (
-                <p className="text-warning-500 text-xs mt-1">
-                  {detailsForm.formState.errors.gender.message}
-                </p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div className="flex flex-col gap-2">
-              <label
-                className="text-sm sm:text-base font-medium text-text-dark"
-                htmlFor="email"
-              >
-                {requiredLabel(signUp.emailLabel)}
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder={signUp.emailPlaceholder}
-                {...detailsForm.register("email")}
-                className={`
-                  bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-                  px-4 py-2.5 sm:py-3 rounded-xl outline-none text-right
-                  border-2 transition-colors duration-200 ${
-                    detailsForm.formState.errors.email
-                      ? "border-warning-500"
-                      : "border-transparent focus:border-primary-500"
-                  }
-                `}
-              />
-              {detailsForm.formState.errors.email && (
-                <p className="text-warning-500 text-xs mt-1">
-                  {detailsForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
+            <Select
+              label={`${signUp.genderLabel}*`}
+              placeholder={signUp.genderPlaceholder}
+              options={[
+                { value: String(Gender.Male), label: signUp.genderMale },
+                { value: String(Gender.Female), label: signUp.genderFemale },
+              ]}
+              error={detailsForm.formState.errors.gender?.message}
+              {...detailsForm.register("gender")}
+            />
 
             {/* Password */}
             <div className="flex flex-col gap-2">

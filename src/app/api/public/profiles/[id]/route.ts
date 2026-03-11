@@ -86,7 +86,7 @@ export async function POST(
     }
 
     const response = await serverApi.post(
-      `${API_ENDPOINTS.MY_PROFILES}/${id}/verify-password?password=${encodeURIComponent(password)}`
+      `${API_ENDPOINTS.PROFILES}/${id}/verify-password?password=${encodeURIComponent(password)}`
     );
 
     const data = response.data;

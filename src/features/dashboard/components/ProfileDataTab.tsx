@@ -184,22 +184,6 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
           </div>
         </div>
 
-        {/* Contact Data Section - Display Only (phone comes from profile) */}
-        {profile?.phone && (
-          <div>
-            <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-              {profileData.contactData}
-            </h3>
-            <div className="bg-shade-100 rounded-xl py-5 px-6">
-              <DataCard
-                label={profileData.fields.whatsappNumber}
-                value={profile.phone}
-                valueDir="ltr"
-              />
-            </div>
-          </div>
-        )}
-
         {/* Save Button */}
         <Button
           type="submit"
@@ -252,23 +236,6 @@ export const ProfileDataTab: React.FC<ProfileDataTabProps> = ({
             <DataCard
               label={profileData.fields.workEmail}
               value={personalInfo?.email || "-"}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Contact Data Section */}
-      <div>
-        <h3 className="text-primary-500 text-lg font-medium mb-4 text-right">
-          {profileData.contactData}
-        </h3>
-        <div className="bg-shade-100 rounded-xl py-5 px-6">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-12 bg-primary-500 rounded-full"></div>
-            <DataCard
-              label={profileData.fields.whatsappNumber}
-              value={profile?.phone || "-"}
-              valueDir="ltr"
             />
           </div>
         </div>

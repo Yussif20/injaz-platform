@@ -39,7 +39,11 @@ export function ApiInterceptorSetup() {
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status !== 401 || originalRequest._retry) {
+        // Let auth endpoint 401s (wrong credentials) pass through to the caller
+        const url = originalRequest?.url || "";
+        const isAuthEndpoint = url.startsWith("/api/auth/");
+
+        if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
           return Promise.reject(error);
         }
 

@@ -24,11 +24,23 @@ export function useLogin(options: UseLoginOptions = {}) {
 
   const mutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await login(credentials);
-      if (!response.status) {
-        throw new Error(response.message || "فشل تسجيل الدخول");
+      try {
+        const response = await login(credentials);
+        if (!response.status) {
+          throw new Error(response.message || "فشل تسجيل الدخول");
+        }
+        return response.data;
+      } catch (error: unknown) {
+        if (error && typeof error === "object" && "response" in error) {
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
+          throw new Error(
+            axiosError.response?.data?.message || "فشل تسجيل الدخول",
+          );
+        }
+        throw error;
       }
-      return response.data;
     },
     onSuccess: (user) => {
       // Update auth query cache

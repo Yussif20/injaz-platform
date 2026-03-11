@@ -113,10 +113,9 @@ export const registerDetailsSchema = z
       .min(3, "الاسم يجب أن يكون 3 أحرف على الأقل")
       .max(100, "الاسم طويل جداً"),
     phone: phoneSchema,
-    gender: z.nativeEnum(Gender, {
-      message: "النوع مطلوب",
-    }),
-    email: emailSchema,
+    gender: z
+      .string({ message: "النوع مطلوب" })
+      .min(1, "النوع مطلوب"),
     password: passwordSchema,
     confirmPassword: z.string().min(1, "تأكيد كلمة المرور مطلوب"),
     acceptTerms: z.boolean().refine((val) => val === true, {

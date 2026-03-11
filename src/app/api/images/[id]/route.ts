@@ -86,32 +86,36 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // No file — just update metadata via JSON
-    const response = await serverApi.put<ApiResponse<ProfileImage>>(
-      `${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
-      null,
+    // No file — update metadata only; still use fetch with empty FormData
+    // because the backend expects multipart/form-data for this endpoint
+    const fetchResponse = await fetch(
+      `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
       {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        body: new FormData(),
       }
     );
 
-    if (isApiSuccess(response.data.status)) {
+    const responseData = (await fetchResponse.json()) as ApiResponse<ProfileImage>;
+
+    if (isApiSuccess(responseData.status)) {
       return NextResponse.json({
         status: "Success",
-        message: response.data.message || "تم تحديث الصورة بنجاح",
-        data: response.data.data,
+        message: responseData.message || "تم تحديث الصورة بنجاح",
+        data: responseData.data,
       });
     }
 
     return NextResponse.json(
       {
         status: "Failure",
-        message: response.data.message || "فشل في تحديث الصورة",
-        errors: response.data.errors,
+        message: responseData.message || "فشل في تحديث الصورة",
+        errors: responseData.errors,
       },
-      { status: 400 }
+      { status: fetchResponse.ok ? 400 : fetchResponse.status }
     );
   } catch (error) {
     console.error("Update image error:", error);

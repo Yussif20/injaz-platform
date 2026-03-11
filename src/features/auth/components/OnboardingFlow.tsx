@@ -32,19 +32,6 @@ import { QualificationCard } from "./QualificationCard";
 import { OnboardingImageCollage } from "./OnboardingImageCollage";
 import Image from "next/image";
 
-// WhatsApp/phone validation (optional; if provided must be valid)
-const whatsappSchema = z
-  .string()
-  .refine(
-    (val) =>
-      !val ||
-      val.trim() === "" ||
-      (/^[0-9+]+$/.test(val) &&
-        val.replace(/\D/g, "").length >= 9 &&
-        val.length <= 15),
-    "رقم واتساب يجب أن يحتوي على أرقام فقط وأن يكون 9 أرقام على الأقل",
-  );
-
 // Basic info form schema
 const basicInfoSchema = z.object({
   nationalId: z
@@ -58,7 +45,6 @@ const basicInfoSchema = z.object({
     .email("البريد الإلكتروني غير صالح")
     .optional()
     .or(z.literal("")),
-  whatsapp: whatsappSchema,
 });
 
 type BasicInfoFormData = z.infer<typeof basicInfoSchema>;
@@ -205,7 +191,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
         address: "",
         birthDate: "",
         email: "",
-        whatsapp: "",
       },
     });
 
@@ -245,7 +230,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
           nationalId: data.nationalId,
           birthDate: data.birthDate,
           address: data.address,
-          phoneNumber: data.whatsapp?.trim() || undefined,
           email: data.email?.trim() || undefined,
         });
         if (res.status) {
@@ -559,33 +543,6 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
                             }
                             className="text-right"
                             {...basicInfoForm.register("email")}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Contact Info Section */}
-                      <div>
-                        <h3 className="text-base md:text-xl lg:text-2xl font-normal text-primary-500 mb-3 text-right">
-                          {onboarding.basicInfo.contactInfo}
-                        </h3>
-                        <div className="space-y-3">
-                          <Input
-                            label={onboarding.basicInfo.whatsappLabel}
-                            placeholder={
-                              onboarding.basicInfo.whatsappPlaceholder
-                            }
-                            error={
-                              basicInfoForm.formState.errors.whatsapp?.message
-                            }
-                            dir="ltr"
-                            className="text-right"
-                            maxLength={15}
-                            {...basicInfoForm.register("whatsapp", {
-                              onChange: (e) => {
-                                const v = e.target.value.replace(/[^\d+]/g, "");
-                                e.target.value = v;
-                              },
-                            })}
                           />
                         </div>
                       </div>
