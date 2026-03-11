@@ -105,7 +105,7 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
 
         <div className="flex gap-2">
           <Button size="sm" onClick={handleStartEditing} className="text-xs! font-light!">
-            <Pencil className="h-3.5 w-3.5 ml-1" />
+            <Pencil className="h-3.5 w-3.5 me-1" />
             تعديل
           </Button>
           <Button
@@ -114,7 +114,7 @@ export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardPr
             className="border-warning-500 text-warning-500 hover:bg-warning-50 text-xs! font-light!"
             onClick={onDelete}
           >
-            <Trash2 className="h-3.5 w-3.5 ml-1" />
+            <Trash2 className="h-3.5 w-3.5 me-1" />
             حذف
           </Button>
         </div>

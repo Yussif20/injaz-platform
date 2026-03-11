@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button, Modal, Input, Select } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { GenderAvailability } from "@/shared/types";
 import { useCreateProfileType, useUpdateProfileType } from "../hooks";
 import type { ProfileTypeDto } from "../types/profile-types.types";
@@ -50,6 +52,7 @@ export function AddProfileTypeModal({
     add: "إضافة",
   };
 
+  const { toast } = useToast();
   const isEditMode = !!initialData;
 
   const createProfileType = useCreateProfileType();
@@ -96,13 +99,13 @@ export function AddProfileTypeModal({
         { id: initialData.id, data },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     } else {
       createProfileType.mutate(data, {
         onSuccess: () => onSuccess?.(),
-        onError: () => {},
+        onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
       });
     }
   };

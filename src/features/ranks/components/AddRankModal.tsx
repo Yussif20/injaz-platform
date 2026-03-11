@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button, Modal, Input } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { useCreateRank, useUpdateRank } from "../hooks";
 import type { RankDto } from "../types/ranks.types";
 import { rankSchema, type RankFormData } from "../validations/ranks.schemas";
@@ -38,6 +40,7 @@ export function AddRankModal({
     add: "إضافة",
   };
 
+  const { toast } = useToast();
   const isEditMode = !!initialData;
 
   const createRank = useCreateRank();
@@ -77,13 +80,13 @@ export function AddRankModal({
         { id: initialData.id, data },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     } else {
       createRank.mutate(data, {
         onSuccess: () => onSuccess?.(),
-        onError: () => {},
+        onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
       });
     }
   };

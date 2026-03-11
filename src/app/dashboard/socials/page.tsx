@@ -15,7 +15,7 @@ export default function SocialsPage() {
     <div>
       <div className="w-full flex justify-between items-center">
         <div className="flex items-center text-text-dark">
-          <Phone className="inline-block h-6 w-6 ml-2" />
+          <Phone className="inline-block h-6 w-6 me-2" />
           <h1 className="text-xl font-normal">{socialsT.title}</h1>
         </div>
         <button
@@ -23,7 +23,7 @@ export default function SocialsPage() {
           className="flex items-center text-primary-500"
         >
           <h1 className="text-lg font-light">{commonT.goBack}</h1>
-          <ChevronLeft className="inline-block h-6 w-6 mr-2" />
+          <ChevronLeft className="inline-block h-6 w-6 ms-2" />
         </button>
       </div>
 

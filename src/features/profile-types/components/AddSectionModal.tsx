@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Modal, Input } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { useCreateSection, useUpdateSection } from "../hooks";
 import type { SectionDto } from "../types/profile-types.types";
 
@@ -45,6 +47,7 @@ export function AddSectionModal({
     weightPlaceholder: "ادخل الوزن النسبي",
   };
 
+  const { toast } = useToast();
   const isEditMode = !!initialData;
 
   const createSection = useCreateSection();
@@ -98,7 +101,7 @@ export function AddSectionModal({
         },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     } else {
@@ -111,7 +114,7 @@ export function AddSectionModal({
         },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     }

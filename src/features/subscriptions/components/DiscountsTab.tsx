@@ -91,10 +91,7 @@ export function DiscountsTab() {
                   <button
                     type="button"
                     disabled={togglingId !== null}
-                    onClick={() => {
-                      console.log("Toggle clicked for discount ID:", discount.id);
-                      handleToggle(discount.id);
-                    }}
+                    onClick={() => handleToggle(discount.id)}
                     className="flex items-center"
                   >
                     {discount.isActive ? (

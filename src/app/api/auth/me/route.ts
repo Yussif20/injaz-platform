@@ -49,13 +49,15 @@ export async function GET() {
           const retryData = await retryResponse.json();
           return NextResponse.json({ user: retryData.data ?? retryData });
         }
-      } catch {
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
         await clearAuthCookies();
       }
     }
 
     return NextResponse.json({ user: null });
-  } catch {
+  } catch (error) {
+    console.error("Auth /me error:", error);
     return NextResponse.json({ user: null });
   }
 }

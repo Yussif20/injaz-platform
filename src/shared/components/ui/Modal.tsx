@@ -21,11 +21,19 @@ export function Modal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") onClose();
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        document.removeEventListener("keydown", handleKeyDown);
+      };
     }
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

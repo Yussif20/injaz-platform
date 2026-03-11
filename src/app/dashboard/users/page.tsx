@@ -15,7 +15,7 @@ export default function UsersPage() {
     <div>
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center text-text-dark">
-          <Users className="ml-2 inline-block h-6 w-6" />
+          <Users className="me-2 inline-block h-6 w-6" />
           <h1 className="text-xl font-normal">{sidebarT.users}</h1>
         </div>
         <button
@@ -23,7 +23,7 @@ export default function UsersPage() {
           className="flex items-center text-primary-500"
         >
           <h1 className="text-lg font-light">{commonT.goBack}</h1>
-          <ChevronLeft className="mr-2 inline-block h-6 w-6" />
+          <ChevronLeft className="ms-2 inline-block h-6 w-6" />
         </button>
       </div>
 

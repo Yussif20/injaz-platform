@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { Button, Modal, Input } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { useCreateUser } from "../hooks";
 import {
   createUserSchema,
@@ -38,6 +40,7 @@ export function AddUserModal({
     add: "إضافة",
   };
 
+  const { toast } = useToast();
   const createUser = useCreateUser();
 
   const {
@@ -70,7 +73,7 @@ export function AddUserModal({
   const onSubmit = (data: CreateUserFormData) => {
     createUser.mutate(data, {
       onSuccess: () => onSuccess?.(),
-      onError: () => {},
+      onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
     });
   };
 

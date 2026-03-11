@@ -18,7 +18,7 @@ export default function LoginPage() {
           alt={loginT.title}
           width={760}
           height={760}
-          className="h-auto w-full max-w-190 mr-auto"
+          className="h-auto w-full max-w-190 me-auto"
           priority
         />
       </div>

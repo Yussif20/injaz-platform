@@ -29,12 +29,7 @@ export async function POST(request: NextRequest) {
       password: body.password,
     };
 
-    console.log("[Login] Attempting login to:", API_ENDPOINTS.AUTH.LOGIN);
-    console.log("[Login] Payload:", { phone: loginPayload.phone, password: "***" });
-
     const { data } = await serverApi.post(API_ENDPOINTS.AUTH.LOGIN, loginPayload);
-
-    console.log("[Login] Success:", data.status);
 
     // Backend returns: { status, message, data: { userId, phone, fullName, userName, role, token, refreshToken } }
     const { token, refreshToken, userId, phone, fullName, userName, role } =

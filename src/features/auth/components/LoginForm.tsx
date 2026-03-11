@@ -82,13 +82,6 @@ export function LoginForm() {
         </p>
       )}
 
-      <button
-        type="button"
-        className="text-sm text-primary-500 hover:text-primary-800 ml-auto"
-      >
-        {loginT.forgotPassword}
-      </button>
-
       <Button
         type="submit"
         loading={loginMutation.isPending}

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Modal, DatePicker } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { useCreateDiscount, useUpdateDiscount, useSubscriptionSettings } from "../hooks";
 import {
   createDiscountSchema,
@@ -24,6 +26,7 @@ export function AddDiscountModal({
   onSuccess,
   discount,
 }: AddDiscountModalProps) {
+  const { toast } = useToast();
   const isEdit = !!discount;
 
   const createDiscount = useCreateDiscount();
@@ -86,13 +89,13 @@ export function AddDiscountModal({
         { id: discount.id, data: payload },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     } else {
       createDiscount.mutate(payload, {
         onSuccess: () => onSuccess?.(),
-        onError: () => {},
+        onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
       });
     }
   };

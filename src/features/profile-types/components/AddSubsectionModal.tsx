@@ -7,6 +7,8 @@ import { Plus, Save } from "lucide-react";
 import { z } from "zod";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { Button, Modal, Input } from "@/shared/components/ui";
+import { useToast } from "@/shared/providers/ToastProvider";
+import { getErrorMessage } from "@/shared/lib/api-helpers";
 import { useCreateSubsection, useUpdateSubsection } from "../hooks";
 import type { SubsectionDto } from "../types/profile-types.types";
 
@@ -58,6 +60,7 @@ export function AddSubsectionModal({
     add: "إضافة",
   };
 
+  const { toast } = useToast();
   const isEditMode = !!initialData;
 
   const createSubsection = useCreateSubsection();
@@ -122,7 +125,7 @@ export function AddSubsectionModal({
         },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     } else {
@@ -136,7 +139,7 @@ export function AddSubsectionModal({
         },
         {
           onSuccess: () => onSuccess?.(),
-          onError: () => {},
+          onError: (error) => toast({ type: "error", message: getErrorMessage(error) }),
         },
       );
     }

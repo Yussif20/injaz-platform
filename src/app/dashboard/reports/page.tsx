@@ -36,7 +36,7 @@ export default function ReportsPage() {
     <div>
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center text-text-dark">
-          <BarChart3 className="ml-2 inline-block h-6 w-6" />
+          <BarChart3 className="me-2 inline-block h-6 w-6" />
           <h1 className="text-xl font-normal">{sidebarT.reports}</h1>
         </div>
         <TodayDateDisplay />
