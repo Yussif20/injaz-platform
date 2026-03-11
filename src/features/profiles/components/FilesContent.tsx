@@ -6,6 +6,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
 import { Button, ConfirmDialog, Pagination } from "@/shared/components/ui";
 import { useToast } from "@/shared/providers/ToastProvider";
 import { useTranslation } from "@/i18n/TranslationContext";
@@ -14,6 +15,7 @@ import { ProfileStatus } from "../types/profiles.types";
 import type { ProfileFilterParams } from "../types/profiles.types";
 import { useAcademicYears } from "@/features/academic-years/hooks/useAcademicYears";
 import { useUsers } from "@/features/users/hooks/useUsers";
+import { getProfileShareLinks } from "../services/share-links.service";
 
 const PAGE_SIZE = 10;
 
@@ -117,6 +119,28 @@ export function FilesContent() {
   const profiles = paginatedData?.items ?? [];
   const totalPages = paginatedData?.totalPages ?? 1;
   const currentPage = paginatedData?.pageNumber ?? 1;
+
+  // Fetch share links for published profiles on this page
+  const publishedProfiles = useMemo(
+    () => profiles.filter((p) => isProfilePublished(p.status)),
+    [profiles],
+  );
+  const shareLinkQueries = useQueries({
+    queries: publishedProfiles.map((p) => ({
+      queryKey: ["shareLinks", "byProfile", p.id],
+      queryFn: () => getProfileShareLinks(p.id),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+  const shareUrlMap = useMemo(() => {
+    const map = new Map<number, string>();
+    publishedProfiles.forEach((p, i) => {
+      const data = shareLinkQueries[i]?.data;
+      const url = data?.[0]?.shareUrl;
+      if (url) map.set(p.id, url);
+    });
+    return map;
+  }, [publishedProfiles, shareLinkQueries]);
 
   const handlePageChange = (page: number) => {
     setFilters((prev) => ({ ...prev, PageNumber: page }));
@@ -338,9 +362,9 @@ export function FilesContent() {
                     <p className="text-lg font-normal text-text-dark">
                       ملف انجاز {profile.academicYearName}
                     </p>
-                    {isPublished && profile.shareUrl ? (
+                    {isPublished && (shareUrlMap.get(profile.id) || profile.shareUrl) ? (
                       <a
-                        href={profile.shareUrl}
+                        href={shareUrlMap.get(profile.id) || profile.shareUrl!}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-5 py-1.5 text-sm text-white transition-colors hover:bg-primary-800"

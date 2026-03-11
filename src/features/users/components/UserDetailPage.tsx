@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useQueries } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "@/i18n/navigation";
 import { ChevronLeft, Users, Pencil, MoreHorizontal, CheckCircle, Search, ExternalLink, Download, Share2 } from "lucide-react";
@@ -16,6 +17,7 @@ import type { SubscriptionDto as SubDto } from "@/features/subscriptions/types/s
 import { PaymentStatus } from "@/features/subscriptions/types/subscriptions.types";
 import type { AdminProfileDto } from "@/features/profiles/types/profiles.types";
 import { ProfileStatus } from "@/features/profiles/types/profiles.types";
+import { getProfileShareLinks } from "@/features/profiles/services/share-links.service";
 import { Gender } from "@/shared/types";
 import { formatDateDual, formatYearRangeDual } from "@/shared/lib/hijri-utils";
 
@@ -582,6 +584,28 @@ function UserFilesSection({
     ? profiles.filter((p) => p.academicYearName?.includes(searchQuery))
     : profiles;
 
+  // Fetch share links for published profiles
+  const publishedProfiles = useMemo(
+    () => profiles.filter((p) => p.status === ProfileStatus.Published),
+    [profiles],
+  );
+  const shareLinkQueries = useQueries({
+    queries: publishedProfiles.map((p) => ({
+      queryKey: ["shareLinks", "byProfile", p.id],
+      queryFn: () => getProfileShareLinks(p.id),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+  const shareUrlMap = useMemo(() => {
+    const map = new Map<number, string>();
+    publishedProfiles.forEach((p, i) => {
+      const data = shareLinkQueries[i]?.data;
+      const url = data?.[0]?.shareUrl;
+      if (url) map.set(p.id, url);
+    });
+    return map;
+  }, [publishedProfiles, shareLinkQueries]);
+
   const statusLabel = (s: ProfileStatus) => {
     switch (s) {
       case ProfileStatus.Published: return "ملف منشور";
@@ -674,40 +698,51 @@ function UserFilesSection({
             </div>
 
             {/* View button */}
-            <a
-              href={profile.shareUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-3xl bg-primary-500 py-3 text-base font-light text-white transition-colors hover:bg-primary-800"
-            >
-              <ExternalLink className="h-4 w-4" />
-              عرض الملف
-            </a>
+            {(() => {
+              const resolvedUrl = shareUrlMap.get(profile.id) || profile.shareUrl;
+              return (
+                <>
+                  <a
+                    href={resolvedUrl || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`mt-5 flex w-full items-center justify-center gap-2 rounded-3xl py-3 text-base font-light text-white transition-colors ${
+                      resolvedUrl
+                        ? "bg-primary-500 hover:bg-primary-800"
+                        : "pointer-events-none bg-grey-300"
+                    }`}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    عرض الملف
+                  </a>
 
-            {/* Action links */}
-            <div className="mt-4 flex items-center justify-between">
-              <button
-                onClick={() => {
-                  if (profile.shareUrl) {
-                    navigator.clipboard.writeText(profile.shareUrl);
-                    toast({ type: "success", message: "تم نسخ رابط الملف" });
-                  }
-                }}
-                className="flex items-center gap-1.5 text-base font-light text-primary-500 hover:underline"
-              >
-                <Share2 className="h-4 w-4" />
-                مشاركة الملف
-              </button>
-              <a
-                href={profile.shareUrl || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-base font-light text-primary-500 hover:underline"
-              >
-                <Download className="h-4 w-4" />
-                تحميل الملف
-              </a>
-            </div>
+                  {/* Action links */}
+                  <div className="mt-4 flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        if (resolvedUrl) {
+                          navigator.clipboard.writeText(resolvedUrl);
+                          toast({ type: "success", message: "تم نسخ رابط الملف" });
+                        }
+                      }}
+                      className="flex items-center gap-1.5 text-base font-light text-primary-500 hover:underline"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      مشاركة الملف
+                    </button>
+                    <a
+                      href={resolvedUrl || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-base font-light text-primary-500 hover:underline"
+                    >
+                      <Download className="h-4 w-4" />
+                      تحميل الملف
+                    </a>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         ))}
       </div>
