@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
   DefaultEducationSection,
@@ -63,8 +63,6 @@ type PageState = "loading" | "password_gate" | "profile" | "error";
 export default function PublicProfilePage() {
   const params = useParams();
   const token = params.token as string;
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const { previewPage } = dashboardContent;
 
   const [pageState, setPageState] = useState<PageState>("loading");
@@ -73,9 +71,6 @@ export default function PublicProfilePage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isDownloading, setIsDownloading] = useState(false);
-  // Store the password used to unlock (needed for PDF export of password-protected profiles)
-  const [unlockedPassword, setUnlockedPassword] = useState<string | null>(null);
 
   // Fetch profile on mount via ShareLinks token endpoint
   useEffect(() => {
@@ -121,7 +116,6 @@ export default function PublicProfilePage() {
 
       if (res.ok && data.status && data.data) {
         setProfileDetails(data.data as SharedProfileData);
-        setUnlockedPassword(password);
         setPageState("profile");
       } else {
         setPasswordError(data.message || "كلمة المرور غير صحيحة");
@@ -271,31 +265,6 @@ export default function PublicProfilePage() {
     || (profileDetails.userName && !/^\+?\d[\d\s-]{7,}$/.test(profileDetails.userName) ? profileDetails.userName : null)
     || "المعلم";
 
-  // Download as PDF via server-side Puppeteer (public, no auth needed)
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
-      let url = `/api/export/shared-pdf?token=${encodeURIComponent(token)}`;
-      if (unlockedPassword) {
-        url += `&password=${encodeURIComponent(unlockedPassword)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Export failed: ${res.status}`);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = `ملف_إنجاز_${resolvedTeacherName}.pdf`;
-      a.click();
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("حدث خطأ أثناء تحميل الملف");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   const noop = () => {};
 
   return (
@@ -317,9 +286,11 @@ export default function PublicProfilePage() {
       {/* Hide back/publish bar — not relevant for public shared view */}
       <style>{`
         [data-preview-bar] { display: none !important; }
+        [data-download-button] { display: none !important; }
+        [data-download-image-button] { display: none !important; }
       `}</style>
 
-      <div ref={contentRef} className="w-full relative pb-8" style={{ backgroundColor: theme.background }}>
+      <div className="w-full relative pb-8" style={{ backgroundColor: theme.background }}>
         {/* Header - public view (no download/share buttons) */}
         {(() => {
           const commonHeaderProps = {
@@ -327,10 +298,10 @@ export default function PublicProfilePage() {
             teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
             academicYear: profileDetails.academicYearName || "",
             profileImageUrl,
-            onDownload: handleDownload,
+            onDownload: noop,
             onShare: noop,
             onBack: noop,
-            isDownloading,
+            isDownloading: false,
             content: {
               downloadFile: previewPage.downloadFile,
               shareFile: "",

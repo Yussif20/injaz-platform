@@ -52,13 +52,7 @@ export const HeritagePortfolioHeader = ({
   return (
     <div className="relative overflow-hidden ">
       {/* Background with pattern and overlay */}
-      <div className="absolute inset-0 bg-cover bg-center bg-repeat bg-[url('/images/profiles/heritage/header-bg.svg')] " />
-      {/* Color overlay */}
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: "#52161E", opacity: 0.85 }}
-      />
-
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/images/profiles/heritage/header-bg-mobile.svg')] md:bg-[url('/images/profiles/heritage/header-bg-tablet.svg')] lg:bg-[url('/images/profiles/heritage/header-bg.svg')]" />
       {/* Content */}
       <div className="relative z-10 px-4 pt-4 pb-8 md:pt-6 md:pb-12 lg:pt-8 lg:pb-16">
         <div className="max-w-300 mx-auto">
