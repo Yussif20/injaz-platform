@@ -185,19 +185,21 @@ export const DarkPortfolioHeader = ({
                 </button>
               )}
 
-              <button
-                data-share-button
-                onClick={onShare}
-                className="bg-transparent text-white flex outline outline-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
-              >
-                <Image
-                  src="/images/profiles/dark/share.svg"
-                  alt="Share"
-                  width={24}
-                  height={24}
-                />
-                {content.shareFile}
-              </button>
+              {content.shareFile && (
+                <button
+                  data-share-button
+                  onClick={onShare}
+                  className="bg-transparent text-white flex outline outline-white items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal justify-center"
+                >
+                  <Image
+                    src="/images/profiles/dark/share.svg"
+                    alt="Share"
+                    width={24}
+                    height={24}
+                  />
+                  {content.shareFile}
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -73,6 +73,9 @@ export default function PublicProfilePage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
+  // Store the password used to unlock (needed for PDF export of password-protected profiles)
+  const [unlockedPassword, setUnlockedPassword] = useState<string | null>(null);
 
   // Fetch profile on mount via ShareLinks token endpoint
   useEffect(() => {
@@ -118,6 +121,7 @@ export default function PublicProfilePage() {
 
       if (res.ok && data.status && data.data) {
         setProfileDetails(data.data as SharedProfileData);
+        setUnlockedPassword(password);
         setPageState("profile");
       } else {
         setPasswordError(data.message || "كلمة المرور غير صحيحة");
@@ -129,8 +133,12 @@ export default function PublicProfilePage() {
     }
   };
 
-  // Get theme
-  const templateId = (profileDetails?.templateId as TemplateId) || TemplateId.Default;
+  // Get theme — coerce templateId to number to handle string values from backend
+  const rawTemplateId = Number(profileDetails?.templateId);
+  const VALID_TEMPLATE_IDS = [TemplateId.Default, TemplateId.Dark, TemplateId.Heritage, TemplateId.Arabic] as number[];
+  const templateId: TemplateId = VALID_TEMPLATE_IDS.includes(rawTemplateId)
+    ? (rawTemplateId as TemplateId)
+    : TemplateId.Default;
   const themeName = TEMPLATE_TO_THEME[templateId] || "default";
   const theme = PORTFOLIO_THEMES[themeName].colors;
 
@@ -160,51 +168,94 @@ export default function PublicProfilePage() {
     );
   }
 
-  // Password gate
+  // Password gate — modal over blurred real template background
   if (pageState === "password_gate") {
-    return (
-      <div
-        className="fixed inset-0 flex items-center justify-center"
-        dir="rtl"
-        style={{ backgroundColor: "#f5f5f5" }}
-      >
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full mx-4">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h1 className="text-xl font-semibold text-secondary-800 mb-2">
-              ملف محمي بكلمة مرور
-            </h1>
-            <p className="text-grey-500 text-sm">
-              يرجى إدخال كلمة المرور للوصول إلى هذا الملف
-            </p>
-          </div>
+    const noop = () => {};
+    const placeholderHeaderProps = {
+      teacherName: "المعلم محمد أحمد",
+      teacherRank: "معلم خبير",
+      academicYear: "2025",
+      profileImageUrl: null,
+      onDownload: noop,
+      onShare: noop,
+      onBack: noop,
+      isDownloading: false,
+      content: {
+        downloadFile: "حمل الملف",
+        shareFile: "مشاركة",
+        fileTitle: previewPage.fileTitle,
+        publishFile: "",
+      },
+      theme,
+    };
+    const placeholderPersonalInfo = {
+      nationalId: "••••••••••",
+      birthDate: "١٩٩٠/٠١/٠١",
+      address: "المملكة العربية السعودية",
+      email: "example@email.com",
+      rankTitle: "معلم خبير",
+      phoneNumber: "+966 ••• ••• ••••",
+    };
+    const placeholderQualifications = [
+      { id: 1, degreeType: "بكالوريوس", title: "التربية والتعليم", graduationDate: "2015-06-15" },
+    ];
+    const placeholderCareerJobs = [
+      { id: 1, school: "مدرسة النموذجية", educationalStage: "المرحلة المتوسطة", startYear: 2018, endYear: null },
+    ];
 
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="كلمة المرور"
-                className="w-full px-4 py-3 rounded-xl border border-grey-200 text-right focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-warning-500 text-sm mt-2">{passwordError}</p>
-              )}
+    return (
+      <div className="fixed inset-0 overflow-hidden" dir="rtl">
+        {/* Blurred background — real template components with placeholder data */}
+        <div className="absolute inset-0 overflow-y-auto blur-[6px] pointer-events-none select-none" aria-hidden="true">
+          <div className="w-full relative pb-8" style={{ backgroundColor: theme.background }}>
+            <DefaultPortfolioHeader {...placeholderHeaderProps} />
+            <div className="max-w-300 mx-auto">
+              <DefaultPersonalInfoSection personalInfo={placeholderPersonalInfo} content={previewPage.personalInfo} theme={theme} />
+              <DefaultEducationSection qualifications={placeholderQualifications} content={previewPage.education} theme={theme} />
+              <DefaultCareerSection careerJobs={placeholderCareerJobs} content={previewPage.career} theme={theme} />
+              <DefaultAchievementsSection sections={[]} content={previewPage.achievements} theme={theme} />
             </div>
-            <button
-              type="submit"
-              disabled={isVerifying || !password.trim()}
-              className="w-full bg-primary-500 text-white py-3 rounded-xl font-medium hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isVerifying ? "جاري التحقق..." : "دخول"}
-            </button>
-          </form>
+          </div>
+        </div>
+
+        {/* Modal overlay */}
+        <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4">
+            <div className="text-center mb-6">
+              <h1 className="text-xl font-semibold text-secondary-800 mb-3">
+                كلمة مرور الملف
+              </h1>
+              <p className="text-grey-500 text-sm">
+                يجب ادخال كلمة مرور الملف لتستطيع الإطلاع عليه
+              </p>
+            </div>
+
+            <form onSubmit={handlePasswordSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-secondary-800 mb-2 text-right">
+                  كلمة المرور
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-grey-200 text-right focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  autoFocus
+                />
+                {passwordError && (
+                  <p className="text-warning-500 text-sm mt-2">{passwordError}</p>
+                )}
+              </div>
+              <button
+                type="submit"
+                disabled={isVerifying || !password.trim()}
+                className="w-full text-white py-3.5 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{ backgroundColor: theme.primary }}
+              >
+                {isVerifying ? "جاري التحقق..." : "دخول"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -220,7 +271,31 @@ export default function PublicProfilePage() {
     || (profileDetails.userName && !/^\+?\d[\d\s-]{7,}$/.test(profileDetails.userName) ? profileDetails.userName : null)
     || "المعلم";
 
-  // No-op handlers for header (public view has no download/share)
+  // Download as PDF via server-side Puppeteer (public, no auth needed)
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      let url = `/api/export/shared-pdf?token=${encodeURIComponent(token)}`;
+      if (unlockedPassword) {
+        url += `&password=${encodeURIComponent(unlockedPassword)}`;
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `ملف_إنجاز_${resolvedTeacherName}.pdf`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("حدث خطأ أثناء تحميل الملف");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const noop = () => {};
 
   return (
@@ -239,6 +314,10 @@ export default function PublicProfilePage() {
         ::-webkit-scrollbar-thumb { background-color: ${theme.primary}; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background-color: ${theme.primary}dd; }
       `}</style>
+      {/* Hide back/publish bar — not relevant for public shared view */}
+      <style>{`
+        [data-preview-bar] { display: none !important; }
+      `}</style>
 
       <div ref={contentRef} className="w-full relative pb-8" style={{ backgroundColor: theme.background }}>
         {/* Header - public view (no download/share buttons) */}
@@ -248,12 +327,12 @@ export default function PublicProfilePage() {
             teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
             academicYear: profileDetails.academicYearName || "",
             profileImageUrl,
-            onDownload: noop,
+            onDownload: handleDownload,
             onShare: noop,
             onBack: noop,
-            isDownloading: false,
+            isDownloading,
             content: {
-              downloadFile: "",
+              downloadFile: previewPage.downloadFile,
               shareFile: "",
               fileTitle: previewPage.fileTitle,
               publishFile: "",
@@ -261,20 +340,20 @@ export default function PublicProfilePage() {
             theme,
           };
           if (templateId === TemplateId.Default) return <DefaultPortfolioHeader {...commonHeaderProps} />;
+          if (templateId === TemplateId.Dark) return <DarkPortfolioHeader {...commonHeaderProps} />;
           if (templateId === TemplateId.Heritage) return <HeritagePortfolioHeader {...commonHeaderProps} />;
-          if (templateId === TemplateId.Arabic) return <ArabicPortfolioHeader {...commonHeaderProps} />;
-          return <DarkPortfolioHeader {...commonHeaderProps} />;
+          return <ArabicPortfolioHeader {...commonHeaderProps} />;
         })()}
 
         <div className="max-w-300 mx-auto">
           {templateId === TemplateId.Default ? (
             <DefaultPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : templateId === TemplateId.Dark ? (
+            <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
           ) : templateId === TemplateId.Heritage ? (
             <HeritagePersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
-          ) : templateId === TemplateId.Arabic ? (
-            <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
           ) : (
-            <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+            <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
           )}
 
           {templateId === TemplateId.Default ? (

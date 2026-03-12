@@ -119,19 +119,21 @@ export const DefaultPortfolioHeader = ({
                 </button>
               )}
 
-              <button
-                data-share-button
-                onClick={onShare}
-                className="bg-white text-primary-500 flex outline outline-primary-500 items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
-              >
-                <Image
-                  src="/images/profiles/default/share.svg"
-                  alt="Share"
-                  width={24}
-                  height={24}
-                />
-                {content.shareFile}
-              </button>
+              {content.shareFile && (
+                <button
+                  data-share-button
+                  onClick={onShare}
+                  className="bg-white text-primary-500 flex outline outline-primary-500 items-center gap-2 px-5 py-4 rounded-lg md:rounded-4xl text-sm md:text-base font-normal"
+                >
+                  <Image
+                    src="/images/profiles/default/share.svg"
+                    alt="Share"
+                    width={24}
+                    height={24}
+                  />
+                  {content.shareFile}
+                </button>
+              )}
             </div>
           </div>
 

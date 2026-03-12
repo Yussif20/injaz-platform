@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
   const { accessToken, profileId } = result;
 
   try {
-    // Fetch profile details
+    // Fetch profile details — use /api/my-profiles/{id} (teacher endpoint, /api/Profiles/{id}/details is now admin-only)
     const detailsRes = await serverApi.get<ApiResponse<ProfileDetails>>(
-      `${API_ENDPOINTS.PROFILES}/${profileId}/details`,
+      `${API_ENDPOINTS.MY_PROFILES}/${profileId}`,
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 

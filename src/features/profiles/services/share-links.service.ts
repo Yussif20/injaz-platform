@@ -37,11 +37,11 @@ export async function getProfileShareLinks(profileId: number): Promise<ShareLink
 // ==================== Delete Share Link ====================
 
 /**
- * Delete a share link
+ * Delete a share link by profile ID
  */
-export async function deleteShareLink(linkId: number): Promise<ShareLinkDeleteResponse> {
+export async function deleteShareLink(profileId: number): Promise<ShareLinkDeleteResponse> {
   const response = await clientApi.delete<ShareLinkDeleteResponse>(
-    `/api/share-links/${linkId}`
+    `/api/share-links/${profileId}`
   );
   return response.data;
 }

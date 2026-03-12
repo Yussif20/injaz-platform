@@ -114,23 +114,25 @@ export const HeritagePortfolioHeader = ({
               {/* Action Buttons */}
               <div className="flex flex-row gap-3 mt-4 md:mt-6">
                 {/* Share Button - Cream/White */}
-                <button
-                  data-share-button
-                  onClick={onShare}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-normal transition-opacity hover:opacity-90"
-                  style={{
-                    backgroundColor: "#F5E6E8",
-                    color: "#52161E",
-                  }}
-                >
-                  <Image
-                    src="/images/profiles/heritage/share.svg"
-                    alt="Share"
-                    width={24}
-                    height={24}
-                  />
-                  {content.shareFile}
-                </button>
+                {content.shareFile && (
+                  <button
+                    data-share-button
+                    onClick={onShare}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-normal transition-opacity hover:opacity-90"
+                    style={{
+                      backgroundColor: "#F5E6E8",
+                      color: "#52161E",
+                    }}
+                  >
+                    <Image
+                      src="/images/profiles/heritage/share.svg"
+                      alt="Share"
+                      width={24}
+                      height={24}
+                    />
+                    {content.shareFile}
+                  </button>
+                )}
 
                 {/* Download as Image Button */}
                 {onDownloadAsImage && content.downloadAsImage && (

@@ -25,8 +25,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
+    // Backend uses DELETE /api/ShareLinks/my-profile/{profileId} (not by link ID)
     const response = await serverApi.delete<ApiResponse<boolean>>(
-      `${API_ENDPOINTS.SHARE_LINKS}/${id}`,
+      `${API_ENDPOINTS.SHARE_LINKS}/my-profile/${id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

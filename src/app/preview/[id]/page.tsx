@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -36,7 +36,7 @@ import { PORTFOLIO_THEMES } from "@/features/profiles/types/theme.types";
 import { TemplateId } from "@/features/profiles/types/template.types";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
-import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL } from "@/shared/lib/api";
+import { PUBLIC_API_BASE_URL, PUBLIC_STORAGE_BASE_URL, clientApi } from "@/shared/lib/api";
 import { Watermark } from "@/shared/components/ui";
 
 function normalizeImageUrl(raw: string | null | undefined): string | null {
@@ -101,6 +101,16 @@ export default function ProfilePreviewPage() {
       setSelectedTemplateId(profileDetails.templateId as TemplateId);
     }
   }, [profileDetails?.templateId]);
+
+  // Persist template selection to backend
+  const handleTemplateChange = useCallback(async (templateId: TemplateId) => {
+    setSelectedTemplateId(templateId);
+    try {
+      await clientApi.put(`/api/profiles/${profileId}/template`, { templateId });
+    } catch (error) {
+      console.error("Failed to save template:", error);
+    }
+  }, [profileId]);
 
   // Get theme colors based on selected template
   const themeName = TEMPLATE_TO_THEME[selectedTemplateId] || "default";
@@ -520,7 +530,7 @@ export default function ProfilePreviewPage() {
       <div data-theme-button>
         <ThemeSelector
           currentTemplate={selectedTemplateId}
-          onTemplateChange={setSelectedTemplateId}
+          onTemplateChange={handleTemplateChange}
           content={previewPage.themeSelector}
         />
       </div>

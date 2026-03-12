@@ -28,8 +28,9 @@ export async function GET(
       );
     }
 
+    // Use /api/my-profiles/{id} (teacher endpoint) — /api/Profiles/{id}/details is now admin-only
     const response = await serverApi.get<ApiResponse<ProfileDetails>>(
-      `${API_ENDPOINTS.PROFILES}/${id}/details`,
+      `${API_ENDPOINTS.MY_PROFILES}/${id}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

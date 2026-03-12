@@ -32,9 +32,7 @@ export async function GET(
     if (isSuccess && data.data) {
       const profile = data.data;
 
-      // Log actual response keys to help debug field mapping
-      console.log("[SharedProfile] Response keys:", Object.keys(profile));
-      console.log("[SharedProfile] userName:", profile.userName, "| userFullName:", profile.userFullName, "| imageUrl:", profile.imageUrl);
+      console.log("[SharedProfile] templateId:", profile.templateId, "| userName:", profile.userName, "| userFullName:", profile.userFullName, "| imageUrl:", profile.imageUrl);
 
       return NextResponse.json({
         status: true,
@@ -60,12 +58,16 @@ export async function GET(
       const statusCode = axiosError.response?.status || 500;
       const message = axiosError.response?.data?.message || "";
 
-      // Password required — backend returns 400 with password-related message
-      if (
-        statusCode === 400 &&
-        (message.toLowerCase().includes("password") ||
-          message.includes("كلمة المرور"))
-      ) {
+      console.log(`[DEBUG SharedProfile] Backend error: status=${statusCode}, message="${message}"`);
+
+      // Password required — detect by message content (backend may return 400/401/403)
+      const isPasswordRequired =
+        message.toLowerCase().includes("password") ||
+        message.includes("كلمة المرور") ||
+        message.includes("كلمة سر") ||
+        message.includes("محمي");
+
+      if (isPasswordRequired) {
         return NextResponse.json(
           {
             status: false,

@@ -61,12 +61,11 @@ export default function ShareLinksPage() {
   };
 
   // Handle delete share link
-  const handleDeleteLink = async (linkId: number) => {
+  const handleDeleteLink = async (_linkId: number) => {
     if (!selectedProfileId) return;
 
     try {
       const response = await deleteShareLinkAsync({
-        linkId,
         profileId: selectedProfileId,
       });
 
