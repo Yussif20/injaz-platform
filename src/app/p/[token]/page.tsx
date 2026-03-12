@@ -187,11 +187,14 @@ export default function PublicProfilePage() {
       birthDate: "١٩٩٠/٠١/٠١",
       address: "المملكة العربية السعودية",
       email: "example@email.com",
+      rankId: 0,
       rankTitle: "معلم خبير",
+      rankTitleMale: "معلم خبير",
+      rankTitleFemale: "معلمة خبيرة",
       phoneNumber: "+966 ••• ••• ••••",
     };
     const placeholderQualifications = [
-      { id: 1, degreeType: "بكالوريوس", title: "التربية والتعليم", graduationDate: "2015-06-15" },
+      { id: 1, degreeType: "بكالوريوس", title: "التربية والتعليم", graduationDate: "2015-06-15", grade: "" },
     ];
     const placeholderCareerJobs = [
       { id: 1, school: "مدرسة النموذجية", educationalStage: "المرحلة المتوسطة", startYear: 2018, endYear: null },
