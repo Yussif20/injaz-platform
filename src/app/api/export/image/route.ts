@@ -32,9 +32,11 @@ export async function GET(request: NextRequest) {
 
   let browser;
   try {
-    const puppeteer = await import("puppeteer");
+    const puppeteer = await import("puppeteer-core");
     browser = await puppeteer.default.launch({
       headless: true,
+      executablePath:
+        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
