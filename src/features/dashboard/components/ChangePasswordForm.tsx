@@ -22,11 +22,7 @@ const {
 const changePasswordSchema = z
   .object({
     oldPassword: z.string().min(1, errorMessages.oldPasswordRequired),
-    newPassword: z
-      .string()
-      .min(6, errorMessages.passwordTooShort)
-      .regex(/[A-Z]/, errorMessages.passwordNeedsUppercase)
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, errorMessages.passwordNeedsSpecialChar),
+    newPassword: z.string().min(1, errorMessages.passwordTooShort),
     confirmPassword: z.string().min(1, errorMessages.confirmPasswordRequired),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
