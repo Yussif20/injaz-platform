@@ -77,7 +77,7 @@ const emailSchema = z
 const otpSchema = z
   .string()
   .min(1, "رمز التحقق مطلوب")
-  .length(5, "رمز التحقق يجب أن يكون 5 أرقام")
+  .length(4, "رمز التحقق يجب أن يكون 4 أرقام")
   .regex(/^[0-9]+$/, "رمز التحقق يجب أن يحتوي على أرقام فقط");
 
 // Login schema

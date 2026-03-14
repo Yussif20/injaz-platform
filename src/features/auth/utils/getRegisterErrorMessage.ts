@@ -6,6 +6,32 @@ type AxiosErrorLike = {
 };
 
 /**
+ * Extract backend error message from Axios errors.
+ * Returns the backend's message if available, otherwise the fallback.
+ */
+export function getBackendErrorMessage(error: unknown, fallback: string): string {
+  const axiosErr = error as AxiosErrorLike;
+  const backendMessage = axiosErr?.response?.data?.message?.trim() || "";
+
+  if (backendMessage) {
+    return backendMessage;
+  }
+
+  // Use first error from array if present
+  const errors = axiosErr?.response?.data?.errors;
+  if (errors?.length) {
+    return errors[0];
+  }
+
+  // If the error is already a thrown Error with a meaningful message, use it
+  if (error instanceof Error && error.message && !error.message.includes("status code")) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
+/**
  * Map backend register error (e.g. 400 phone/email already used) to a clear Arabic message.
  */
 export function getRegisterErrorMessage(error: unknown): string {

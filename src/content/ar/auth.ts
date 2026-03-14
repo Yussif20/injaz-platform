@@ -82,7 +82,7 @@ export const authContent = {
     resendText: "لم تستلم الرمز؟",
     resendButton: "إعادة الإرسال",
     resendCountdown: "إعادة الإرسال",
-    errorLength6: "رمز التحقق يجب أن يكون 6 أرقام",
+    errorLength4: "رمز التحقق يجب أن يكون 4 أرقام",
     errorInvalid: "رمز التحقق غير صحيح",
   },
 

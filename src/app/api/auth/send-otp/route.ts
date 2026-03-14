@@ -22,12 +22,7 @@ export async function POST(request: NextRequest) {
     // Call backend to send OTP
     const response = await serverApi.post<ApiResponse<boolean>>(
       API_ENDPOINTS.SEND_REGISTRATION_OTP,
-      phone,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      { phone }
     );
 
     const { status, message, errors } = response.data;

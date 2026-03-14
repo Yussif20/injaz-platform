@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { sendPasswordResetOtp, resetPassword } from "../services/auth.service";
 import { ROUTES } from "@/config";
 import type { ResetPasswordRequest } from "../types/auth.types";
+import { getBackendErrorMessage } from "../utils/getRegisterErrorMessage";
 
 interface UseForgotPasswordOptions {
   onSuccess?: () => void;
@@ -23,22 +24,30 @@ export function useForgotPassword(options: UseForgotPasswordOptions = {}) {
   // Step 1: Send OTP
   const sendOtpMutation = useMutation({
     mutationFn: async (phone: string) => {
-      const response = await sendPasswordResetOtp(phone);
-      if (!response.status) {
-        throw new Error(response.message || "فشل إرسال رمز التحقق");
+      try {
+        const response = await sendPasswordResetOtp(phone);
+        if (!response.status) {
+          throw new Error(response.message || "فشل إرسال رمز التحقق");
+        }
+        return response;
+      } catch (err) {
+        throw new Error(getBackendErrorMessage(err, "فشل إرسال رمز التحقق"));
       }
-      return response;
     },
   });
 
   // Step 2: Reset password
   const resetMutation = useMutation({
     mutationFn: async (data: ResetPasswordRequest) => {
-      const response = await resetPassword(data);
-      if (!response.status) {
-        throw new Error(response.message || "فشل تغيير كلمة المرور");
+      try {
+        const response = await resetPassword(data);
+        if (!response.status) {
+          throw new Error(response.message || "فشل تغيير كلمة المرور");
+        }
+        return response;
+      } catch (err) {
+        throw new Error(getBackendErrorMessage(err, "فشل تغيير كلمة المرور"));
       }
-      return response;
     },
     onSuccess: () => {
       options.onSuccess?.();

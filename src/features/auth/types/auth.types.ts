@@ -67,6 +67,7 @@ export interface RegisterCredentials {
   confirmPassword: string;
   gender: Gender;
   email: string;
+  verificationCode: string;
 }
 
 // Send OTP request

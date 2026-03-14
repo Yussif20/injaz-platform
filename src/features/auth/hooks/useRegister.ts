@@ -14,7 +14,7 @@ import {
 import { AUTH_QUERY_KEY } from "./useAuth";
 import { ROUTES } from "@/config";
 import { VerificationPurpose, type RegisterCredentials } from "../types/auth.types";
-import { getRegisterErrorMessage } from "../utils/getRegisterErrorMessage";
+import { getRegisterErrorMessage, getBackendErrorMessage } from "../utils/getRegisterErrorMessage";
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
@@ -31,11 +31,15 @@ export function useRegister(options: UseRegisterOptions = {}) {
   // Step 1: Send OTP
   const sendOtpMutation = useMutation({
     mutationFn: async (phone: string) => {
-      const response = await sendRegistrationOtp(phone);
-      if (!response.status) {
-        throw new Error(response.message || "فشل إرسال رمز التحقق");
+      try {
+        const response = await sendRegistrationOtp(phone);
+        if (!response.status) {
+          throw new Error(response.message || "فشل إرسال رمز التحقق");
+        }
+        return response;
+      } catch (err) {
+        throw new Error(getBackendErrorMessage(err, "فشل إرسال رمز التحقق"));
       }
-      return response;
     },
   });
 

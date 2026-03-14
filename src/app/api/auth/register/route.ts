@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Call backend register endpoint
     const response = await serverApi.post<ApiResponse<AuthData>>(
-      API_ENDPOINTS.REGISTER,
+      API_ENDPOINTS.REGISTER_WITH_OTP,
       body
     );
 

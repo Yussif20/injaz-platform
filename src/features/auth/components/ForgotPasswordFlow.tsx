@@ -17,8 +17,6 @@ import { Button } from "@/shared/components/ui";
 import { authContent } from "@/content";
 import { ROUTES } from "@/config";
 import { useForgotPassword } from "../hooks/useForgotPassword";
-import { verifyOtp } from "../services/auth.service";
-import { VerificationPurpose } from "../types/auth.types";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "../validations/auth.schemas";
 import { OtpInput } from "./OtpInput";
 import { StepIndicator } from "./StepIndicator";
@@ -53,11 +51,11 @@ export function ForgotPasswordFlow() {
   const { forgotPassword, otp, buttons, signIn } = authContent;
   const [step, setStep] = useState<ForgotPasswordStep>("phone");
   const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+966");
   const [otpCode, setOtpCode] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
 
   const {
@@ -111,11 +109,14 @@ export function ForgotPasswordFlow() {
     }
   };
 
+  const phoneMaxLength = countryCode === "+20" ? 10 : 9;
+
   // Step 1: Handle phone submission
   const handlePhoneSubmit = async (data: ForgotPasswordFormValues) => {
+    const normalizedPhone = `${countryCode}${data.phone.replace(/^\+/, "")}`;
     try {
-      await sendOtpAsync(data.phone);
-      setPhone(data.phone);
+      await sendOtpAsync(normalizedPhone);
+      setPhone(normalizedPhone);
       setStep("otp");
       setResendTimer(60);
     } catch {
@@ -131,26 +132,11 @@ export function ForgotPasswordFlow() {
     setOtpCode("");
   };
 
-  // Step 2: Handle OTP verification with backend
-  const handleOtpVerify = async () => {
-    if (otpCode.length !== 6) return;
-
-    setIsVerifyingOtp(true);
+  // Step 2: Move to password step (OTP verified by reset-password-with-otp endpoint)
+  const handleOtpVerify = () => {
+    if (otpCode.length !== 4) return;
     setOtpError(null);
-
-    try {
-      const response = await verifyOtp(phone, otpCode, VerificationPurpose.PasswordReset);
-
-      if (response.status) {
-        setStep("newPassword");
-      } else {
-        setOtpError(response.message || authContent.errors.invalidOtp);
-      }
-    } catch (error) {
-      setOtpError(authContent.errors.invalidOtp);
-    } finally {
-      setIsVerifyingOtp(false);
-    }
+    setStep("newPassword");
   };
 
   // Step 3: Handle password reset
@@ -176,11 +162,9 @@ export function ForgotPasswordFlow() {
     }
   };
 
-  // Handle phone input - only allow numbers and +
+  // Handle phone input - only allow digits, enforce max length
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const sanitized = value.replace(/[^\d+]/g, "");
-    e.target.value = sanitized;
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, phoneMaxLength);
   };
 
   return (
@@ -211,22 +195,48 @@ export function ForgotPasswordFlow() {
             >
               {forgotPassword.phoneLabel}
             </label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder={forgotPassword.phonePlaceholder}
-              {...phoneForm.register("phone", { onChange: handlePhoneInput })}
-              className={`
-                bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
-                px-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
-                border-2 transition-colors duration-200
-                ${
-                  phoneForm.formState.errors.phone
-                    ? "border-warning-500"
-                    : "border-transparent focus:border-primary-500"
-                }
-              `}
-            />
+            <div className="relative">
+              <input
+                id="phone"
+                type="tel"
+                maxLength={phoneMaxLength}
+                placeholder={forgotPassword.phonePlaceholder}
+                {...phoneForm.register("phone", { onChange: handlePhoneInput })}
+                className={`
+                  w-full bg-grey-100 text-text-dark placeholder-grey-400 text-sm sm:text-base
+                  pr-24 pl-4 py-3 sm:py-3.5 rounded-xl outline-none text-right
+                  border-2 transition-colors duration-200
+                  ${
+                    phoneForm.formState.errors.phone
+                      ? "border-warning-500"
+                      : "border-transparent focus:border-primary-500"
+                  }
+                `}
+              />
+              <select
+                aria-label="country-code"
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="
+                  absolute right-2 top-1/2 -translate-y-1/2
+                  bg-white/80 text-text-dark text-xs sm:text-sm
+                  px-2.5 sm:px-3 pr-6 py-1.5 sm:py-2
+                  rounded-full border border-grey-300 shadow-sm
+                  outline-none cursor-pointer
+                  focus:border-primary-500 focus:ring-2 focus:ring-primary-100
+                  appearance-none
+                "
+                style={{
+                  backgroundImage: "url('/icons/ui/arrow-down.svg')",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "left 0.5rem center",
+                  backgroundSize: "14px 14px",
+                }}
+              >
+                <option value="+20">+20</option>
+                <option value="+966">+966</option>
+              </select>
+            </div>
             {phoneForm.formState.errors.phone && (
               <p className="text-warning-500 text-xs mt-1">
                 {phoneForm.formState.errors.phone.message}
@@ -282,8 +292,7 @@ export function ForgotPasswordFlow() {
                 setOtpCode(value);
                 setOtpError(null); // Clear error when user types
               }}
-              length={6}
-              disabled={isVerifyingOtp}
+              length={4}
               error={otpError ? " " : undefined}
             />
           </div>
@@ -293,9 +302,9 @@ export function ForgotPasswordFlow() {
             <button
               type="button"
               onClick={handleResendOtp}
-              disabled={resendTimer > 0 || isVerifyingOtp}
+              disabled={resendTimer > 0}
               className={`text-primary-500 ${
-                resendTimer > 0 || isVerifyingOtp
+                resendTimer > 0
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:underline"
               }`}
@@ -311,7 +320,6 @@ export function ForgotPasswordFlow() {
               type="button"
               variant="outline"
               onClick={handleBack}
-              disabled={isVerifyingOtp}
               className="flex-1 py-3 sm:py-3.5 rounded-xl"
             >
               {buttons.back}
@@ -319,8 +327,7 @@ export function ForgotPasswordFlow() {
             <Button
               type="button"
               onClick={handleOtpVerify}
-              isLoading={isVerifyingOtp}
-              disabled={otpCode.length !== 6 || isVerifyingOtp}
+              disabled={otpCode.length !== 4}
               className="flex-1 bg-primary-500 hover:bg-primary-800 text-white py-3 sm:py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {buttons.next}
