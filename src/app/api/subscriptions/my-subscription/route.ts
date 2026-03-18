@@ -43,13 +43,14 @@ export async function GET() {
       const errorData = axiosError.response?.data;
       const statusCode = axiosError.response?.status || 500;
 
+      // Return 200 for 404 — subscription endpoints not yet implemented on backend
       return NextResponse.json(
         {
           status: false,
           message: errorData?.message || "فشل في جلب بيانات الاشتراك",
           errors: errorData?.errors || null,
         },
-        { status: statusCode },
+        { status: statusCode === 404 ? 200 : statusCode },
       );
     }
 

@@ -241,6 +241,7 @@ function ManageSubscriptionContent() {
     }
 
     const moyasarKey = process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY;
+    console.log("[Payment] Moyasar key:", moyasarKey ? `${moyasarKey.slice(0, 10)}...` : "NOT SET");
     if (!moyasarKey) {
       setPaymentError("مفتاح بوابة الدفع غير مضبوط. يرجى التواصل مع الدعم.");
       return;
