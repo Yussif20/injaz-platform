@@ -12,13 +12,19 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Stage 3: Production image with Chromium
+# Stage 3: Download the exact Chrome build that matches puppeteer-core v24.37.5
+FROM node:20-slim AS chrome
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+# puppeteer-core v24.37.5 expects Chrome 145.0.7632.77 (Chrome for Testing)
+RUN npx --yes @puppeteer/browsers install chrome@145.0.7632.77 --install-dir /opt/chrome
+
+# Stage 4: Production image
 FROM node:20-slim AS runner
 WORKDIR /app
 
-# Install Chromium and required system libraries
+# Install only the system libraries Chrome needs (not the full chromium package)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
     fonts-noto-color-emoji \
     fonts-noto \
     fonts-noto-cjk \
@@ -34,13 +40,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     libxss1 \
     libgtk-3-0 \
+    libdrm2 \
+    libxshmfence1 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy the exact Chrome build from the chrome stage
+COPY --from=chrome /opt/chrome /opt/chrome
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Point to the exact Chrome for Testing binary
+ENV PUPPETEER_EXECUTABLE_PATH=/opt/chrome/chrome/linux-145.0.7632.77/chrome-linux64/chrome
 
 # Copy standalone output and static/public assets
 COPY --from=builder /app/.next/standalone ./

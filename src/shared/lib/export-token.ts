@@ -8,10 +8,7 @@
 
 import { createHmac, randomBytes } from "crypto";
 
-const SECRET =
-  process.env.EXPORT_TOKEN_SECRET ||
-  // Fallback: derive from the Next.js build ID which is unique per deployment
-  `injaz-export-${process.env.NEXT_BUILD_ID || "dev"}`;
+const SECRET = process.env.EXPORT_TOKEN_SECRET || "injaz-export-default-secret";
 
 const TTL_MS = 60_000; // 60 seconds
 

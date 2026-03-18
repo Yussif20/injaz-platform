@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getBrowserPath } from "@/shared/lib/browser-path";
 
 export const maxDuration = 30;
 
@@ -29,13 +30,21 @@ export async function GET(request: NextRequest) {
     const puppeteer = await import("puppeteer-core");
     browser = await puppeteer.default.launch({
       headless: true,
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+      executablePath: getBrowserPath(),
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
         "--disable-gpu",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-default-apps",
+        "--disable-sync",
+        "--disable-translate",
+        "--hide-scrollbars",
+        "--metrics-recording-only",
+        "--mute-audio",
+        "--no-first-run",
         "--font-render-hinting=none",
       ],
     });
