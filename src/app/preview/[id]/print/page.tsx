@@ -129,7 +129,20 @@ export default function PrintPreviewPage() {
   const theme = PORTFOLIO_THEMES[themeName].colors;
   const profileImageUrl = normalizeImageUrl(imageUrl ?? profileDetails.imageUrl);
 
-  // No-op handlers — buttons are rendered but hidden by CSS print rules
+  // Split an array into chunks of `size`
+  function chunk<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  }
+
+  const qualifications = profileDetails.qualifications ?? [];
+  const careerJobs = profileDetails.careerJobs ?? [];
+  // If both have ≤1 item, combine on one page; otherwise paginate each with max 2 per page
+  const combineEduCareer = qualifications.length <= 1 && careerJobs.length <= 1;
+
   const noop = () => {};
 
   const commonHeaderProps = {
@@ -170,15 +183,37 @@ export default function PrintPreviewPage() {
           display: none !important;
         }
 
+        /* Ensure the container doesn't overflow the A4 width */
+        body {
+          width: 100%;
+          overflow-x: hidden;
+        }
+
         /* Prevent content from being cut mid-element in PDF */
         section, [data-section] {
           break-inside: avoid;
           page-break-inside: avoid;
         }
 
-        /* Ensure images load fully for Puppeteer */
+        /* Ensure images don't split across pages */
         img {
           break-inside: avoid;
+        }
+
+        /* Force dark personal info cards into 2-column desktop layout at A4 width */
+        .grid.grid-cols-1.lg\\:grid-cols-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 20px !important;
+        }
+        .grid.grid-cols-1.lg\\:grid-cols-2 > div {
+          height: 162px !important;
+          padding: 24px !important;
+          border-radius: 24px !important;
+          font-size: 12px !important;
+        }
+        .grid.grid-cols-1.lg\\:grid-cols-2 > div p {
+          font-size: 12px !important;
+          line-height: 1.4 !important;
         }
       `}</style>
 
@@ -191,59 +226,89 @@ export default function PrintPreviewPage() {
       {/* Main content */}
       <div className="max-w-300 mx-auto">
         {/* Personal Info */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritagePersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Arabic ? (
-          <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+        <div>
+          {selectedTemplateId === TemplateId.Default ? (
+            <DefaultPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : selectedTemplateId === TemplateId.Heritage ? (
+            <HeritagePersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : selectedTemplateId === TemplateId.Arabic ? (
+            <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : (
+            <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          )}
+        </div>
+
+        {/* Education & Career — max 2 cards per page, combine if both ≤1 */}
+        {combineEduCareer ? (
+          <div style={{ breakBefore: "page", paddingTop: "40px" }}>
+            {qualifications.length > 0 && (
+              selectedTemplateId === TemplateId.Default ? (
+                <DefaultEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : selectedTemplateId === TemplateId.Dark ? (
+                <DarkEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : selectedTemplateId === TemplateId.Heritage ? (
+                <HeritageEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : (
+                <ArabicEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              )
+            )}
+            {careerJobs.length > 0 && (
+              selectedTemplateId === TemplateId.Default ? (
+                <DefaultCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : selectedTemplateId === TemplateId.Dark ? (
+                <DarkCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : selectedTemplateId === TemplateId.Heritage ? (
+                <HeritageCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : (
+                <ArabicCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              )
+            )}
+          </div>
         ) : (
-          <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          <>
+            {chunk(qualifications, 2).map((eduChunk, i) => (
+              <div key={`edu-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
+                {selectedTemplateId === TemplateId.Default ? (
+                  <DefaultEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : selectedTemplateId === TemplateId.Dark ? (
+                  <DarkEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : selectedTemplateId === TemplateId.Heritage ? (
+                  <HeritageEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : (
+                  <ArabicEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                )}
+              </div>
+            ))}
+            {chunk(careerJobs, 2).map((careerChunk, i) => (
+              <div key={`career-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
+                {selectedTemplateId === TemplateId.Default ? (
+                  <DefaultCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : selectedTemplateId === TemplateId.Dark ? (
+                  <DarkCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : selectedTemplateId === TemplateId.Heritage ? (
+                  <HeritageCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : (
+                  <ArabicCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                )}
+              </div>
+            ))}
+          </>
         )}
 
-        {/* Education */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Dark ? (
-          <DarkEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritageEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : (
-          <ArabicEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        )}
+        {/* Achievements — always start on a new page */}
+        <div style={{ breakBefore: "page", paddingTop: "40px" }}>
+          {selectedTemplateId === TemplateId.Default ? (
+            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : selectedTemplateId === TemplateId.Dark ? (
+            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : selectedTemplateId === TemplateId.Heritage ? (
+            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : (
+            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          )}
+        </div>
 
-        {/* Career */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Dark ? (
-          <DarkCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritageCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : (
-          <ArabicCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        )}
-
-        {/* Achievements */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Dark ? (
-          <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : (
-          <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        )}
-
-        {/* Contact */}
-        {selectedTemplateId === TemplateId.Default ? (
-          <DefaultContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Dark ? (
-          <DarkContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : selectedTemplateId === TemplateId.Heritage ? (
-          <HeritageContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : (
-          <ArabicContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        )}
+        {/* Contact section removed from PDF export */}
       </div>
     </div>
   );

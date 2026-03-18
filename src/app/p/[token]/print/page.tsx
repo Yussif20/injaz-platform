@@ -119,6 +119,18 @@ export default function SharedPrintPage() {
   const theme = PORTFOLIO_THEMES[themeName].colors;
   const profileImageUrl = normalizeImageUrl(profileDetails.imageUrl);
 
+  function chunk<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  }
+
+  const qualifications = profileDetails.qualifications ?? [];
+  const careerJobs = profileDetails.careerJobs ?? [];
+  const combineEduCareer = qualifications.length <= 1 && careerJobs.length <= 1;
+
   const noop = () => {};
   const commonHeaderProps = {
     teacherName: profileDetails.userName || "المعلم",
@@ -156,12 +168,32 @@ export default function SharedPrintPage() {
         [data-preview-bar] {
           display: none !important;
         }
+        body {
+          width: 100%;
+          overflow-x: hidden;
+        }
         section, [data-section] {
           break-inside: avoid;
           page-break-inside: avoid;
         }
         img {
           break-inside: avoid;
+        }
+
+        /* Force dark personal info cards into 2-column desktop layout at A4 width */
+        .grid.grid-cols-1.lg\\:grid-cols-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 20px !important;
+        }
+        .grid.grid-cols-1.lg\\:grid-cols-2 > div {
+          height: 162px !important;
+          padding: 24px !important;
+          border-radius: 24px !important;
+          font-size: 12px !important;
+        }
+        .grid.grid-cols-1.lg\\:grid-cols-2 > div p {
+          font-size: 12px !important;
+          line-height: 1.4 !important;
         }
       `}</style>
 
@@ -171,55 +203,90 @@ export default function SharedPrintPage() {
       {templateId === TemplateId.Dark && <DarkPortfolioHeader {...commonHeaderProps} />}
 
       <div className="max-w-300 mx-auto">
-        {templateId === TemplateId.Default ? (
-          <DefaultPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
-        ) : templateId === TemplateId.Heritage ? (
-          <HeritagePersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
-        ) : templateId === TemplateId.Arabic ? (
-          <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+        {/* Personal Info */}
+        <div>
+          {templateId === TemplateId.Default ? (
+            <DefaultPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : templateId === TemplateId.Heritage ? (
+            <HeritagePersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : templateId === TemplateId.Arabic ? (
+            <ArabicPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          ) : (
+            <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          )}
+        </div>
+
+        {/* Education & Career — max 2 cards per page, combine if both ≤1 */}
+        {combineEduCareer ? (
+          <div style={{ breakBefore: "page", paddingTop: "40px" }}>
+            {qualifications.length > 0 && (
+              templateId === TemplateId.Default ? (
+                <DefaultEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : templateId === TemplateId.Dark ? (
+                <DarkEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : templateId === TemplateId.Heritage ? (
+                <HeritageEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              ) : (
+                <ArabicEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+              )
+            )}
+            {careerJobs.length > 0 && (
+              templateId === TemplateId.Default ? (
+                <DefaultCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : templateId === TemplateId.Dark ? (
+                <DarkCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : templateId === TemplateId.Heritage ? (
+                <HeritageCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              ) : (
+                <ArabicCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+              )
+            )}
+          </div>
         ) : (
-          <DarkPersonalInfoSection personalInfo={profileDetails.personalInfo} content={previewPage.personalInfo} theme={theme} />
+          <>
+            {chunk(qualifications, 2).map((eduChunk, i) => (
+              <div key={`edu-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
+                {templateId === TemplateId.Default ? (
+                  <DefaultEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : templateId === TemplateId.Dark ? (
+                  <DarkEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : templateId === TemplateId.Heritage ? (
+                  <HeritageEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                ) : (
+                  <ArabicEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
+                )}
+              </div>
+            ))}
+            {chunk(careerJobs, 2).map((careerChunk, i) => (
+              <div key={`career-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
+                {templateId === TemplateId.Default ? (
+                  <DefaultCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : templateId === TemplateId.Dark ? (
+                  <DarkCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : templateId === TemplateId.Heritage ? (
+                  <HeritageCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                ) : (
+                  <ArabicCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
+                )}
+              </div>
+            ))}
+          </>
         )}
 
-        {templateId === TemplateId.Default ? (
-          <DefaultEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : templateId === TemplateId.Dark ? (
-          <DarkEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : templateId === TemplateId.Heritage ? (
-          <HeritageEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        ) : (
-          <ArabicEducationSection qualifications={profileDetails.qualifications} content={previewPage.education} theme={theme} />
-        )}
+        {/* Achievements — always start on a new page */}
+        <div style={{ breakBefore: "page", paddingTop: "40px" }}>
+          {templateId === TemplateId.Default ? (
+            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : templateId === TemplateId.Dark ? (
+            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : templateId === TemplateId.Heritage ? (
+            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          ) : (
+            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+          )}
+        </div>
 
-        {templateId === TemplateId.Default ? (
-          <DefaultCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : templateId === TemplateId.Dark ? (
-          <DarkCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : templateId === TemplateId.Heritage ? (
-          <HeritageCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        ) : (
-          <ArabicCareerSection careerJobs={profileDetails.careerJobs} content={previewPage.career} theme={theme} />
-        )}
-
-        {templateId === TemplateId.Default ? (
-          <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : templateId === TemplateId.Dark ? (
-          <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : templateId === TemplateId.Heritage ? (
-          <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        ) : (
-          <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
-        )}
-
-        {templateId === TemplateId.Default ? (
-          <DefaultContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : templateId === TemplateId.Dark ? (
-          <DarkContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : templateId === TemplateId.Heritage ? (
-          <HeritageContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        ) : (
-          <ArabicContactSection content={previewPage.contact} whatsappNumber={profileDetails.personalInfo?.phoneNumber} theme={theme} />
-        )}
+        {/* Contact section removed from PDF export */}
       </div>
     </div>
   );

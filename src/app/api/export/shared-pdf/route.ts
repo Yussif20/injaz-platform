@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     });
 
     const page = await browser.newPage();
-    await page.setViewport({ width: 1200, height: 1600 });
+    await page.setViewport({ width: 794, height: 1123 });
 
     await page.goto(printUrl, {
       waitUntil: "domcontentloaded",
@@ -62,14 +62,8 @@ export async function GET(request: NextRequest) {
     // Wait for images to load
     await new Promise((r) => setTimeout(r, 3000));
 
-    const contentSize = await page.evaluate(() => ({
-      width: document.body.scrollWidth,
-      height: document.body.scrollHeight,
-    }));
-
     const pdfBuffer = await page.pdf({
-      width: `${contentSize.width}px`,
-      height: `${contentSize.height + 20}px`,
+      format: "A4",
       printBackground: true,
       margin: { top: "0", bottom: "0", left: "0", right: "0" },
     });

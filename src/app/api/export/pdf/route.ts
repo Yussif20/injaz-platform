@@ -57,8 +57,8 @@ export async function GET(request: NextRequest) {
 
     const page = await browser.newPage();
 
-    // Set viewport to A4-ish width for consistent rendering
-    await page.setViewport({ width: 1200, height: 1600 });
+    // Set viewport to A4 width at 96 DPI for consistent rendering
+    await page.setViewport({ width: 794, height: 1123 });
 
     // Use domcontentloaded — networkidle never settles in dev mode due to
     // HMR WebSocket. We rely on data-print-ready for actual readiness.
@@ -75,16 +75,9 @@ export async function GET(request: NextRequest) {
     // provider's failed requests can invalidate the page context.
     await new Promise((r) => setTimeout(r, 3000));
 
-    // Measure actual content dimensions to create a single-page PDF
-    const contentSize = await page.evaluate(() => ({
-      width: document.body.scrollWidth,
-      height: document.body.scrollHeight,
-    }));
-
-    // Generate a single continuous PDF (no page breaks)
+    // Generate multi-page A4 PDF
     const pdfBuffer = await page.pdf({
-      width: `${contentSize.width}px`,
-      height: `${contentSize.height + 20}px`, // small padding at bottom
+      format: "A4",
       printBackground: true,
       margin: { top: "0", bottom: "0", left: "0", right: "0" },
     });

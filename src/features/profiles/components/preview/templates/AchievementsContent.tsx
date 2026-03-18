@@ -60,49 +60,99 @@ export const AchievementsContent = ({
   const weightColor = weightColorMap[theme.primary] || "#008387";
   const titleColor = titleColorMap[theme.primary] || "#333333";
 
+  // Chunk an array into groups of `size`
+  function chunk<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  }
+
   return (
     <div
       className="rounded-[36px] px-14 py-13 space-y-8 md:space-y-10"
       style={{ backgroundColor: outer }}
     >
-      {sectionsWithContent.map((section) => (
-        <div key={section.id}>
-          {/* Section Weight Badge */}
-          <div
-            className="flex justify-start mb-2 text-xs font-light md:text-xl lg:text-2xl"
-            style={{ color: weightColor }}
-          >
-            {content.weightLabel} {section.weightPercent}%
-          </div>
+      {sectionsWithContent.map((section, sectionIndex) => {
+        const filteredSubs = section.subsections?.filter(
+          (sub) => sub.images && sub.images.length > 0,
+        ) ?? [];
 
-          {/* Section Title */}
-          <h3
-            className="text-sm font-light md:text-2xl md:font-normal lg:text-[28px] text-right mb-4 md:mb-6"
-            style={{ color: titleColor }}
-          >
-            {section.title}
-          </h3>
+        // First subsection alone on a page (with section title), then 2 per page
+        const firstSub = filteredSubs[0];
+        const remainingSubs = filteredSubs.slice(1);
+        const remainingChunks = chunk(remainingSubs, 2);
 
-          {/* Subsections */}
-          <div
-            className="rounded-[36px] px-14 py-13 space-y-8 md:space-y-12"
-            style={{ backgroundColor: inner }}
-          >
-            {section.subsections
-              ?.filter((sub) => sub.images && sub.images.length > 0)
-              .map((subsection) => (
-                <SubsectionGallery
-                  key={subsection.id}
-                  images={subsection.images || []}
-                  subsectionTitle={subsection.title}
-                  attachmentLabel={content.attachmentLabel}
-                  theme={theme}
-                  imageRadius={imageRadius}
-                />
-              ))}
+        return (
+          <div key={section.id}>
+            {/* First page: section title + first subsection */}
+            <div
+              style={
+                sectionIndex > 0
+                  ? { breakBefore: "page" as const, paddingTop: "40px" }
+                  : undefined
+              }
+            >
+              {/* Section Weight Badge */}
+              <div
+                className="flex justify-start mb-2 text-xs font-light md:text-xl lg:text-2xl"
+                style={{ color: weightColor }}
+              >
+                {content.weightLabel} {section.weightPercent}%
+              </div>
+
+              {/* Section Title */}
+              <h3
+                className="text-sm font-light md:text-2xl md:font-normal lg:text-[28px] text-right mb-4 md:mb-6"
+                style={{ color: titleColor }}
+              >
+                {section.title}
+              </h3>
+
+              {firstSub && (
+                <div
+                  className="rounded-[36px] px-14 py-13 space-y-8 md:space-y-12"
+                  style={{ backgroundColor: inner }}
+                >
+                  <SubsectionGallery
+                    key={firstSub.id}
+                    images={firstSub.images || []}
+                    subsectionTitle={firstSub.title}
+                    attachmentLabel={content.attachmentLabel}
+                    theme={theme}
+                    imageRadius={imageRadius}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Remaining subsections: 2 per page */}
+            {remainingChunks.map((subsChunk, chunkIndex) => (
+              <div
+                key={`chunk-${chunkIndex}`}
+                style={{ breakBefore: "page" as const, paddingTop: "40px" }}
+              >
+                <div
+                  className="rounded-[36px] px-14 py-13 space-y-8 md:space-y-12"
+                  style={{ backgroundColor: inner }}
+                >
+                  {subsChunk.map((subsection) => (
+                    <SubsectionGallery
+                      key={subsection.id}
+                      images={subsection.images || []}
+                      subsectionTitle={subsection.title}
+                      attachmentLabel={content.attachmentLabel}
+                      theme={theme}
+                      imageRadius={imageRadius}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
