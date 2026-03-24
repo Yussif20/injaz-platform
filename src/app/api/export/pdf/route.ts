@@ -78,9 +78,15 @@ export async function GET(request: NextRequest) {
     // provider's failed requests can invalidate the page context.
     await new Promise((r) => setTimeout(r, 3000));
 
-    // Generate multi-page A4 PDF
+    // Measure actual content height for single-page PDF (add buffer to avoid overflow onto a second page)
+    const bodyHeight = await page.evaluate(() =>
+      Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)
+    ) + 50;
+
+    // Generate single continuous page PDF (no page breaks)
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      width: "794px",
+      height: `${bodyHeight}px`,
       printBackground: true,
       margin: { top: "0", bottom: "0", left: "0", right: "0" },
     });

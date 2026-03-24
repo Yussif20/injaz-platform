@@ -119,17 +119,8 @@ export default function SharedPrintPage() {
   const theme = PORTFOLIO_THEMES[themeName].colors;
   const profileImageUrl = normalizeImageUrl(profileDetails.imageUrl);
 
-  function chunk<T>(arr: T[], size: number): T[][] {
-    const result: T[][] = [];
-    for (let i = 0; i < arr.length; i += size) {
-      result.push(arr.slice(i, i + size));
-    }
-    return result;
-  }
-
   const qualifications = profileDetails.qualifications ?? [];
   const careerJobs = profileDetails.careerJobs ?? [];
-  const combineEduCareer = qualifications.length <= 1 && careerJobs.length <= 1;
 
   const noop = () => {};
   const commonHeaderProps = {
@@ -172,12 +163,12 @@ export default function SharedPrintPage() {
           width: 100%;
           overflow-x: hidden;
         }
-        section, [data-section] {
-          break-inside: avoid;
-          page-break-inside: avoid;
-        }
-        img {
-          break-inside: avoid;
+        /* Disable all page breaks — single continuous page */
+        * {
+          break-before: auto !important;
+          break-after: auto !important;
+          page-break-before: auto !important;
+          page-break-after: auto !important;
         }
 
         /* Force dark personal info cards into 2-column desktop layout at A4 width */
@@ -216,65 +207,38 @@ export default function SharedPrintPage() {
           )}
         </div>
 
-        {/* Education & Career — max 2 cards per page, combine if both ≤1 */}
-        {combineEduCareer ? (
-          <div style={{ breakBefore: "page", paddingTop: "40px" }}>
-            {qualifications.length > 0 && (
-              templateId === TemplateId.Default ? (
-                <DefaultEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
-              ) : templateId === TemplateId.Dark ? (
-                <DarkEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
-              ) : templateId === TemplateId.Heritage ? (
-                <HeritageEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
-              ) : (
-                <ArabicEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
-              )
-            )}
-            {careerJobs.length > 0 && (
-              templateId === TemplateId.Default ? (
-                <DefaultCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
-              ) : templateId === TemplateId.Dark ? (
-                <DarkCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
-              ) : templateId === TemplateId.Heritage ? (
-                <HeritageCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
-              ) : (
-                <ArabicCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
-              )
+        {/* Education */}
+        {qualifications.length > 0 && (
+          <div>
+            {templateId === TemplateId.Default ? (
+              <DefaultEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+            ) : templateId === TemplateId.Dark ? (
+              <DarkEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+            ) : templateId === TemplateId.Heritage ? (
+              <HeritageEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
+            ) : (
+              <ArabicEducationSection qualifications={qualifications} content={previewPage.education} theme={theme} />
             )}
           </div>
-        ) : (
-          <>
-            {chunk(qualifications, 2).map((eduChunk, i) => (
-              <div key={`edu-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
-                {templateId === TemplateId.Default ? (
-                  <DefaultEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
-                ) : templateId === TemplateId.Dark ? (
-                  <DarkEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
-                ) : templateId === TemplateId.Heritage ? (
-                  <HeritageEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
-                ) : (
-                  <ArabicEducationSection qualifications={eduChunk} content={previewPage.education} theme={theme} />
-                )}
-              </div>
-            ))}
-            {chunk(careerJobs, 2).map((careerChunk, i) => (
-              <div key={`career-${i}`} style={{ breakBefore: "page", paddingTop: "40px" }}>
-                {templateId === TemplateId.Default ? (
-                  <DefaultCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
-                ) : templateId === TemplateId.Dark ? (
-                  <DarkCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
-                ) : templateId === TemplateId.Heritage ? (
-                  <HeritageCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
-                ) : (
-                  <ArabicCareerSection careerJobs={careerChunk} content={previewPage.career} theme={theme} />
-                )}
-              </div>
-            ))}
-          </>
         )}
 
-        {/* Achievements — always start on a new page */}
-        <div style={{ breakBefore: "page", paddingTop: "40px" }}>
+        {/* Career */}
+        {careerJobs.length > 0 && (
+          <div>
+            {templateId === TemplateId.Default ? (
+              <DefaultCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+            ) : templateId === TemplateId.Dark ? (
+              <DarkCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+            ) : templateId === TemplateId.Heritage ? (
+              <HeritageCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+            ) : (
+              <ArabicCareerSection careerJobs={careerJobs} content={previewPage.career} theme={theme} />
+            )}
+          </div>
+        )}
+
+        {/* Achievements */}
+        <div>
           {templateId === TemplateId.Default ? (
             <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
           ) : templateId === TemplateId.Dark ? (
@@ -286,7 +250,25 @@ export default function SharedPrintPage() {
           )}
         </div>
 
-        {/* Contact section removed from PDF export */}
+        {/* Contact Section */}
+        {profileDetails.personalInfo?.phoneNumber && (
+          <div className="px-4 py-12 text-center">
+            <div className="max-w-300 mx-auto flex flex-col items-center gap-3">
+              <h3
+                className="text-[18px] md:text-[28px] font-semibold"
+                style={{ color: theme.text }}
+              >
+                {previewPage.contact.title}
+              </h3>
+              <p
+                className="text-[16px] md:text-[22px]"
+                style={{ color: theme.text, direction: "ltr" }}
+              >
+                {profileDetails.personalInfo.phoneNumber}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
