@@ -14,10 +14,14 @@ RUN npm run build
 
 # Stage 3: Download the exact Chrome build that matches puppeteer-core v24.37.5
 FROM node:20-slim AS chrome
+WORKDIR /tmp/chrome-dl
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-# puppeteer-core v24.37.5 expects Chrome 145.0.7632.77 (Chrome for Testing)
-RUN npx --yes @puppeteer/browsers install chrome@145.0.7632.77 --install-dir /opt/chrome
+# Pin @puppeteer/browsers version to avoid install-dir regressions from npx --yes
+# pulling the latest. puppeteer-core v24.37.5 bundles @puppeteer/browsers 2.13.0.
+RUN npm init -y && npm install @puppeteer/browsers@2.13.0
+RUN npx @puppeteer/browsers install chrome@145.0.7632.77 --install-dir /opt/chrome \
+    && test -f /opt/chrome/chrome/linux-145.0.7632.77/chrome-linux64/chrome
 
 # Stage 4: Production image
 FROM node:20-slim AS runner

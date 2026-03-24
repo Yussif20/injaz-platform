@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
   // Create a short-lived token for the print page
   const exportToken = createExportToken(accessToken, profileId);
 
-  // Build the URL to the print page
-  const baseUrl = request.nextUrl.origin;
+  // Build the URL to the print page.
+  // Puppeteer connects to the local server over HTTP — force http:// to avoid
+  // ERR_SSL_PROTOCOL_ERROR when the origin reports https (e.g. behind a proxy).
+  const port = process.env.PORT || "3000";
+  const localBase = `http://localhost:${port}`;
   const templateId = request.nextUrl.searchParams.get("templateId") || "";
-  const printUrl = `${baseUrl}/preview/${profileId}/print?token=${encodeURIComponent(exportToken)}&templateId=${templateId}`;
+  const printUrl = `${localBase}/preview/${profileId}/print?token=${encodeURIComponent(exportToken)}&templateId=${templateId}`;
 
   let browser;
   try {

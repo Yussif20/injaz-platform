@@ -17,10 +17,14 @@ export async function GET(request: NextRequest) {
   }
 
   const password = request.nextUrl.searchParams.get("password") || "";
-  const baseUrl = request.nextUrl.origin;
+
+  // Puppeteer connects to the local server over HTTP — force http:// to avoid
+  // ERR_SSL_PROTOCOL_ERROR when the origin reports https (e.g. behind a proxy).
+  const port = process.env.PORT || "3000";
+  const localBase = `http://localhost:${port}`;
 
   // Build URL to the public print page
-  let printUrl = `${baseUrl}/p/${encodeURIComponent(shareToken)}/print`;
+  let printUrl = `${localBase}/p/${encodeURIComponent(shareToken)}/print`;
   if (password) {
     printUrl += `?password=${encodeURIComponent(password)}`;
   }
