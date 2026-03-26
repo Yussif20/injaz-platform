@@ -13,12 +13,14 @@ interface ArabicAchievementsSectionProps {
     attachmentLabel?: string;
   };
   theme: ThemeColors;
+  isPdf?: boolean;
 }
 
 export const ArabicAchievementsSection = ({
   sections,
   content,
   theme,
+  isPdf,
 }: ArabicAchievementsSectionProps) => {
   return (
     <div className="px-4 py-6">
@@ -48,6 +50,7 @@ export const ArabicAchievementsSection = ({
         content={content}
         theme={theme}
         imageRadius="15px"
+        isPdf={isPdf}
       />
     </div>
   );

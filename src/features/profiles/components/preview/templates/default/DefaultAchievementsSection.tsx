@@ -14,12 +14,14 @@ interface DefaultAchievementsSectionProps {
     attachmentLabel?: string;
   };
   theme: ThemeColors;
+  isPdf?: boolean;
 }
 
 export const DefaultAchievementsSection = ({
   sections,
   content,
   theme,
+  isPdf,
 }: DefaultAchievementsSectionProps) => {
   return (
     <div className="px-4 py-6">
@@ -44,6 +46,7 @@ export const DefaultAchievementsSection = ({
         sections={sections}
         content={content}
         theme={theme}
+        isPdf={isPdf}
       />
     </div>
   );

@@ -13,12 +13,14 @@ interface HeritageAchievementsSectionProps {
     attachmentLabel?: string;
   };
   theme: ThemeColors;
+  isPdf?: boolean;
 }
 
 export const HeritageAchievementsSection = ({
   sections,
   content,
   theme,
+  isPdf,
 }: HeritageAchievementsSectionProps) => {
   return (
     <div className="px-4 py-6">
@@ -40,6 +42,7 @@ export const HeritageAchievementsSection = ({
         content={content}
         theme={theme}
         imageRadius="15px"
+        isPdf={isPdf}
       />
     </div>
   );

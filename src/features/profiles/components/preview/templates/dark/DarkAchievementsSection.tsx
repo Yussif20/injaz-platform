@@ -13,12 +13,14 @@ interface DarkAchievementsSectionProps {
     attachmentLabel?: string;
   };
   theme: ThemeColors;
+  isPdf?: boolean;
 }
 
 export const DarkAchievementsSection = ({
   sections,
   content,
   theme,
+  isPdf,
 }: DarkAchievementsSectionProps) => {
   return (
     <div className="px-4 py-6">
@@ -40,6 +42,7 @@ export const DarkAchievementsSection = ({
         content={content}
         theme={theme}
         imageRadius="15px"
+        isPdf={isPdf}
       />
     </div>
   );

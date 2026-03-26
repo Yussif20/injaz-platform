@@ -240,13 +240,13 @@ export default function SharedPrintPage() {
         {/* Achievements */}
         <div>
           {templateId === TemplateId.Default ? (
-            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : templateId === TemplateId.Dark ? (
-            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : templateId === TemplateId.Heritage ? (
-            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : (
-            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           )}
         </div>
 

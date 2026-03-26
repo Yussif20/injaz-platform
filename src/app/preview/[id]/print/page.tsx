@@ -257,13 +257,13 @@ export default function PrintPreviewPage() {
         {/* Achievements */}
         <div>
           {selectedTemplateId === TemplateId.Default ? (
-            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <DefaultAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : selectedTemplateId === TemplateId.Dark ? (
-            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <DarkAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : selectedTemplateId === TemplateId.Heritage ? (
-            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <HeritageAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           ) : (
-            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} />
+            <ArabicAchievementsSection sections={profileDetails.sections} content={previewPage.achievements} theme={theme} isPdf />
           )}
         </div>
 

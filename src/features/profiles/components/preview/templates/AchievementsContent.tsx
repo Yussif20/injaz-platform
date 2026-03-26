@@ -14,6 +14,7 @@ interface AchievementsContentProps {
   };
   theme: ThemeColors;
   imageRadius?: string;
+  isPdf?: boolean;
 }
 
 export const AchievementsContent = ({
@@ -21,6 +22,7 @@ export const AchievementsContent = ({
   content,
   theme,
   imageRadius,
+  isPdf = false,
 }: AchievementsContentProps) => {
   if (!sections || sections.length === 0) return null;
 
@@ -122,6 +124,7 @@ export const AchievementsContent = ({
                     attachmentLabel={content.attachmentLabel}
                     theme={theme}
                     imageRadius={imageRadius}
+                    isPdf={isPdf}
                   />
                 </div>
               )}
@@ -145,6 +148,7 @@ export const AchievementsContent = ({
                       attachmentLabel={content.attachmentLabel}
                       theme={theme}
                       imageRadius={imageRadius}
+                      isPdf={isPdf}
                     />
                   ))}
                 </div>
