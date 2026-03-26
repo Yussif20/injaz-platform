@@ -20,7 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 # Pin @puppeteer/browsers version to avoid install-dir regressions from npx --yes
 # pulling the latest. puppeteer-core v24.37.5 bundles @puppeteer/browsers 2.13.0.
 RUN npm init -y && npm install @puppeteer/browsers@2.13.0
-RUN ./node_modules/.bin/browsers install chrome@stable --install-dir /opt/chrome \
+RUN ./node_modules/.bin/browsers install chrome@stable \
+    && mkdir -p /opt/chrome \
+    && cp -r chrome/* /opt/chrome/ \
     && ln -s "$(find /opt/chrome -name chrome -type f | head -1)" /opt/chrome/chrome-binary
 
 # Stage 4: Production image
