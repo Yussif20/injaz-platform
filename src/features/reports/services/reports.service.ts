@@ -33,7 +33,7 @@ import type {
 export async function getDashboardStats(): Promise<DashboardStatsDto> {
   // Fetch users count
   const usersResponse = await proxyApi.get<ApiResponse<PaginatedData<UserDto>>>(
-    "/Users/filtered",
+    "Users/filtered",
     { params: { PageSize: 1, PageNumber: 1 } },
   );
   const usersData = unwrapResponse(usersResponse);
@@ -42,7 +42,7 @@ export async function getDashboardStats(): Promise<DashboardStatsDto> {
   // Fetch active subscriptions count
   const subsResponse = await proxyApi.get<
     ApiResponse<PaginatedData<SubscriptionDto>>
-  >("/Subscriptions/filtered", {
+  >("Subscriptions/filtered", {
     params: { PageSize: 1, PageNumber: 1, IsActive: true },
   });
   const subsData = unwrapResponse(subsResponse);
@@ -50,7 +50,7 @@ export async function getDashboardStats(): Promise<DashboardStatsDto> {
 
   // Calculate total profits from subscriptions
   const allSubsResponse =
-    await proxyApi.get<ApiResponse<SubscriptionDto[]>>("/Subscriptions");
+    await proxyApi.get<ApiResponse<SubscriptionDto[]>>("Subscriptions");
   const allSubs = unwrapResponse(allSubsResponse);
   const totalProfits = allSubs.reduce(
     (sum, sub) => sum + (sub.finalAmount || 0),
@@ -86,7 +86,7 @@ export async function getLatestSubscriptions(
 ): Promise<LatestSubscriptionDto[]> {
   const response = await proxyApi.get<
     ApiResponse<PaginatedData<SubscriptionDto>>
-  >("/Subscriptions/filtered", {
+  >("Subscriptions/filtered", {
     params: {
       PageSize: limit,
       PageNumber: 1,
@@ -131,7 +131,7 @@ export async function getLatestSubscriptions(
  */
 export async function getProfitChartData(): Promise<ChartDataPoint[]> {
   const response =
-    await proxyApi.get<ApiResponse<SubscriptionDto[]>>("/Subscriptions");
+    await proxyApi.get<ApiResponse<SubscriptionDto[]>>("Subscriptions");
   const subscriptions = unwrapResponse(response);
 
   // Group by month and sum profits

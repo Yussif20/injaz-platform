@@ -7,7 +7,7 @@ import type {
   UpdateSubscriptionDiscountDto,
 } from "../types/subscriptions.types";
 
-const BASE_PATH = "/subscription-discounts";
+const BASE_PATH = "subscription-discounts";
 
 /**
  * Get all discounts

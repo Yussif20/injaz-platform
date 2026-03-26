@@ -8,7 +8,7 @@ import type {
   ProfileTypeFilterParams,
 } from "../types/profile-types.types";
 
-const BASE_PATH = "/ProfileTypes";
+const BASE_PATH = "ProfileTypes";
 
 /**
  * Get all profile types (active + inactive)

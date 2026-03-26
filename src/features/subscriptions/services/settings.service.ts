@@ -6,7 +6,7 @@ import type {
   UpdateSubscriptionSettingsDto,
 } from "../types/subscriptions.types";
 
-const BASE_PATH = "/subscription-settings";
+const BASE_PATH = "subscription-settings";
 
 /**
  * Get global subscription settings

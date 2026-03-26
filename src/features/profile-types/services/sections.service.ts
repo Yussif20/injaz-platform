@@ -8,7 +8,7 @@ import type {
   ReorderMap,
 } from "../types/profile-types.types";
 
-const BASE_PATH = "/Sections";
+const BASE_PATH = "Sections";
 
 /**
  * Get all sections for a profile type (ordered by displayOrder)

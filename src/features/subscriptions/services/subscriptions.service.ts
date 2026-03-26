@@ -7,7 +7,7 @@ import type {
   SubscriptionFilterParams,
 } from "../types/subscriptions.types";
 
-const BASE_PATH = "/Subscriptions";
+const BASE_PATH = "Subscriptions";
 
 /**
  * Get subscription info (fees, discount, days remaining)

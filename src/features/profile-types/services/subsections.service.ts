@@ -8,7 +8,7 @@ import type {
   ReorderMap,
 } from "../types/profile-types.types";
 
-const BASE_PATH = "/Subsections";
+const BASE_PATH = "Subsections";
 
 /**
  * Get all subsections for a section
