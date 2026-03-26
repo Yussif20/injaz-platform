@@ -46,6 +46,6 @@ export function getBrowserPath(): string {
     if (existsSync(p)) return p;
   }
 
-  // 3. Fallback — will fail with a clear error from Puppeteer
-  return "/usr/bin/chromium";
+  // 3. Fallback — prefer the Docker symlink, then /usr/bin/chromium
+  return "/opt/chrome/chrome-binary";
 }
