@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 # Pin @puppeteer/browsers version to avoid install-dir regressions from npx --yes
 # pulling the latest. puppeteer-core v24.37.5 bundles @puppeteer/browsers 2.13.0.
 RUN npm init -y && npm install @puppeteer/browsers@2.13.0
-RUN ./node_modules/.bin/browsers install chrome@145.0.7632.77 --install-dir /opt/chrome \
-    && test -f /opt/chrome/chrome/linux-145.0.7632.77/chrome-linux64/chrome
+RUN ./node_modules/.bin/browsers install chrome@stable --install-dir /opt/chrome \
+    && ln -s "$(find /opt/chrome -name chrome -type f | head -1)" /opt/chrome/chrome-binary
 
 # Stage 4: Production image
 FROM node:20-slim AS runner
@@ -56,7 +56,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Point to the exact Chrome for Testing binary
-ENV PUPPETEER_EXECUTABLE_PATH=/opt/chrome/chrome/linux-145.0.7632.77/chrome-linux64/chrome
+ENV PUPPETEER_EXECUTABLE_PATH=/opt/chrome/chrome-binary
 
 # Copy standalone output and static/public assets
 COPY --from=builder /app/.next/standalone ./

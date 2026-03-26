@@ -15,7 +15,7 @@ const WINDOWS_PATHS = [
 ];
 
 const LINUX_PATHS = [
-  "/opt/chrome/chrome/linux-145.0.7632.77/chrome-linux64/chrome",
+  "/opt/chrome/chrome-binary",
   "/usr/bin/chromium",
   "/usr/bin/chromium-browser",
   "/usr/bin/google-chrome",
