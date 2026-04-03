@@ -407,71 +407,122 @@ function ManageSubscriptionContent() {
   if (isSubscribed && subscription) {
     return (
       <div className="min-h-[60vh] bg-[#FAFAFA] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-6">
-        <div className="bg-shade-100 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-4 sm:mb-6">
-            <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M5 13l4 4L19 7"
+        {/* Title */}
+        <h2 className="text-[16px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333] text-right">
+          {content.activeSubscriptionTitle}
+        </h2>
+
+        {/* Subtitle */}
+        <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-light text-[#4D4D4D] text-right !mt-2 sm:!mt-5 lg:!mt-5">
+          {content.activeSubtitle}
+        </p>
+
+        {/* Date row */}
+        <div className="grid grid-cols-2 gap-4 text-right bg-white rounded-[24px] p-4 sm:p-6">
+          <div className="flex items-center gap-2">
+            <p className="text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333]">
+              {content.activeSubscriptionDateLabel}
+            </p>
+            <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-normal text-[#666666]">
+              {new Date(subscription.subscribedAt).toLocaleDateString("ar-SA")}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333]">
+              {content.activeExpiryLabel}
+            </p>
+            <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-normal text-[#666666]">
+              {new Date(subscription.expiresAt).toLocaleDateString("ar-SA")}
+            </p>
+          </div>
+        </div>
+
+        {/* Features box */}
+        <div className="bg-[#E3EFEF] border border-[#008387] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          <h3 className="text-[14px] sm:text-[20px] lg:text-[20px] font-normal text-[#333333] text-right mb-3 sm:mb-8 lg:mb-6">
+            {content.activeFeaturesTitle}
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-3 lg:gap-y-5 gap-x-3">
+            {content.features.map((feature, idx) => (
+              <div key={idx} className="flex items-center gap-2 min-w-0">
+                <Image
+                  src="/images/dashboard/check-mark.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="flex-shrink-0"
                 />
-              </svg>
-            </div>
-            <h2 className="text-lg sm:text-xl font-bold text-secondary-800">
-              {content.activeSubscriptionTitle}
-            </h2>
+                <span className="text-[12px] sm:text-[18px] lg:text-[16px] font-light text-[#666666]">
+                  {feature}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Expired subscription ─────────────────────────────────────────────────
+
+  if (!isSubscribed && subscription) {
+    const price = info?.subscriptionFee ?? info?.finalAmount ?? 70;
+
+    return (
+      <div className="min-h-[60vh] bg-[#FAFAFA] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-6">
+        {/* Title */}
+        <h2 className="text-[16px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333] text-right">
+          {content.expiredTitle}
+        </h2>
+
+        {/* Subtitle */}
+        <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-light text-[#4D4D4D] text-right !mt-2 sm:!mt-5 lg:!mt-5">
+          {content.expiredSubtitle}
+        </p>
+
+        {/* Features box */}
+        <div className="bg-[#E3EFEF] border border-[#008387] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          {/* Header: title + price */}
+          <div className="flex items-center justify-between mb-3 sm:mb-8 lg:mb-6">
+            <h3 className="text-[14px] sm:text-[20px] lg:text-[20px] font-normal text-[#333333]">
+              {content.activeFeaturesTitle}
+            </h3>
+            <p className="text-[14px] sm:text-[20px] lg:text-[20px] font-normal text-[#333333]">
+              {price} {content.priceCurrency}/{content.priceUnit}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div className="bg-white rounded-xl p-3 sm:p-4">
-              <p className="text-xs text-grey-500 mb-1">
-                {content.activeExpiryLabel}
-              </p>
-              <p className="text-sm sm:text-base font-medium text-secondary-800">
-                {new Date(subscription.expiresAt).toLocaleDateString("ar-SA")}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-3 sm:p-4">
-              <p className="text-xs text-grey-500 mb-1">
-                {content.activeDaysRemainingLabel}
-              </p>
-              <p className="text-sm sm:text-base font-medium text-secondary-800">
-                {subscription.daysRemaining} {content.dayUnit}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-3 sm:p-4">
-              <p className="text-xs text-grey-500 mb-1">
-                {content.activePaymentMethodLabel}
-              </p>
-              <p className="text-sm sm:text-base font-medium text-secondary-800">
-                {subscription.paymentMethod || "—"}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-3 sm:p-4">
-              <p className="text-xs text-grey-500 mb-1">
-                {content.activeAmountLabel}
-              </p>
-              <p className="text-sm sm:text-base font-medium text-secondary-800">
-                {subscription.finalAmount} {content.sar}
-              </p>
-            </div>
+          {/* Feature items */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-3 lg:gap-y-5 gap-x-3">
+            {content.features.map((feature, idx) => (
+              <div key={idx} className="flex items-center gap-2 min-w-0">
+                <Image
+                  src="/images/dashboard/check-mark.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="flex-shrink-0"
+                />
+                <span className="text-[12px] sm:text-[18px] lg:text-[16px] font-light text-[#666666]">
+                  {feature}
+                </span>
+              </div>
+            ))}
           </div>
 
-          <div className="mt-4 sm:mt-6 text-center">
-            <Link
-              href="/dashboard/account/subscription/history"
-              className="text-primary-500 hover:text-primary-800 text-sm font-medium underline"
-            >
-              {content.viewHistoryLink}
-            </Link>
-          </div>
+          {/* Subscribe button */}
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full mt-6"
+            onClick={() => {
+              idempotencyKeyRef.current = null;
+              setPaymentError(null);
+              setShowPaymentFormWithUrl(true);
+            }}
+          >
+            {content.subscribeNow}
+          </Button>
         </div>
       </div>
     );

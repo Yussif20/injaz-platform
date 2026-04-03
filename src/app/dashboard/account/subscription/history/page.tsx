@@ -31,7 +31,7 @@ export default function SubscriptionHistoryPage() {
     const status = getStatusFromSubscription(isActive, paymentStatus);
     switch (status) {
       case "active":
-        return "bg-success-100 text-success-600";
+        return "bg-[#E6FFE8] text-[#03960D]";
       case "expired":
         return "bg-grey-100 text-grey-600";
       case "cancelled":
@@ -52,55 +52,50 @@ export default function SubscriptionHistoryPage() {
   return (
     <div className="space-y-6">
       {history.length > 0 ? (
-        <div className="bg-white rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-shade-50">
-                <tr>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {content.historyTableHeaders.plan}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {content.historyTableHeaders.startDate}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {content.historyTableHeaders.endDate}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {content.historyTableHeaders.status}
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-medium text-secondary-800">
-                    {content.historyTableHeaders.amount}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-grey-100">
-                {history.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-6 py-4 text-sm text-secondary-800">
-                      {content.planTitle}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-grey-600">
-                      {new Date(item.subscribedAt).toLocaleDateString("ar-SA")}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-grey-600">
-                      {new Date(item.expiresAt).toLocaleDateString("ar-SA")}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs ${getStatusColor(item.isActive, item.paymentStatus)}`}
-                      >
-                        {getStatusLabel(item.isActive, item.paymentStatus)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-secondary-800">
-                      {item.finalAmount} {content.sar}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="space-y-4">
+          {history.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-2xl p-4 sm:p-6 flex items-start justify-between gap-4"
+            >
+              {/* Right side: dates */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <p className="text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333]">
+                    {content.historySubscriptionDateLabel}
+                  </p>
+                  <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-normal text-[#666666]">
+                    {new Date(item.subscribedAt).toLocaleDateString("ar-SA")}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333]">
+                    {content.historyRenewalDateLabel}
+                  </p>
+                  <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-normal text-[#666666]">
+                    {new Date(item.expiresAt).toLocaleDateString("ar-SA")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Left side: status + amount */}
+              <div className="space-y-3 text-left flex flex-col items-start">
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-[12px] sm:text-[14px] lg:text-[18px] font-normal ${getStatusColor(item.isActive, item.paymentStatus)}`}
+                >
+                  {getStatusLabel(item.isActive, item.paymentStatus)}
+                </span>
+                <div className="flex items-center gap-1">
+                  <p className="text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-[#333333]">
+                    {content.historyAmountLabel}
+                  </p>
+                  <p className="text-[12px] sm:text-[16px] lg:text-[18px] font-normal text-[#666666]">
+                    {item.finalAmount}{content.sar}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-16">

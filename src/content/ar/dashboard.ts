@@ -446,14 +446,24 @@ export const dashboardContent = {
       amount: "المبلغ",
     },
 
+    // History card labels
+    historySubscriptionDateLabel: "تاريخ الإشتراك",
+    historyRenewalDateLabel: "تاريخ التجديد",
+    historyAmountLabel: "القيمة",
+
     // Status labels
-    statusActive: "نشط",
+    statusActive: "اشتراك ناجح",
     statusExpired: "منتهي",
     statusCancelled: "ملغي",
 
     // Active subscription card
-    activeSubscriptionTitle: "اشتراكك الحالي",
-    activeExpiryLabel: "تاريخ الانتهاء:",
+    activeSubscriptionTitle: "الاشتراك الحالي",
+    activeSubtitle: "عند إنتهاء اشتراكك تصبح ملفاتك غير منشورة حتى إعادة الإشتراك",
+    activeSubscriptionDateLabel: "تاريخ الإشتراك",
+    activeExpiryLabel: "تاريخ الإنتهاء",
+    activeFeaturesTitle: "مميزات الإشتراك",
+    expiredTitle: "انتهى الإشتراك الحالي",
+    expiredSubtitle: "اشترك مرة أخرى لتتمكن من نشر ملفاتك وانشاء ملفات جديدة",
     activeDaysRemainingLabel: "الأيام المتبقية:",
     activePaymentMethodLabel: "طريقة الدفع:",
     activeAmountLabel: "المبلغ المدفوع:",
