@@ -1,23 +1,21 @@
 import DOMPurify from "isomorphic-dompurify";
 import { Navbar, Footer } from "@/shared/components/layout";
-import { BACKEND_API_URL } from "@/shared/lib/api";
+import { serverApi } from "@/shared/lib/api";
 import { getAccessToken } from "@/shared/lib/cookies";
 
 async function fetchTermsContent(): Promise<string | null> {
   try {
     const token = await getAccessToken();
-    const headers: HeadersInit = token
-      ? { Authorization: `Bearer ${token}` }
-      : {};
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(
-      `${BACKEND_API_URL}/api/SystemParameters/terms-and-conditions`,
-      { headers, next: { revalidate: 3600 } },
+    const response = await serverApi.get(
+      "/api/SystemParameters/terms-and-conditions",
+      { headers },
     );
-    if (!res.ok) return null;
-    const json = await res.json();
-    if (json.status !== "Success" || !json.data?.content) return null;
-    return json.data.content as string;
+    const data = response.data;
+    if (data?.status !== "Success" || !data.data?.content) return null;
+    return data.data.content as string;
   } catch {
     return null;
   }
