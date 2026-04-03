@@ -47,6 +47,8 @@ export const authContent = {
     confirmPasswordRequired: "*",
     confirmPasswordPlaceholder: "*********",
     termsLabel: "أوافق على الشروط والأحكام",
+    termsModalTitle: "الشروط والأحكام",
+    termsAcceptButton: "أوافق",
     submitButton: "إنشاء حساب",
     signInLink: "لديك حساب؟ تسجيل دخول",
     customerServiceAlt: "خدمة العملاء",

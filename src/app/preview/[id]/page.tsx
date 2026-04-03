@@ -362,7 +362,7 @@ export default function ProfilePreviewPage() {
           const profileImageUrl = normalizeImageUrl(profileFromList?.imageUrl ?? profileDetails.imageUrl);
           const commonHeaderProps = {
             teacherName: profileDetails.userName || "المعلم",
-            teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
+            teacherRank: profileDetails.personalInfo?.rankTitle || profileDetails.profileTypeName || "معلم",
             academicYear: profileDetails.academicYearName || "",
             profileImageUrl,
             onDownload: handleDownload,

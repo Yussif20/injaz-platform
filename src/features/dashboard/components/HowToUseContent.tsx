@@ -35,26 +35,31 @@ export const HowToUseContent: React.FC<HowToUseContentProps> = ({ youtubeUrl }) 
     {
       number: 1,
       image: "/images/dashboard/how-to-use/step-1.svg",
+      tabletImage: "/images/dashboard/how-to-use/step-1-tablet.svg",
       mobileImage: "/images/dashboard/how-to-use/step-1-mobile.svg",
     },
     {
       number: 2,
       image: "/images/dashboard/how-to-use/step-2.svg",
+      tabletImage: "/images/dashboard/how-to-use/step-2-tablet.svg",
       mobileImage: "/images/dashboard/how-to-use/step-2-mobile.svg",
     },
     {
       number: 3,
       image: "/images/dashboard/how-to-use/step-3.svg",
+      tabletImage: "/images/dashboard/how-to-use/step-3-tablet.svg",
       mobileImage: "/images/dashboard/how-to-use/step-3-mobile.svg",
     },
     {
       number: 4,
       image: "/images/dashboard/how-to-use/step-4.svg",
+      tabletImage: "/images/dashboard/how-to-use/step-4-tablet.svg",
       mobileImage: "/images/dashboard/how-to-use/step-4-mobile.svg",
     },
     {
       number: 5,
       image: "/images/dashboard/how-to-use/step-5.svg",
+      tabletImage: "/images/dashboard/how-to-use/step-5-tablet.svg",
       mobileImage: "/images/dashboard/how-to-use/step-5-mobile.svg",
     },
   ];
@@ -109,21 +114,35 @@ export const HowToUseContent: React.FC<HowToUseContentProps> = ({ youtubeUrl }) 
               {step.number}-
             </p>
             {/* Step Image - Mobile */}
-            <Image
-              src={step.mobileImage}
-              alt={`step ${step.number}`}
-              width={800}
-              height={400}
-              className="w-full h-auto rounded-xl md:hidden"
-            />
-            {/* Step Image - Desktop/Tablet */}
-            <Image
-              src={step.image}
-              alt={`step ${step.number}`}
-              width={800}
-              height={400}
-              className="w-full h-auto rounded-xl hidden md:block"
-            />
+            <div className="bg-[#E3EFEF] rounded-xl md:hidden">
+              <Image
+                src={step.mobileImage}
+                alt={`step ${step.number}`}
+                width={800}
+                height={400}
+                className="w-full h-auto"
+              />
+            </div>
+            {/* Step Image - Tablet */}
+            <div className="bg-[#E3EFEF] rounded-xl hidden md:block lg:hidden">
+              <Image
+                src={step.tabletImage}
+                alt={`step ${step.number}`}
+                width={800}
+                height={400}
+                className="w-full h-auto"
+              />
+            </div>
+            {/* Step Image - Desktop */}
+            <div className="bg-[#E3EFEF] rounded-xl hidden lg:block">
+              <Image
+                src={step.image}
+                alt={`step ${step.number}`}
+                width={800}
+                height={400}
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         ))}
       </div>

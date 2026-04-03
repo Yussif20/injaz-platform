@@ -22,6 +22,7 @@ import {
 import { Gender } from "../types/auth.types";
 import { OtpInput } from "./OtpInput";
 import { StepIndicator } from "./StepIndicator";
+import { TermsModal } from "./TermsModal";
 
 type RegisterStep = "details" | "otp";
 
@@ -42,6 +43,7 @@ export function RegisterForm() {
   const phoneMaxLength = countryCode === "+20" ? 10 : 9;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const {
     sendOtpAsync,
@@ -391,12 +393,13 @@ export function RegisterForm() {
 
             {/* Terms Checkbox */}
             <div className="flex flex-row-reverse items-center justify-end gap-3 lg:col-span-2 mt-2">
-              <label
-                htmlFor="acceptTerms"
+              <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
                 className="text-sm sm:text-base text-primary-500 cursor-pointer hover:underline"
               >
                 {requiredLabel(signUp.termsLabel)}
-              </label>
+              </button>
               <input
                 id="acceptTerms"
                 type="checkbox"
@@ -504,6 +507,15 @@ export function RegisterForm() {
           </div>
         </div>
       )}
+
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        onAccept={() => {
+          detailsForm.setValue("acceptTerms", true, { shouldValidate: true });
+          setShowTermsModal(false);
+        }}
+      />
     </div>
   );
 }

@@ -298,7 +298,7 @@ export default function PublicProfilePage() {
         {(() => {
           const commonHeaderProps = {
             teacherName: resolvedTeacherName,
-            teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
+            teacherRank: profileDetails.personalInfo?.rankTitle || profileDetails.profileTypeName || "معلم",
             academicYear: profileDetails.academicYearName || "",
             profileImageUrl,
             onDownload: noop,

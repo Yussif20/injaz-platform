@@ -522,7 +522,7 @@ export const dashboardContent = {
       // Card details
       cardDetailsTitle: "بيانات البطاقة",
       cardNameLabel: "الاسم على البطاقة",
-      cardNamePlaceholder: "مثال: محمد أحمد العتيبي",
+      cardNamePlaceholder: "الاسم بالإنجليزي كما على البطاقة",
       cardNumberLabel: "رقم البطاقة",
       cardNumberPlaceholder: "مثال: 123 456 789 587",
       cvvLabel: "رمز التحقق",

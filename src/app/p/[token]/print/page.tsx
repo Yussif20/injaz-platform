@@ -125,7 +125,7 @@ export default function SharedPrintPage() {
   const noop = () => {};
   const commonHeaderProps = {
     teacherName: profileDetails.userName || "المعلم",
-    teacherRank: profileDetails.personalInfo?.rankTitle || "معلم",
+    teacherRank: profileDetails.personalInfo?.rankTitle || profileDetails.profileTypeName || "معلم",
     academicYear: profileDetails.academicYearName || "",
     profileImageUrl,
     onDownload: noop,
@@ -253,19 +253,40 @@ export default function SharedPrintPage() {
         {/* Contact Section */}
         {profileDetails.personalInfo?.phoneNumber && (
           <div className="px-4 py-12 text-center">
-            <div className="max-w-300 mx-auto flex flex-col items-center gap-3">
-              <h3
-                className="text-[18px] md:text-[28px] font-semibold"
-                style={{ color: theme.text }}
-              >
-                {previewPage.contact.title}
-              </h3>
-              <p
-                className="text-[16px] md:text-[22px]"
-                style={{ color: theme.text, direction: "ltr" }}
-              >
-                {profileDetails.personalInfo.phoneNumber}
-              </p>
+            <div className="max-w-300 mx-auto flex flex-col items-center gap-4">
+              {/* Contact Icon and Text */}
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <div className="w-6 h-6 md:w-12.5 md:h-12.5 relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/images/profiles/${themeName}/contact.svg`}
+                    alt="Contact"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </div>
+                <h3
+                  className="text-[18px] md:text-[28px] font-semibold"
+                  style={{ color: theme.text }}
+                >
+                  {previewPage.contact.title}
+                </h3>
+              </div>
+
+              {/* WhatsApp Icon and Number */}
+              <div className="flex items-center justify-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/images/profiles/${themeName}/whatsapp.svg`}
+                  alt="WhatsApp"
+                  style={{ width: 24, height: 24 }}
+                />
+                <p
+                  className="text-[16px] md:text-[22px]"
+                  style={{ color: theme.text, direction: "ltr" }}
+                >
+                  {profileDetails.personalInfo.phoneNumber}
+                </p>
+              </div>
             </div>
           </div>
         )}
