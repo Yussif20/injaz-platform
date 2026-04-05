@@ -37,7 +37,12 @@ interface GraduationYearPickerProps {
   onChange: (year: string) => void;
   error?: string;
   placeholder?: string;
+  /** When true, the trigger is not clickable (use alongside a "حتى الآن" checkbox) */
+  disabled?: boolean;
 }
+
+/** Sentinel value representing an open-ended "حتى الآن" end date */
+export const PRESENT_YEAR_VALUE = "present";
 
 const GREGORIAN_START = 1960;
 const HIJRI_END = 1350;
@@ -48,6 +53,7 @@ export function GraduationYearPicker({
   onChange,
   error,
   placeholder = "اختر السنة",
+  disabled = false,
 }: GraduationYearPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<{
@@ -77,8 +83,9 @@ export function GraduationYearPicker({
     return list;
   }, [currentHijri, currentGregorian]);
 
+  const isPresent = value === PRESENT_YEAR_VALUE;
   const num = parseInt(value, 10);
-  const selectedYear = value !== "" && !isNaN(num) ? num : null;
+  const selectedYear = !isPresent && value !== "" && !isNaN(num) ? num : null;
 
   const handleSelectYear = (year: number, isHijri: boolean) => {
     if (isHijri) {
@@ -123,8 +130,9 @@ export function GraduationYearPicker({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const displayValue =
-    selectedYear != null
+  const displayValue = isPresent
+    ? "حتى الآن"
+    : selectedYear != null
       ? `${selectedYear} / ${gregorianYearToHijri(selectedYear)} ھ`
       : "";
 
@@ -146,24 +154,58 @@ export function GraduationYearPicker({
       {/* Trigger: whole field opens picker; calendar icon on the right, text next to it (RTL) */}
       <button
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-2xl border border-[#EBEBEB] bg-white px-3 py-2 text-right transition-colors hover:border-grey-300 hover:bg-grey-50/50"
+        onClick={() => !disabled && setIsOpen((prev) => !prev)}
+        disabled={disabled}
+        className={`flex min-h-10 w-full items-center gap-2 rounded-2xl border px-3 py-2 text-right transition-all ${
+          isPresent
+            ? "cursor-not-allowed border-primary-500 bg-primary-50 ring-2 ring-primary-500/20"
+            : disabled
+              ? "cursor-not-allowed border-[#EBEBEB] bg-grey-50 opacity-60"
+              : "cursor-pointer border-[#EBEBEB] bg-white hover:border-grey-300 hover:bg-grey-50/50"
+        }`}
         dir="rtl"
         aria-label="فتح منتقي السنة"
         aria-expanded={isOpen}
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-grey-500">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/icons/ui/calendar.svg"
-            alt=""
-            width={20}
-            height={20}
-            className="h-5 w-5 object-contain"
-          />
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+            isPresent ? "text-primary-500" : "text-grey-500"
+          }`}
+        >
+          {isPresent ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+              aria-hidden
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/icons/ui/calendar.svg"
+              alt=""
+              width={20}
+              height={20}
+              className="h-5 w-5 object-contain"
+            />
+          )}
         </span>
         <span
-          className={`flex-1 text-right text-sm ${displayValue ? "text-[#333]" : "text-grey-400"}`}
+          className={`flex-1 text-right text-sm ${
+            isPresent
+              ? "font-medium text-primary-500"
+              : displayValue
+                ? "text-[#333]"
+                : "text-grey-400"
+          }`}
         >
           {displayValue || placeholder}
         </span>

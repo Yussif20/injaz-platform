@@ -26,7 +26,8 @@ import {
   OnboardingProgressStepper,
   type OnboardingStep,
 } from "./OnboardingProgressStepper";
-import { GraduationYearPicker } from "./GraduationYearPicker";
+import { GraduationYearPicker, PRESENT_YEAR_VALUE } from "./GraduationYearPicker";
+import { EndYearLabelRow } from "./EndYearLabelRow";
 import { OnboardingDataModal } from "./OnboardingDataModal";
 import { QualificationCard } from "./QualificationCard";
 import { OnboardingImageCollage } from "./OnboardingImageCollage";
@@ -65,7 +66,7 @@ interface CareerJobData {
   jobTitle: string;
   stage: string;
   startYear: number;
-  endYear: number;
+  endYear: number | null;
 }
 
 // Qualification form schema
@@ -89,6 +90,7 @@ const careerJobSchema = z
   })
   .refine(
     (data) => {
+      if (data.endYear === PRESENT_YEAR_VALUE) return true;
       const start = parseInt(data.startYear, 10);
       const end = parseInt(data.endYear, 10);
       if (Number.isNaN(start) || Number.isNaN(end)) return true;
@@ -134,7 +136,10 @@ const generateYears = () => {
 const YEARS = generateYears();
 
 /** Format job year range for display: "2020 / 1442 ھ - 2024 / 1446 ھ" (Aug 1 for correct Gregorian↔Hijri alignment) */
-function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
+function formatJobYearRangeDisplay(
+  startYear: number,
+  endYear: number | null,
+): string {
   const fmt = (y: number) => {
     const dateInSecondHalf = new Date(y, 7, 1); // August 1
     const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
@@ -147,7 +152,7 @@ function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
       : y - 622;
     return `${y} / ${hijri} ھ`;
   };
-  return `${fmt(startYear)} - ${fmt(endYear)}`;
+  return `${fmt(startYear)} - ${endYear == null ? "حتى الآن" : fmt(endYear)}`;
 }
 
 export interface OnboardingFlowHandle {
@@ -267,7 +272,8 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
         jobTitle: data.jobTitle,
         stage: data.stage,
         startYear: parseInt(data.startYear),
-        endYear: parseInt(data.endYear),
+        endYear:
+          data.endYear === PRESENT_YEAR_VALUE ? null : parseInt(data.endYear),
       };
 
       if (editingCareerJob) {
@@ -333,7 +339,7 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
         jobTitle: job.jobTitle,
         stage: job.stage,
         startYear: job.startYear.toString(),
-        endYear: job.endYear.toString(),
+        endYear: job.endYear == null ? PRESENT_YEAR_VALUE : job.endYear.toString(),
       });
       setIsCareerModalOpen(true);
     };
@@ -812,13 +818,20 @@ export const OnboardingFlow = forwardRef<OnboardingFlowHandle>(
               name="endYear"
               control={careerJobForm.control}
               render={({ field }) => (
-                <div className="min-w-0 w-full">
-                  <GraduationYearPicker
+                <div className="min-w-0 w-full flex flex-col gap-2">
+                  <EndYearLabelRow
                     label={onboarding.careerJobs.endYearLabel}
+                    isPresent={field.value === PRESENT_YEAR_VALUE}
+                    onTogglePresent={(next) =>
+                      field.onChange(next ? PRESENT_YEAR_VALUE : "")
+                    }
+                  />
+                  <GraduationYearPicker
                     placeholder="إلى"
                     value={field.value}
                     onChange={field.onChange}
                     error={careerJobForm.formState.errors.endYear?.message}
+                    disabled={field.value === PRESENT_YEAR_VALUE}
                   />
                 </div>
               )}

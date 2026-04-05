@@ -8,7 +8,8 @@ import { z } from "zod";
 import { dashboardContent, authContent } from "@/content";
 import { Input, Select } from "@/shared/components/ui";
 import { OnboardingDataModal } from "@/features/auth/components/OnboardingDataModal";
-import { GraduationYearPicker } from "@/features/auth/components/GraduationYearPicker";
+import { GraduationYearPicker, PRESENT_YEAR_VALUE } from "@/features/auth/components/GraduationYearPicker";
+import { EndYearLabelRow } from "@/features/auth/components/EndYearLabelRow";
 import { QualificationCard } from "@/features/auth/components/QualificationCard";
 import Link from "next/link";
 import { ROUTES } from "@/config";
@@ -32,6 +33,7 @@ const jobSchema = z
   })
   .refine(
     (data) => {
+      if (data.endYear === PRESENT_YEAR_VALUE) return true;
       const start = parseInt(data.startYear, 10);
       const end = parseInt(data.endYear, 10);
       if (Number.isNaN(start) || Number.isNaN(end)) return true;
@@ -60,7 +62,10 @@ const EDUCATIONAL_STAGES = [
 ];
 
 /** Format job year range for display: "2020 / 1442 ھ - 2024 / 1446 ھ" (Aug 1 for correct Gregorian↔Hijri alignment) */
-function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
+function formatJobYearRangeDisplay(
+  startYear: number,
+  endYear: number | null,
+): string {
   const fmt = (y: number) => {
     const dateInSecondHalf = new Date(y, 7, 1); // August 1
     const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
@@ -73,7 +78,7 @@ function formatJobYearRangeDisplay(startYear: number, endYear: number): string {
       : y - 622;
     return `${y} / ${hijri} ھ`;
   };
-  return `${fmt(startYear)} - ${fmt(endYear)}`;
+  return `${fmt(startYear)} - ${endYear == null ? "حتى الآن" : fmt(endYear)}`;
 }
 
 export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
@@ -130,7 +135,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
         endYear:
           editingJob.endYear != null
             ? editingJob.endYear.toString()
-            : new Date().getFullYear().toString(),
+            : PRESENT_YEAR_VALUE,
       });
     } else {
       reset({
@@ -151,7 +156,10 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
         school: data.school,
         educationalStage: data.educationalStage,
         startYear: parseInt(data.startYear),
-        endYear: data.endYear ? parseInt(data.endYear) : null,
+        endYear:
+          data.endYear === PRESENT_YEAR_VALUE || !data.endYear
+            ? null
+            : parseInt(data.endYear),
       };
 
       if (editingJob) {
@@ -262,10 +270,7 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
             key={job.id}
             degree={(job.jobTitle ?? job.title ?? job.rank) || "وظيفة"}
             institution={job.school || "-"}
-            year={formatJobYearRangeDisplay(
-              job.startYear,
-              job.endYear ?? job.startYear,
-            )}
+            year={formatJobYearRangeDisplay(job.startYear, job.endYear ?? null)}
             onEdit={() => openEditModal(job)}
             onDelete={() => handleDeleteJob(job.id)}
           />
@@ -425,13 +430,20 @@ export const JobDataTab: React.FC<JobDataTabProps> = ({ onSave }) => {
             name="endYear"
             control={control}
             render={({ field }) => (
-              <div className="min-w-0 w-full">
-                <GraduationYearPicker
+              <div className="min-w-0 w-full flex flex-col gap-2">
+                <EndYearLabelRow
                   label={onboarding.careerJobs.endYearLabel}
+                  isPresent={field.value === PRESENT_YEAR_VALUE}
+                  onTogglePresent={(next) =>
+                    field.onChange(next ? PRESENT_YEAR_VALUE : "")
+                  }
+                />
+                <GraduationYearPicker
                   placeholder="إلى"
                   value={field.value}
                   onChange={field.onChange}
                   error={errors.endYear?.message}
+                  disabled={field.value === PRESENT_YEAR_VALUE}
                 />
               </div>
             )}
