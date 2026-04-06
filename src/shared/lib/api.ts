@@ -26,7 +26,7 @@ export const proxyApi = axios.create({
 export const API_ENDPOINTS = {
   // ── Auth (server-side, called from /api/auth/* routes) ──
   AUTH: {
-    LOGIN: "/api/Auth/login",
+    LOGIN: "/api/Auth/admin-login",
     ME: "/api/Me",
     REFRESH: "/api/Auth/refresh-token",
     CHANGE_PASSWORD: "/api/Auth/change-password",
