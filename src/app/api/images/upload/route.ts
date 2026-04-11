@@ -34,17 +34,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Pass-through the raw multipart body (see /api/me/image for rationale).
-    const contentType = request.headers.get("content-type");
+    // Get the form data from the request
+    const incomingFormData = await request.formData();
+    const imageFile = incomingFormData.get("file");
 
-    if (!contentType || !contentType.includes("multipart/form-data")) {
+    if (!imageFile) {
       return NextResponse.json(
-        { status: "Failure", message: "نوع الطلب غير صحيح", data: null },
+        { status: "Failure", message: "لم يتم تحديد صورة", data: null },
         { status: 400 }
       );
     }
 
-    const body = Buffer.from(await request.arrayBuffer());
+    // Re-create FormData for the backend request
+    const backendFormData = new FormData();
+    backendFormData.append("file", imageFile);
 
     // Build query params for backend
     const backendParams = new URLSearchParams();
@@ -53,15 +56,17 @@ export async function POST(request: NextRequest) {
     if (description) backendParams.append("description", description);
     if (displayOrder) backendParams.append("displayOrder", displayOrder);
 
+    // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
+    // Axios can throw when serialising native File objects in Node.js; fetch does not.
+    // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
     const fetchResponse = await fetch(
       `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES_UPLOAD}?${backendParams.toString()}`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": contentType,
         },
-        body,
+        body: backendFormData,
       }
     );
 

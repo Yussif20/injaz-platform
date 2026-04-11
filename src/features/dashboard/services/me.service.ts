@@ -104,7 +104,7 @@ export async function updateBasicInfo(
  */
 export async function uploadProfileImage(file: File): Promise<ImageUploadResponse> {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("image", file);
 
   const response = await axios.post<ImageUploadResponse>("/api/me/image", formData, {
     withCredentials: true, // send cookies (auth)

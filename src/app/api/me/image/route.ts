@@ -23,35 +23,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Pass-through the raw multipart body to the backend. We do NOT call
-    // request.formData() here — re-serialising a parsed FormData through
-    // undici on Node 20 was producing broken multipart that the backend
-    // silently rejected with an empty response body. Forwarding the raw
-    // bytes + the original Content-Type (which contains the client's
-    // boundary) is lossless and faster.
-    const contentType = request.headers.get("content-type");
+    // Get the form data from the request
+    const incomingFormData = await request.formData();
+    const imageFile = incomingFormData.get("image");
 
-    if (!contentType || !contentType.includes("multipart/form-data")) {
+    if (!imageFile) {
       return NextResponse.json(
-        { status: false, message: "نوع الطلب غير صحيح", data: null },
+        { status: false, message: "لم يتم تحديد صورة", data: null },
         { status: 400 }
       );
     }
 
-    const body = Buffer.from(await request.arrayBuffer());
+    // Backend expects multipart field name "file" (not "image")
+    const backendFormData = new FormData();
+    backendFormData.append("file", imageFile);
 
+    // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
+    // Axios can throw when serialising native File objects in Node.js; fetch does not.
+    // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
     const fetchResponse = await fetch(
       `${BACKEND_API_URL}${API_ENDPOINTS.MY_IMAGE}`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": contentType,
         },
-        body,
+        body: backendFormData,
       }
     );
 
+    // Read as text first so we can surface the backend's actual response
+    // (status + body + headers) in logs when something upstream — Railway's
+    // edge, Fastly, a WAF — intercepts the request and returns an empty
+    // response. The old code called fetchResponse.json() directly and would
+    // throw "Unexpected end of JSON input" with no context.
     const responseText = await fetchResponse.text();
 
     let responseData: ApiResponse<ImageUploadResponse> | null = null;
