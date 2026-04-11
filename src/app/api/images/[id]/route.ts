@@ -44,46 +44,58 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const contentType = request.headers.get("content-type") || "";
 
     if (contentType.includes("multipart/form-data")) {
-      const incomingFormData = await request.formData();
-      const imageFile = incomingFormData.get("file");
+      // Pass-through the raw multipart body (see /api/me/image for rationale).
+      const body = Buffer.from(await request.arrayBuffer());
 
-      if (imageFile) {
-        const backendFormData = new FormData();
-        backendFormData.append("file", imageFile);
-
-        // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
-        // Axios can throw when serialising native File objects in Node.js; fetch does not.
-        // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
-        const fetchResponse = await fetch(
-          `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: backendFormData,
-          }
-        );
-
-        const responseData = (await fetchResponse.json()) as ApiResponse<ProfileImage>;
-
-        if (isApiSuccess(responseData.status)) {
-          return NextResponse.json({
-            status: "Success",
-            message: responseData.message || "تم تحديث الصورة بنجاح",
-            data: responseData.data,
-          });
-        }
-
-        return NextResponse.json(
-          {
-            status: "Failure",
-            message: responseData.message || "فشل في تحديث الصورة",
-            errors: responseData.errors,
+      const fetchResponse = await fetch(
+        `${BACKEND_API_URL}${API_ENDPOINTS.IMAGES}/${id}?${backendParams.toString()}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": contentType,
           },
-          { status: fetchResponse.ok ? 400 : fetchResponse.status }
+          body,
+        }
+      );
+
+      const responseText = await fetchResponse.text();
+
+      let responseData: ApiResponse<ProfileImage> | null = null;
+      if (responseText) {
+        try {
+          responseData = JSON.parse(responseText);
+        } catch {
+          console.error(
+            "Backend returned non-JSON for PUT /api/Images/:id:",
+            fetchResponse.status,
+            responseText.slice(0, 500)
+          );
+        }
+      } else {
+        console.error(
+          "Backend returned empty body for PUT /api/Images/:id:",
+          fetchResponse.status,
+          Object.fromEntries(fetchResponse.headers.entries())
         );
       }
+
+      if (responseData && isApiSuccess(responseData.status)) {
+        return NextResponse.json({
+          status: "Success",
+          message: responseData.message || "تم تحديث الصورة بنجاح",
+          data: responseData.data,
+        });
+      }
+
+      return NextResponse.json(
+        {
+          status: "Failure",
+          message: responseData?.message || `فشل في تحديث الصورة (HTTP ${fetchResponse.status})`,
+          errors: responseData?.errors ?? (responseText ? [responseText.slice(0, 500)] : null),
+        },
+        { status: fetchResponse.ok ? 400 : fetchResponse.status }
+      );
     }
 
     // No file — update metadata only; still use fetch with empty FormData

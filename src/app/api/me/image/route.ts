@@ -23,38 +23,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the form data from the request
-    const incomingFormData = await request.formData();
-    const imageFile = incomingFormData.get("image");
+    // Pass-through the raw multipart body to the backend. We do NOT call
+    // request.formData() here — re-serialising a parsed FormData through
+    // undici on Node 20 was producing broken multipart that the backend
+    // silently rejected with an empty response body. Forwarding the raw
+    // bytes + the original Content-Type (which contains the client's
+    // boundary) is lossless and faster.
+    const contentType = request.headers.get("content-type");
 
-    if (!imageFile) {
+    if (!contentType || !contentType.includes("multipart/form-data")) {
       return NextResponse.json(
-        { status: false, message: "لم يتم تحديد صورة", data: null },
+        { status: false, message: "نوع الطلب غير صحيح", data: null },
         { status: 400 }
       );
     }
 
-    // Backend expects multipart field name "file" (not "image")
-    const backendFormData = new FormData();
-    backendFormData.append("file", imageFile);
+    const body = Buffer.from(await request.arrayBuffer());
 
-    // Use native fetch — handles File/Blob from request.formData() natively in Node.js 18+.
-    // Axios can throw when serialising native File objects in Node.js; fetch does not.
-    // Do NOT set Content-Type — fetch sets multipart/form-data with the correct boundary automatically.
     const fetchResponse = await fetch(
       `${BACKEND_API_URL}${API_ENDPOINTS.MY_IMAGE}`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": contentType,
         },
-        body: backendFormData,
+        body,
       }
     );
 
-    const responseData = (await fetchResponse.json()) as ApiResponse<ImageUploadResponse>;
+    const responseText = await fetchResponse.text();
 
-    if (isApiSuccess(responseData.status)) {
+    let responseData: ApiResponse<ImageUploadResponse> | null = null;
+    if (responseText) {
+      try {
+        responseData = JSON.parse(responseText);
+      } catch {
+        console.error(
+          "Backend returned non-JSON for /api/Me/image:",
+          fetchResponse.status,
+          responseText.slice(0, 500)
+        );
+      }
+    } else {
+      console.error(
+        "Backend returned empty body for /api/Me/image:",
+        fetchResponse.status,
+        Object.fromEntries(fetchResponse.headers.entries())
+      );
+    }
+
+    if (responseData && isApiSuccess(responseData.status)) {
       return NextResponse.json({
         status: true,
         message: responseData.message || "تم رفع الصورة بنجاح",
@@ -65,8 +84,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         status: false,
-        message: responseData.message || "فشل في رفع الصورة",
-        errors: responseData.errors,
+        message: responseData?.message || `فشل في رفع الصورة (HTTP ${fetchResponse.status})`,
+        errors: responseData?.errors ?? (responseText ? [responseText.slice(0, 500)] : null),
       },
       { status: fetchResponse.ok ? 400 : fetchResponse.status }
     );
@@ -74,7 +93,12 @@ export async function POST(request: NextRequest) {
     console.error("Upload image error:", error);
 
     return NextResponse.json(
-      { status: false, message: "حدث خطأ غير متوقع", data: null },
+      {
+        status: false,
+        message: "حدث خطأ غير متوقع",
+        data: null,
+        errors: error instanceof Error ? [error.message] : null,
+      },
       { status: 500 }
     );
   }

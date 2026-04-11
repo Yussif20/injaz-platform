@@ -62,20 +62,15 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Point to the exact Chrome for Testing binary
 ENV PUPPETEER_EXECUTABLE_PATH=/opt/chrome/chrome-binary
 
-# Copy the built app and its runtime dependencies (non-standalone mode: run via `next start`)
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
-COPY --from=builder /app/next.config.ts ./next.config.ts
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+# Copy standalone output and static/public assets.
+# The standalone server.js reads PORT and HOSTNAME from env automatically,
+# so Railway's dynamically injected $PORT works without any extra flags.
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
+ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Do NOT hardcode -p: Railway injects a dynamic $PORT env var and routes
-# traffic there. `next start` reads PORT from env automatically; hardcoding
-# -p 3000 makes the container listen on the wrong port and Railway's proxy
-# returns 502. PORT is still defaulted to 3000 for local `docker run` use.
-ENV PORT=3000
-CMD ["npx", "next", "start", "-H", "0.0.0.0"]
+CMD ["node", "server.js"]
