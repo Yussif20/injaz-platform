@@ -4,14 +4,22 @@
 
 import axios from "axios";
 
+// Strip any trailing slash so concatenation like `${BACKEND_API_URL}${endpoint}`
+// never produces a double slash. Railway forces a trailing slash on dashboard
+// URL inputs and some CDN/WAF rules can match paths differently when the raw
+// request is `//api/...` vs `/api/...`, so we normalize here once at boot.
+const stripTrailingSlash = (url: string) => url.replace(/\/+$/, "");
+
 // Backend API base URL (server-side; use in API routes)
-export const BACKEND_API_URL =
-  process.env.BACKEND_API_URL || "https://staging.enjazfile.com";
+export const BACKEND_API_URL = stripTrailingSlash(
+  process.env.BACKEND_API_URL || "https://staging.enjazfile.com"
+);
 
 /** Backend base URL for client (e.g. resolving relative imageUrl). Set NEXT_PUBLIC_API_URL if different from default. */
-export const PUBLIC_API_BASE_URL =
+export const PUBLIC_API_BASE_URL = stripTrailingSlash(
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
-  "https://staging.enjazfile.com";
+    "https://staging.enjazfile.com"
+);
 
 /**
  * Storage base URL for uploaded files (e.g. profile images on Backblaze S3).
@@ -19,9 +27,10 @@ export const PUBLIC_API_BASE_URL =
  * we prepend this URL so images load from the correct host.
  * Set NEXT_PUBLIC_STORAGE_URL if your uploads are on a different domain (e.g. S3/Backblaze).
  */
-export const PUBLIC_STORAGE_BASE_URL =
+export const PUBLIC_STORAGE_BASE_URL = stripTrailingSlash(
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_STORAGE_URL) ||
-  "https://enjazmo3alem-staging.s3.us-east-005.backblazeb2.com";
+    "https://enjazmo3alem-staging.s3.us-east-005.backblazeb2.com"
+);
 
 // Server-side axios instance (for API routes)
 export const serverApi = axios.create({
