@@ -71,7 +71,11 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
-ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-CMD ["npx", "next", "start", "-H", "0.0.0.0", "-p", "3000"]
+# Do NOT hardcode -p: Railway injects a dynamic $PORT env var and routes
+# traffic there. `next start` reads PORT from env automatically; hardcoding
+# -p 3000 makes the container listen on the wrong port and Railway's proxy
+# returns 502. PORT is still defaulted to 3000 for local `docker run` use.
+ENV PORT=3000
+CMD ["npx", "next", "start", "-H", "0.0.0.0"]
