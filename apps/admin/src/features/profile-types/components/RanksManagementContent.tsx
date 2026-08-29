@@ -18,7 +18,9 @@ import { SectionItemCard } from "./SectionItemCard";
 
 export function RanksManagementContent() {
   // ── Selected tab ──────────────────────────────────────────────────────────
-  const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
+  // The first profile type is selected until the reader picks another, so the selection is
+  // derived rather than written into state by an effect once the list arrives.
+  const [selectedTypeChoice, setSelectedTypeId] = useState<number | null>(null);
 
   // ── Modal / dialog state ──────────────────────────────────────────────────
   const [isAddTypeModalOpen, setIsAddTypeModalOpen] = useState(false);
@@ -36,6 +38,8 @@ export function RanksManagementContent() {
   // ── Data ──────────────────────────────────────────────────────────────────
   const { data: profileTypes = [], isLoading: isLoadingTypes } =
     useProfileTypes();
+
+  const selectedTypeId = selectedTypeChoice ?? profileTypes[0]?.id ?? null;
 
   const { data: selectedTypeData, isLoading: isLoadingSections } =
     useProfileTypeWithSections(selectedTypeId ?? undefined);
@@ -57,13 +61,6 @@ export function RanksManagementContent() {
     }
     return counts;
   }, [profilesData]);
-
-  // Auto-select first type on load
-  useEffect(() => {
-    if (profileTypes.length > 0 && selectedTypeId === null) {
-      setSelectedTypeId(profileTypes[0].id);
-    }
-  }, [profileTypes, selectedTypeId]);
 
   // ── Derived ───────────────────────────────────────────────────────────────
   const selectedType = profileTypes.find((t) => t.id === selectedTypeId);

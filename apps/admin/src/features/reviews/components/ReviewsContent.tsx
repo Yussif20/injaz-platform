@@ -14,7 +14,7 @@ const PAGE_SIZE = 10;
 
 export function ReviewsContent() {
   const { t } = useTranslation();
-  const reviewsT = t("reviews") as any;
+  const reviewsT = t("reviews");
   const { toast } = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);

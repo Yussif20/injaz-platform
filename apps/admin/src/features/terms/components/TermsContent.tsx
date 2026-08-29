@@ -11,7 +11,7 @@ import { PreviewModal } from "./PreviewModal";
 
 export function TermsContent() {
   const { t } = useTranslation();
-  const termsT = t("terms") as any;
+  const termsT = t("terms");
   const { toast } = useToast();
 
   const editorRef = useRef<HTMLDivElement>(null);

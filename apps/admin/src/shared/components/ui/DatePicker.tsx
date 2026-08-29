@@ -105,6 +105,13 @@ function jsDayToGridIndex(jsDay: number): number {
 
 // ─── DatePicker Component ─────────────────────────────────────────────────────
 
+/** The month the calendar should open on: the stored date, or today when there is none. */
+function calendarStart(value: string | undefined): Date {
+  if (!value) return new Date();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
 type CalendarMode = "gregorian" | "hijri";
 
 interface DatePickerProps {
@@ -130,6 +137,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   showModeToggle = true,
   inputBg,
 }) => {
+  // The calendar opens on the stored date when there is one, and on today otherwise. Both
+  // are known at first render, so they seed the state directly instead of being written by
+  // an effect afterwards — which used to open every populated picker on the current month
+  // for one frame before jumping to the saved date.
+  const initialDate = calendarStart(value);
+  const initialHijri = gregorianToHijri(initialDate);
+
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<CalendarMode>(defaultMode);
   const [selectedDate, setSelectedDate] = useState<Date | null>(
@@ -137,14 +151,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   );
   const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(null);
 
-  const [viewYear, setViewYear] = useState(new Date().getFullYear());
-  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
-  const [hijriViewYear, setHijriViewYear] = useState(
-    () => gregorianToHijri(new Date()).year,
-  );
-  const [hijriViewMonth, setHijriViewMonth] = useState(
-    () => gregorianToHijri(new Date()).month,
-  );
+  const [viewYear, setViewYear] = useState(initialDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialDate.getMonth());
+  const [hijriViewYear, setHijriViewYear] = useState(initialHijri.year);
+  const [hijriViewMonth, setHijriViewMonth] = useState(initialHijri.month);
 
   const [popupPos, setPopupPos] = useState<{ top: number; right: number; minWidth: number } | null>(null);
 
@@ -161,19 +171,22 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     });
   }, []);
 
-  useEffect(() => {
-    if (value) {
-      const d = new Date(value);
-      if (!isNaN(d.getTime())) {
-        setSelectedDate(d);
-        setViewYear(d.getFullYear());
-        setViewMonth(d.getMonth());
-        const h = gregorianToHijri(d);
-        setHijriViewYear(h.year);
-        setHijriViewMonth(h.month);
-      }
+  // Re-derive the position when the value changes underneath us (a form reset, or a parent
+  // loading its data late). Done during render rather than in an effect so the calendar is
+  // never briefly showing the previous date.
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    const d = value ? new Date(value) : null;
+    if (d && !isNaN(d.getTime())) {
+      const h = gregorianToHijri(d);
+      setSelectedDate(d);
+      setViewYear(d.getFullYear());
+      setViewMonth(d.getMonth());
+      setHijriViewYear(h.year);
+      setHijriViewMonth(h.month);
     }
-  }, [value]);
+  }
 
   useEffect(() => {
     if (!isOpen) return;

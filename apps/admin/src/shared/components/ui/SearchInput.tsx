@@ -16,12 +16,17 @@ export function SearchInput({
   placeholder = "بحث...",
   debounceMs = 300,
 }: SearchInputProps) {
+  // What the user is typing, which runs ahead of the committed `value` by up to the
+  // debounce interval. When `value` changes from outside — a cleared filter, a restored
+  // query — the box adopts it. Doing that during render rather than from an effect means
+  // the input never briefly shows the stale text after an external reset.
   const [localValue, setLocalValue] = useState(value);
+  const [lastValue, setLastValue] = useState(value);
 
-  // Sync external value changes
-  useEffect(() => {
+  if (value !== lastValue) {
+    setLastValue(value);
     setLocalValue(value);
-  }, [value]);
+  }
 
   // Debounced callback
   const debouncedOnChange = useCallback(

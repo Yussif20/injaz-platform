@@ -12,21 +12,8 @@ import {
 import { CircleDollarSign } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { TrendBadge } from "./TrendBadge";
+import { ChartTooltip } from "./ChartTooltip";
 import { useProfitChartData } from "../hooks";
-
-function CustomTooltip({ active, payload }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div
-        dir="rtl"
-        className="rounded-lg bg-primary-500 px-3 py-1.5 text-sm text-white shadow"
-      >
-        {payload[0].value.toLocaleString("ar-SA")} ريال
-      </div>
-    );
-  }
-  return null;
-}
 
 export function ProfitChart() {
   const { t } = useTranslation();
@@ -111,7 +98,10 @@ export function ProfitChart() {
               tickLine={false}
               tickFormatter={(v) => `${v} ®`}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,131,135,0.05)" }} />
+            <Tooltip
+              content={<ChartTooltip unit="ريال" />}
+              cursor={{ fill: "rgba(0,131,135,0.05)" }}
+            />
             <Bar
               dataKey="value"
               fill="#008387"

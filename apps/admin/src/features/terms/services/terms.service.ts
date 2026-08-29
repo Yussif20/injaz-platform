@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { ApiResponse } from "@/shared/types";
 import { API_ENDPOINTS, proxyApi } from "@/shared/lib/api";
 import { unwrapResponse } from "@/shared/lib/api-helpers";
@@ -9,8 +10,10 @@ export async function getTermsContent(): Promise<TermsContentDto | null> {
       API_ENDPOINTS.SYSTEM_PARAMETERS.TERMS_AND_CONDITIONS,
     );
     return unwrapResponse(response);
-  } catch (error: any) {
-    if (error?.response?.status === 404) return null;
+  } catch (error: unknown) {
+    // No terms saved yet is a normal state, not a failure. Anything else is a real error
+    // and is rethrown. axios.isAxiosError narrows this without an `any` cast.
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
     throw error;
   }
 }

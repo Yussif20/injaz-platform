@@ -12,21 +12,8 @@ import {
 import { FileText } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import { TrendBadge } from "./TrendBadge";
+import { ChartTooltip } from "./ChartTooltip";
 import { useFilesChartData } from "../hooks";
-
-function CustomTooltip({ active, payload }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div
-        dir="rtl"
-        className="rounded-lg bg-primary-500 px-3 py-1.5 text-sm text-white shadow"
-      >
-        {payload[0].value.toLocaleString("ar-SA")} ملف
-      </div>
-    );
-  }
-  return null;
-}
 
 export function FilesChart() {
   const { t } = useTranslation();
@@ -123,7 +110,7 @@ export function FilesChart() {
               tickLine={false}
               tickFormatter={(v) => `${v} ®`}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip unit="ملف" />} />
             <Area
               type="monotone"
               dataKey="value"

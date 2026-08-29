@@ -11,7 +11,7 @@ interface PaginationProps {
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   const { t } = useTranslation();
-  const ayT = t("academicYears") as any;
+  const ayT = t("academicYears");
   const paginationT = ayT.pagination;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);

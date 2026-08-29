@@ -44,13 +44,22 @@ function DonutChart({
   const cx = 32;
   const cy = 32;
   const circumference = 2 * Math.PI * r;
-  let offset = 0;
+
+  // Each arc begins where the previous one ended. That running total is derived per
+  // segment rather than accumulated into a variable while mapping: render must not
+  // reassign values it closes over, and the React Compiler stops optimizing a component
+  // where it sees that. A chart has a handful of segments, so recomputing is free.
+  const arcStart = (index: number) =>
+    segments
+      .slice(0, index)
+      .reduce((sum, s) => sum + (s.value / total) * circumference, 0);
+
   return (
     <svg width="64" height="64" viewBox="0 0 64 64">
       {segments.map((seg, i) => {
         const dash = (seg.value / total) * circumference;
         const gap = circumference - dash;
-        const el = (
+        return (
           <circle
             key={i}
             cx={cx}
@@ -60,12 +69,10 @@ function DonutChart({
             stroke={seg.color}
             strokeWidth="10"
             strokeDasharray={`${dash} ${gap}`}
-            strokeDashoffset={-offset}
+            strokeDashoffset={-arcStart(i)}
             transform="rotate(-90 32 32)"
           />
         );
-        offset += dash;
-        return el;
       })}
     </svg>
   );
@@ -85,17 +92,22 @@ function PieChart({
   const cx = size / 2;
   const cy = size / 2;
   const r = size / 2;
-  let cumulativeAngle = -90; // start from top
-
   const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  // As in DonutChart: the angle each slice starts at is derived from the slices before it,
+  // rather than carried in a variable that the map reassigns on every pass.
+  const START_ANGLE = -90; // twelve o'clock
+  const sliceStart = (index: number) =>
+    segments
+      .slice(0, index)
+      .reduce((sum, s) => sum + (s.value / total) * 360, START_ANGLE);
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       {segments.map((seg, i) => {
         const angle = (seg.value / total) * 360;
-        const startAngle = cumulativeAngle;
-        const endAngle = cumulativeAngle + angle;
-        cumulativeAngle = endAngle;
+        const startAngle = sliceStart(i);
+        const endAngle = startAngle + angle;
 
         const x1 = cx + r * Math.cos(toRad(startAngle));
         const y1 = cy + r * Math.sin(toRad(startAngle));

@@ -15,8 +15,8 @@ interface AddReviewModalProps {
 
 export function AddReviewModal({ isOpen, onClose }: AddReviewModalProps) {
   const { t } = useTranslation();
-  const modalT = (t("reviews") as any).modal;
-  const jobTitlesT = (t("reviews") as any).jobTitles;
+  const modalT = t("reviews").modal;
+  const jobTitlesT = t("reviews").jobTitles;
   const { toast } = useToast();
 
   const [rating, setRating] = useState(4);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Star, Check, Trash2, User } from "lucide-react";
 import { useTranslation } from "@/i18n/TranslationContext";
 import type { ReviewDto } from "../types/reviews.types";
@@ -44,11 +45,18 @@ export function ReviewCard({
   onDelete,
 }: ReviewCardProps) {
   const { t } = useTranslation();
-  const reviewsT = t("reviews") as any;
+  const reviewsT = t("reviews");
 
   const avatarUrl = resolveAvatarUrl(review.publicUrl, review.reviewerPhotoPath);
+
+  // "N days ago" is measured from a clock read once, when the card mounts. Calling
+  // Date.now() while rendering makes the output depend on when React happens to render,
+  // so the same card could disagree with itself between two passes; pinning it keeps
+  // render a pure function of props and state. Day granularity means the frozen reading
+  // stays correct far longer than anyone leaves this page open.
+  const [now] = useState(() => Date.now());
   const daysAgo = Math.floor(
-    (Date.now() - new Date(review.createdAt).getTime()) / 86400000,
+    (now - new Date(review.createdAt).getTime()) / 86400000,
   );
 
   return (

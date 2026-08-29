@@ -26,22 +26,31 @@ type LocalSubsection = {
 export function SectionItemCard({ section, onEdit, onDelete }: SectionItemCardProps) {
   const [expanded, setExpanded] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [rows, setRows] = useState<LocalSubsection[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const queryClient = useQueryClient();
   const createSubsection = useCreateSubsection();
   const updateSubsection = useUpdateSubsection();
 
-  useEffect(() => {
-    setRows(
-      section.subsections.map((s) => ({
-        id: s.id,
-        title: s.title,
-        maxImageCount: s.maxImageCount,
-      })),
-    );
-  }, [section.id]);
+  // `rows` is the editable working copy of this section's subsections. It is seeded on
+  // mount and re-seeded only when the card is showing a *different* section — keyed on the
+  // id, not the contents, so a refetch of the same section does not discard edits in
+  // progress. It used to start empty and be filled by an effect, so every card rendered
+  // once with no rows before its real ones appeared.
+  const rowsFromSection = () =>
+    section.subsections.map((s) => ({
+      id: s.id,
+      title: s.title,
+      maxImageCount: s.maxImageCount,
+    }));
+
+  const [rows, setRows] = useState<LocalSubsection[]>(rowsFromSection);
+  const [lastSectionId, setLastSectionId] = useState(section.id);
+
+  if (section.id !== lastSectionId) {
+    setLastSectionId(section.id);
+    setRows(rowsFromSection());
+  }
 
   const handleAddRow = () => {
     setRows((prev) => [...prev, { title: "", maxImageCount: null }]);

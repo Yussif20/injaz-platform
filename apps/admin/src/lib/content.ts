@@ -276,6 +276,9 @@ export const content = {
     auth: {
       login: {
         title: "Login",
+        description:
+          "Welcome to the Injaz Moalem dashboard. Sign in to review submissions and statistics.",
+        email: "Email address",
         phone: "Phone Number",
         phonePlaceholder: "05xxxxxxxx",
         password: "Password",
@@ -476,12 +479,24 @@ export function getTranslations(locale: Locale) {
   return content[locale];
 }
 
+/**
+ * Look up a namespace, optionally walking into it with a dotted key.
+ *
+ * The dotted path is a runtime string, so the walk itself cannot be typed beyond `unknown`
+ * — but `unknown` forces the caller to narrow, where the previous `any` let anything
+ * through unchecked. Returns `undefined` for a path that does not exist.
+ */
 export function getTranslation(
   locale: Locale,
   namespace: keyof (typeof content)[Locale],
   key?: string,
-) {
-  const ns = content[locale][namespace] as any;
+): unknown {
+  const ns: unknown = content[locale][namespace];
   if (!key) return ns;
-  return key.split(".").reduce((obj, k) => obj?.[k], ns);
+  return key
+    .split(".")
+    .reduce<unknown>(
+      (obj, k) => (obj as Record<string, unknown> | null | undefined)?.[k],
+      ns,
+    );
 }

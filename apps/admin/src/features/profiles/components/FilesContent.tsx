@@ -48,20 +48,25 @@ export function FilesContent() {
 
   // Academic year selector
   const { data: academicYears } = useAcademicYears();
-  const [selectedYearId, setSelectedYearId] = useState<number | undefined>(
-    undefined,
-  );
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
 
-  // Set default to active year (only on first load)
-  const [initialYearSet, setInitialYearSet] = useState(false);
-  useEffect(() => {
-    if (academicYears && academicYears.length > 0 && !initialYearSet) {
-      const active = academicYears.find((y) => y.status === "Active");
-      setSelectedYearId(active?.id ?? academicYears[0].id);
-      setInitialYearSet(true);
-    }
-  }, [academicYears, initialYearSet]);
+  // The filter shows the active year until the reader picks something else. "All years" is
+  // itself a choice and is represented by `undefined`, so the wrapper object is what
+  // distinguishes "chose all years" from "has not chosen yet" — a bare `undefined` could
+  // not tell those apart and would snap back to the active year.
+  //
+  // This replaces an effect plus an `initialYearSet` flag whose only job was to stop that
+  // effect running twice.
+  const [yearChoice, setYearChoice] = useState<{ id: number | undefined } | null>(
+    null,
+  );
+
+  const defaultYearId = useMemo(() => {
+    if (!academicYears || academicYears.length === 0) return undefined;
+    return academicYears.find((y) => y.status === "Active")?.id ?? academicYears[0].id;
+  }, [academicYears]);
+
+  const selectedYearId = yearChoice ? yearChoice.id : defaultYearId;
 
   const selectedYear = useMemo(
     () => academicYears?.find((y) => y.id === selectedYearId),
@@ -292,7 +297,7 @@ export function FilesContent() {
                 <div className="absolute left-0 top-full z-[9999] mt-1 w-max min-w-full overflow-hidden rounded-xl border border-grey-200 bg-white shadow-lg">
                   <button
                     onClick={() => {
-                      setSelectedYearId(undefined);
+                      setYearChoice({ id: undefined });
                       setYearDropdownOpen(false);
                       setFilters((prev) => ({ ...prev, PageNumber: 1 }));
                     }}
@@ -308,7 +313,7 @@ export function FilesContent() {
                     <button
                       key={year.id}
                       onClick={() => {
-                        setSelectedYearId(year.id);
+                        setYearChoice({ id: year.id });
                         setYearDropdownOpen(false);
                         setFilters((prev) => ({ ...prev, PageNumber: 1 }));
                       }}

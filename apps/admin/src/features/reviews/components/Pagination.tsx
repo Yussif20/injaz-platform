@@ -20,7 +20,7 @@ export function Pagination({
   onPageChange,
 }: PaginationProps) {
   const { t } = useTranslation();
-  const paginationT = (t("reviews") as any).pagination;
+  const paginationT = t("reviews").pagination;
 
   // Show a window of pages with ellipsis
   const getVisiblePages = () => {

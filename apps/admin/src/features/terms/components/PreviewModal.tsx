@@ -11,7 +11,7 @@ interface PreviewModalProps {
 
 export function PreviewModal({ isOpen, onClose, html }: PreviewModalProps) {
   const { t } = useTranslation();
-  const termsT = t("terms") as any;
+  const termsT = t("terms");
 
   if (!isOpen) return null;
 
