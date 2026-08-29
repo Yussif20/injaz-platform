@@ -154,10 +154,19 @@ begin
       now() - interval '1 day'
     );
 
+    -- The token columns are set to '' rather than left null on purpose. GoTrue scans them
+    -- into Go strings, and a null produces
+    --   "Scan error on column index 3, name \"confirmation_token\":
+    --    converting NULL to string is unsupported"
+    -- which surfaces at the API as a 500 "Database error querying schema" — a message that
+    -- says nothing about the actual cause. Seeding auth.users by hand means supplying
+    -- these; the sign-up endpoint would have done it for us.
     insert into auth.users (
       id, instance_id, aud, role, email, encrypted_password,
       email_confirmed_at, created_at, updated_at,
-      raw_app_meta_data, raw_user_meta_data
+      raw_app_meta_data, raw_user_meta_data,
+      confirmation_token, recovery_token, email_change,
+      email_change_token_new, email_change_token_current
     ) values (
       new_id,
       '00000000-0000-0000-0000-000000000000',
@@ -168,8 +177,29 @@ begin
       crypt('demo-password-1234', gen_salt('bf')),
       created, created, created,
       '{"provider":"email","providers":["email"]}',
-      json_build_object('full_name', display_name)::jsonb
+      json_build_object('full_name', display_name)::jsonb,
+      '', '', '', '', ''
     );
+
+    -- GoTrue resolves an email login through auth.identities, not auth.users alone. Without
+    -- a matching row the account exists but cannot sign in.
+    -- auth.identities.email is a generated column derived from identity_data, so it is
+    -- deliberately not listed here; supplying it is rejected outright.
+    insert into auth.identities (
+      id, user_id, provider_id, provider, identity_data,
+      last_sign_in_at, created_at, updated_at
+    )
+    select
+      gen_random_uuid(), u.id, u.id::text, 'email',
+      jsonb_build_object(
+        'sub', u.id::text,
+        'email', u.email,
+        'email_verified', true,
+        'phone_verified', false
+      ),
+      created, created, created
+    from auth.users u
+    where u.id = new_id;
 
     -- handle_new_user has now created the accounts row; fill in the rest.
     update public.accounts
