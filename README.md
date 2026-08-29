@@ -6,9 +6,12 @@ build achievement portfolios and share them as a public link or a generated PDF.
 This repository merges two client applications that previously lived apart, and replaces a
 .NET backend that no longer exists.
 
-> **Status: in progress.** The audit is complete and the histories are imported; the
-> backend replacement and the rewiring are not done yet. This README is a placeholder and
-> will be rewritten once there is something deployed to describe.
+> **Status: in progress.** The audit, the monorepo and the replacement backend are done and
+> verified; the apps are not yet rewired onto it and nothing is deployed. This README is a
+> placeholder and will be rewritten once there is something live to describe.
+>
+> **[docs/progress.md](docs/progress.md) is the current state** — what is finished, what is
+> next, and how to get back in. Start there.
 
 ## What this repository is
 
