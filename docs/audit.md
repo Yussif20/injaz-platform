@@ -229,10 +229,38 @@ git ls-files | grep -iE 'playwright|e2e|\.spec\.|\.test\.'   # (nothing)
 
 Neither app contains a test of any kind.
 
-**b. `eslint-config-next@^0.2.4` on a Next 16 app.** Confirmed installed at that version —
-a package roughly eight years older than the framework it is meant to configure. `npm run
-lint` therefore runs with essentially none of Next's rules. The sibling app shows what the
-value should be: `injaz-dashboard` pins `eslint-config-next@16.1.6`.
+**b. `npm run lint` has never run at all.** `apps/teacher` declared
+`eslint-config-next@^0.2.4` — a package roughly eight years older than the framework it is
+meant to configure — while `eslint.config.mjs` imports the Next 16 subpaths. The result is
+not a weak ruleset but a hard crash, before a single file is examined:
+
+```
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module
+  '.../apps/teacher/node_modules/eslint-config-next/core-web-vitals'
+  imported from .../apps/teacher/eslint.config.mjs
+Did you mean to import "eslint-config-next/dist/core-web-vitals.js"?
+```
+
+The sibling app shows the intended value — `injaz-dashboard` pins `eslint-config-next@16.1.6`.
+
+The monorepo made the discrepancy structural: after importing both apps, the *only* package
+npm could not hoist was `eslint-config-next`, because 0.2.4 and 16.1.6 conflict.
+
+**Pinning it to 16.1.6 turned a crash into 308 files linted, 19 errors and 46 warnings** —
+none of which had ever been visible. The errors are not cosmetic:
+
+| Count | Rule |
+|---|---|
+| 15 | `react-hooks/set-state-in-effect` — synchronous `setState` in an effect, cascading renders |
+| 2 | `@typescript-eslint/no-explicit-any` |
+| 1 | `react-hooks/preserve-manual-memoization` — React Compiler skipped optimizing `DatePicker.tsx` |
+| 1 | `prefer-const` |
+
+`apps/admin`, whose config was correct all along, reports a further **21 errors and 46
+warnings** — so lint was never enforced there either. Neither repository has CI.
+
+Across both apps, `@next/next/no-img-element` fires **23 times**, independently
+corroborating §8.
 
 **c. "Never hardcode Arabic text in components"** (`CLAUDE.md`, Content Management) —
 violated in **133 `.tsx` files**, while `src/content/ar/` holds only 6 files and 1,085
