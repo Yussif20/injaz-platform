@@ -1,0 +1,346 @@
+/**
+ * User profile types for Me endpoints
+ * Based on backend API: https://staging.enjazfile.com/swagger
+ */
+
+// Re-export Gender from auth (will be updated to match backend)
+export { Gender } from "@/features/auth";
+
+// ============================================
+// Personal Info
+// ============================================
+
+/**
+ * Personal information from /api/Me/personal-info
+ */
+export interface PersonalInfo {
+  rankId: number | null;
+  rankTitleMale: string | null;
+  rankTitleFemale: string | null;
+  rankTitle: string | null;
+  nationalId: string | null;
+  birthDate: string | null;
+  address: string | null;
+  phoneNumber: string | null;
+  email: string | null;
+}
+
+/**
+ * Request body for PUT /api/Me/personal-info
+ * Note: Backend requires birthDate and address, but for partial updates
+ * (like just updating email), we make them optional here.
+ * Full personal info form should provide all required fields.
+ */
+export interface UpdatePersonalInfoRequest {
+  rankId?: number;
+  nationalId?: string; // 10 digits
+  birthDate?: string; // ISO date - Required by backend for full update
+  address?: string; // Max 500 chars - Required by backend for full update
+  phoneNumber?: string; // contact/WhatsApp number (stored in personal info)
+  email?: string;
+}
+
+// ============================================
+// Qualifications
+// ============================================
+
+/**
+ * Qualification/Education entry
+ */
+export interface Qualification {
+  id: number;
+  degreeType: string | null;
+  title?: string | null; // deprecated, use major
+  major?: string | null; // التخصص
+  institution?: string | null;
+  grade: string | null;
+  graduationDate: string; // ISO date
+}
+
+/**
+ * Request body for POST /api/my-qualifications
+ */
+export interface CreateQualificationRequest {
+  degreeType?: string;
+  institution?: string;
+  major?: string;
+  grade?: string;
+  graduationDate: string; // ISO date - Required
+}
+
+/**
+ * Request body for PUT /api/my-qualifications/{id}
+ */
+export interface UpdateQualificationRequest {
+  degreeType?: string;
+  institution?: string;
+  major?: string;
+  grade?: string;
+  graduationDate: string; // ISO date - Required
+}
+
+// ============================================
+// Career Jobs
+// ============================================
+
+/**
+ * Career/Job history entry
+ */
+export interface CareerJob {
+  id: number;
+  title?: string | null; // job title (backend may return as jobTitle or title)
+  jobTitle?: string | null;
+  rank?: string | null; // deprecated, use title/jobTitle
+  school: string | null;
+  educationalStage: string | null;
+  startYear: number;
+  endYear: number | null;
+}
+
+/**
+ * Request body for POST /api/my-career-jobs
+ */
+export interface CreateCareerJobRequest {
+  jobTitle: string;
+  school: string;
+  educationalStage: string;
+  startYear: number; // 1900-2100
+  endYear?: number | null; // 1900-2100
+}
+
+/**
+ * Request body for PUT /api/my-career-jobs/{id}
+ */
+export interface UpdateCareerJobRequest {
+  jobTitle: string;
+  school: string;
+  educationalStage: string;
+  startYear: number; // 1900-2100
+  endYear?: number | null; // 1900-2100
+}
+
+// ============================================
+// Subscription
+// ============================================
+
+/**
+ * Payment status enum — matches backend API values
+ */
+export enum PaymentStatus {
+  Pending = 0,
+  Processing = 1,
+  Initiated = 2,
+  Completed = 3,
+  Failed = 4,
+  Unknown = 5,
+  Cancelled = 6,
+}
+
+/**
+ * Subscription discount info
+ */
+export interface SubscriptionDiscount {
+  id: number;
+  title: string | null;
+  discountPercentage: number;
+  endDate: string | null;
+  isActive: boolean;
+  createdAt: string | null;
+}
+
+/**
+ * User subscription details
+ * Note: paymentStatus from the API is a string ("Completed", "Failed", etc.), not a numeric enum.
+ */
+export interface Subscription {
+  id: number;
+  userId: number;
+  subscribedAt: string;
+  expiresAt: string;
+  baseAmount: number;
+  discountPercentage: number;
+  discountAmount: number;
+  finalAmount: number;
+  paymentStatus: string;
+  paymentMethod: string | null;
+  paymentTransactionId: string | null;
+  isActive: boolean;
+  daysRemaining: number;
+  appliedDiscount: SubscriptionDiscount | null;
+  // 3D Secure fields
+  requires3DSecure: boolean;
+  threeDSecureUrl: string | null;
+  paymentGatewayId: string | null;
+  paymentFee: number | null;
+  paymentCompletedAt: string | null;
+}
+
+/**
+ * Subscription info from GET /api/Subscriptions/info
+ */
+export interface SubscriptionInfo {
+  subscriptionFee: number;
+  discountPercentage: number;
+  finalAmount: number;
+  daysRemaining: number;
+  endDate: string;
+  isSubscriptionOpen: boolean;
+  activeDiscount: SubscriptionDiscount | null;
+}
+
+// ============================================
+// User Profile (Full)
+// ============================================
+
+/**
+ * Complete user profile from GET /api/Me/profile
+ * This is the main type for dashboard data display
+ */
+export interface UserProfile {
+  id: number;
+  phone: string | null;
+  fullName: string | null;
+  gender: number; // 1 = Male, 2 = Female (backend values)
+  role: string | null;
+  imageUrl: string | null;
+  personalInfo: PersonalInfo | null;
+  qualifications: Qualification[] | null;
+  careerJobs: CareerJob[] | null;
+  createdAt: string;
+  lastLogin: string | null;
+  isActive: boolean;
+  isSubscribed: boolean;
+  currentSubscription: Subscription | null;
+}
+
+/**
+ * Basic user info from GET /api/Me (JWT decoded, no DB query)
+ */
+export interface BasicUserInfo {
+  id: number;
+  phone: string;
+  fullName: string;
+  gender: number;
+  role: string;
+}
+
+// ============================================
+// Basic Info Update
+// ============================================
+
+/**
+ * Request body for PUT /api/Me/basic-info
+ */
+export interface UpdateBasicInfoRequest {
+  fullName?: string;
+  gender?: number; // 1 = Male, 2 = Female
+}
+
+// ============================================
+// Profile Completeness
+// ============================================
+
+/**
+ * Profile completeness check response from GET /api/Me/profile-completeness
+ */
+export interface ProfileCompleteness {
+  isComplete: boolean;
+  isPersonalDataComplete: boolean;
+  hasCareerJobs: boolean;
+  hasQualifications: boolean;
+  missingFields: string[];
+  message: string;
+}
+
+// ============================================
+// Change Password
+// ============================================
+
+/**
+ * Request body for POST /api/Auth/change-password
+ */
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+// ============================================
+// API Response Wrapper
+// ============================================
+
+/**
+ * Standard API response wrapper
+ */
+export interface MeApiResponse<T> {
+  status: "Success" | "Failure" | string | boolean;
+  message: string;
+  data: T;
+  errors: string[] | null;
+}
+
+// ============================================
+// Helper Functions
+// ============================================
+
+/**
+ * Get display-friendly gender label
+ */
+export function getGenderLabel(
+  gender: number | null | undefined,
+  locale: "ar" | "en" = "ar",
+): string {
+  if (gender === 1) return locale === "ar" ? "ذكر" : "Male";
+  if (gender === 2) return locale === "ar" ? "أنثى" : "Female";
+  return locale === "ar" ? "غير محدد" : "Not specified";
+}
+
+/**
+ * Convert backend gender (1=Male, 2=Female) to form value
+ */
+export function genderToFormValue(
+  gender: number | null | undefined,
+): "male" | "female" | "" {
+  if (gender === 1) return "male";
+  if (gender === 2) return "female";
+  return "";
+}
+
+/**
+ * Convert form value to backend gender
+ */
+export function formValueToGender(
+  value: "male" | "female" | "",
+): number | undefined {
+  if (value === "male") return 1;
+  if (value === "female") return 2;
+  return undefined;
+}
+
+/**
+ * Format date for display (Arabic locale)
+ */
+export function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ar-SA");
+  } catch {
+    return dateString;
+  }
+}
+
+/**
+ * Get rank title based on gender
+ */
+export function getRankTitle(
+  personalInfo: PersonalInfo | null,
+  gender: number,
+): string {
+  if (!personalInfo) return "";
+  if (gender === 1 && personalInfo.rankTitleMale)
+    return personalInfo.rankTitleMale;
+  if (gender === 2 && personalInfo.rankTitleFemale)
+    return personalInfo.rankTitleFemale;
+  return personalInfo.rankTitle || "";
+}

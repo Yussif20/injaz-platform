@@ -1,0 +1,103 @@
+/**
+ * API configuration and axios instance
+ */
+
+import axios from "axios";
+
+// Strip any trailing slash so concatenation like `${BACKEND_API_URL}${endpoint}`
+// never produces a double slash. Railway forces a trailing slash on dashboard
+// URL inputs and some CDN/WAF rules can match paths differently when the raw
+// request is `//api/...` vs `/api/...`, so we normalize here once at boot.
+const stripTrailingSlash = (url: string) => url.replace(/\/+$/, "");
+
+// Backend API base URL (server-side; use in API routes)
+export const BACKEND_API_URL = stripTrailingSlash(
+  process.env.BACKEND_API_URL || "https://staging.enjazfile.com"
+);
+
+/** Backend base URL for client (e.g. resolving relative imageUrl). Set NEXT_PUBLIC_API_URL if different from default. */
+export const PUBLIC_API_BASE_URL = stripTrailingSlash(
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
+    "https://staging.enjazfile.com"
+);
+
+/**
+ * Storage base URL for uploaded files (e.g. profile images on Backblaze S3).
+ * When the backend returns a relative path like "uploads/users/10/xxx.jpg",
+ * we prepend this URL so images load from the correct host.
+ * Set NEXT_PUBLIC_STORAGE_URL if your uploads are on a different domain (e.g. S3/Backblaze).
+ */
+export const PUBLIC_STORAGE_BASE_URL = stripTrailingSlash(
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_STORAGE_URL) ||
+    "https://enjazmo3alem-staging.s3.us-east-005.backblazeb2.com"
+);
+
+// Server-side axios instance (for API routes)
+export const serverApi = axios.create({
+  baseURL: BACKEND_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 30000,
+});
+
+// Client-side axios instance (for calling Next.js API routes)
+export const clientApi = axios.create({
+  baseURL: "",
+  timeout: 30000,
+});
+
+// API endpoints
+export const API_ENDPOINTS = {
+  // Auth endpoints (backend)
+  LOGIN: "/api/Auth/login",
+  REGISTER: "/api/Auth/register",
+  REGISTER_WITH_OTP: "/api/Auth/register-with-otp",
+  SEND_REGISTRATION_OTP: "/api/Auth/send-registration-otp",
+  VERIFY_REGISTRATION_OTP: "/api/Auth/verify-registration-otp",
+  SEND_PASSWORD_RESET_OTP: "/api/Auth/send-password-reset-otp",
+  RESET_PASSWORD_WITH_OTP: "/api/Auth/reset-password-with-otp",
+  CHANGE_PASSWORD: "/api/Auth/change-password",
+  REFRESH_TOKEN: "/api/Auth/refresh-token",
+
+  // Me endpoints (backend)
+  ME: "/api/Me",
+  MY_PROFILE: "/api/Me/profile",
+  MY_PERSONAL_INFO: "/api/Me/personal-info",
+  MY_BASIC_INFO: "/api/Me/basic-info",
+  MY_IMAGE: "/api/Me/image",
+  PROFILE_COMPLETENESS: "/api/Me/profile-completeness",
+
+  // Career Jobs endpoints (backend)
+  MY_CAREER_JOBS: "/api/my-career-jobs",
+
+  // Qualifications endpoints (backend)
+  MY_QUALIFICATIONS: "/api/my-qualifications",
+
+  // Profiles endpoints (backend)
+  MY_PROFILES: "/api/my-profiles",
+
+  // Reference Data endpoints (backend)
+  ACADEMIC_YEARS: "/api/AcademicYears",
+  ACADEMIC_YEARS_ACTIVE: "/api/AcademicYears/active",
+  PROFILE_TYPES: "/api/ProfileTypes",
+  PROFILE_TYPES_AVAILABLE: "/api/ProfileTypes/available",
+  PROFILE_TYPES_ACTIVE: "/api/ProfileTypes/active",
+  RANKS: "/api/Ranks",
+
+  // Profile Management endpoints (backend)
+  PROFILES: "/api/Profiles",
+
+  // Images endpoints (backend)
+  IMAGES: "/api/Images",
+  IMAGES_UPLOAD: "/api/Images/upload",
+
+  // Share Links endpoints (backend)
+  SHARE_LINKS: "/api/ShareLinks",
+
+  // Subscriptions endpoints (backend)
+  SUBSCRIPTION_INFO: "/api/Subscriptions/info",
+  SUBSCRIBE: "/api/Subscriptions/subscribe",
+  MY_SUBSCRIPTION: "/api/Subscriptions/my-subscription",
+  MY_SUBSCRIPTION_HISTORY: "/api/Subscriptions/my-history",
+} as const;

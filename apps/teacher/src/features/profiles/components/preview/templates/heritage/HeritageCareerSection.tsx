@@ -1,0 +1,89 @@
+"use client";
+
+import Image from "next/image";
+import type { ThemeColors } from "../../../../types/theme.types";
+import type { CareerJob } from "../../../../types/profile.types";
+
+interface HeritageCareerSectionProps {
+  careerJobs: CareerJob[] | null;
+  content: {
+    title: string;
+    subtitle: string;
+  };
+  theme: ThemeColors;
+}
+
+export const HeritageCareerSection = ({
+  careerJobs,
+  content,
+}: HeritageCareerSectionProps) => {
+  if (!careerJobs || careerJobs.length === 0) return null;
+
+  const heritageSubtitle = "تعرف على البيانات الوظيفية الخاصة بي";
+
+  // Format year range
+  const formatYearRange = (startYear: number, endYear: number | null) => {
+    if (endYear) {
+      return `${endYear} - ${startYear}`;
+    }
+    return `الآن - ${startYear}`;
+  };
+
+  return (
+    <div className="px-4 py-6">
+      {/* Section Header */}
+      <div className="flex items-start justify-start gap-2 md:gap-3 mb-4 md:mb-8 border-r-2 border-[#602726] pr-3 md:pr-6">
+        <div className="text-right flex flex-col gap-2 md:gap-4">
+          <h2 className="text-lg md:text-2xl lg:text-[28px] font-normal text-text-dark flex items-center gap-2 justify-start">
+            {content.title}
+          </h2>
+          <p className="text-sm md:text-lg lg:text-xl font-light text-text-muted">
+            {heritageSubtitle}
+          </p>
+        </div>
+      </div>
+
+      {/* Career Cards */}
+      <div className="space-y-2 md:space-y-7 bg-white rounded-[38px] border-2 border-[#E5E5E5]">
+        <div className="w-full bg-[#B2BAAF] rounded-t-[38px] py-4">
+          <div
+            className="h-8.75 md:h-14.5 lg:h-16.25 bg-[url('/images/profiles/heritage/pattern-dark.svg')] bg-repeat-space bg-center bg-size-[auto_35px] md:bg-size-[auto_58px] lg:bg-size-[auto_65px]"
+            aria-hidden="true"
+          ></div>
+        </div>
+
+        {careerJobs.map((job) => (
+          <div key={job.id} className="rounded-[36px] overflow-hidden flex">
+            {/* Diamond Pattern - Full Height Border */}
+
+            {/* Content */}
+            <div className="flex-1 flex  items-stretch justify-start py-4 px-4 gap-1 md:gap-6">
+              <div className="w-1 md:w-2 shrink-0 relative scale-x-[-1]">
+                <Image
+                  src="/images/profiles/heritage/diamond-pattern.svg"
+                  alt="diamond pattern"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Text Content */}
+              <div className="text-right flex flex-col gap-1 md:gap-4.5">
+                <h3 className="text-text-dark text-sm md:text-2xl lg:text-[28px] font-normal">
+                  {job.jobTitle ?? job.title ?? job.rank ?? ""}
+                </h3>
+                <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
+                  {job.school}
+                  {job.educationalStage && ` - ${job.educationalStage}`}
+                </p>
+                <p className="text-text-muted text-xs md:text-xl lg:text-2xl font-light md:font-normal">
+                  {formatYearRange(job.startYear, job.endYear)} •
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
