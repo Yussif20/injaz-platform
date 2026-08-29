@@ -35,3 +35,7 @@ yarn-error.log*
 
 # Local agent settings
 .claude/settings.local.json
+
+# Supabase local stack
+supabase/.branches
+supabase/.temp
