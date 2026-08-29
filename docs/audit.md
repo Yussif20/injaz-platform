@@ -372,3 +372,63 @@ One smell hiding in the good pile: `graduationDate: \`${year}-06-15\`` — a fab
 
 Seven of the eight are fixable in ways that can be demonstrated rather than asserted.
 Findings 3 and 4 carry the rebuild's story.
+
+---
+
+## Addendum — what fixing the lint errors uncovered
+
+Enabling the linter was itself an audit step. Two defects surfaced that no amount of
+reading the source had found, and neither would ever have shown up as a failing build.
+
+**A botched paste, invisible for the life of the project.** In the teacher app's
+`DatePicker.tsx`, `formatHijriDisplay` had been pasted into the *middle* of
+`hijriStringToGregorianDate`, splitting that function around it:
+
+```ts
+function hijriStringToGregorianDate(hijriYMD: string): Date {
+  const [y, m, d] = hijriYMD.split("-").map((x) => parseInt(x, 10));
+  const day1 = findGregorianForHijriDay1(y, m);
+function formatHijriDisplay(hijriYMD: string): string {   // <- nested, never called
+  ...
+}
+
+  return new Date(day1.getTime() + (d - 1) * 86400000);   // <- tail of the outer function
+}
+```
+
+Nested function declarations are legal JavaScript, so this compiled, typechecked and ran
+correctly for the project's entire history — the module-level `formatHijriDisplay` defined
+further down is the one every caller reached. Only `no-unused-vars` could see it, and
+`no-unused-vars` had never run.
+
+**Two translation keys exist in Arabic but not English.** The admin app's translation
+helper returned `any`, so eight call sites wrote `t("reviews") as any`. Making it generic
+over the namespace removed every cast — and the compiler immediately rejected two property
+reads. A full key diff confirms the extent:
+
+```
+ar keys: 171 | en keys: 169
+in ar but missing in en:  auth.login.description, auth.login.email
+in en but missing in ar:  (none)
+```
+
+Harmless today, because `DEFAULT_LOCALE` is `"ar"` and nothing switches it. Both would have
+rendered blank the moment English was turned on — which is precisely what §4 proposes
+doing. The `any` was hiding it; the type restored it. This is the playbook's *"diff the key
+sets between locales"* check arriving by a different route.
+
+**Not fixed, flagged for a decision:** `ar.auth.login.phonePlaceholder` is
+`"مثال: mohammed@gmail.com"` — an email address offered as the example for a phone number
+field. The English equivalent is `"05xxxxxxxx"`. This is user-facing copy rather than a
+defect in code, so it is left as-is pending a call on the right Saudi format.
+
+### Result
+
+| App | Errors before | Errors after | Warnings (untouched) |
+|---|---|---|---|
+| `apps/teacher` | 19 | **0** | 46 |
+| `apps/admin` | 21 | **0** | 47 |
+
+Both apps typecheck. Behaviour is unchanged throughout, with one intended improvement: a
+number of components previously rendered once with empty or default content and were
+corrected by an effect immediately afterwards. Those now render correctly the first time.
