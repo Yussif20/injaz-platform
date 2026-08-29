@@ -8,7 +8,7 @@ An Arabic educational platform empowering teachers to create, manage, and share 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-[Live Demo](https://enjazfile.com/) · [Documentation](./docs/PROJECT.md) · [Report Bug](#)
+[Documentation](./docs/PROJECT.md)
 
 ---
 
@@ -208,4 +208,4 @@ This project is proprietary software. All rights reserved.
 
 ---
 
-**Built with by [the client](#)**
+**Originally built for a client; rebuilt here as a portfolio piece.**

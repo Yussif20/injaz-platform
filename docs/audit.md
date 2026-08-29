@@ -15,12 +15,12 @@ inferred from reading the source alone.
 achievement portfolios (career history, qualifications, evidence images) and share them as
 a public link or a generated PDF. Subscriptions billed through Moyasar.
 
-Two apps, one client, one backend, both under `the client` on GitHub:
+Two apps, one client, one backend, both private repositories belonging to the client:
 
-| App | Repo | Lines | Files | Last commit |
-|---|---|---|---|---|
-| `injaz-almoalem` (teacher-facing) | `the teacher app` | 33,987 | 306 | 2026-04-13 |
-| `injaz-dashboard` (admin) | `the admin app` | 16,272 | 189 | 2026-04-07 |
+| App | Lines | Files | Last commit |
+|---|---|---|---|
+| teacher-facing | 33,987 | 306 | 2026-04-13 |
+| staff-facing (admin) | 16,272 | 189 | 2026-04-07 |
 
 **50,259 lines total.** Both Next 16.1.6 / React 19.2.3 / Tailwind 4 / TanStack Query /
 React Hook Form + Zod, deployed on Railway via Docker.

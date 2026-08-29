@@ -144,10 +144,10 @@ Listed now so there are no surprises. Nothing here is actionable until the apps 
 
 ## 4. Decisions only you can make
 
-**Attribution.** Both repositories sit under `the client`. Before anything goes public,
-either get their explicit sign-off on being named, or describe it anonymised — "a Saudi
-edtech company" keeps the credibility without the exposure. This gates the portfolio entry,
-not the code.
+**Attribution.** The client is not named anywhere in this repository, deliberately. Before
+naming them in a portfolio entry or anywhere else public, get their explicit sign-off; "a
+Saudi edtech company" keeps the credibility without the exposure. This gates the portfolio
+entry, not the code.
 
 **One piece of Arabic copy.** `ar.auth.login.phonePlaceholder` in the admin app is
 `"مثال: mohammed@gmail.com"` — an email address offered as the example for a phone number

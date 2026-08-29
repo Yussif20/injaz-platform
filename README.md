@@ -16,8 +16,8 @@ Two applications, one client, one backend:
 
 | Path | Was | Purpose |
 |---|---|---|
-| `apps/teacher` | `the teacher app` | Teachers build and share portfolios |
-| `apps/admin`   | `the admin app` | Staff review profiles and subscriptions |
+| `apps/teacher` | teacher-facing app | Teachers build and share portfolios |
+| `apps/admin`   | staff-facing app | Staff review profiles and subscriptions |
 
 Both histories were imported with `git subtree`, so all 197 original commits are preserved
 and the original repositories are left online untouched as archives.
