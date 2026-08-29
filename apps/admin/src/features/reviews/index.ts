@@ -1,0 +1,1 @@
+export { ReviewsContent } from "./components";
