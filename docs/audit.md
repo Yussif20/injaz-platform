@@ -432,3 +432,68 @@ defect in code, so it is left as-is pending a call on the right Saudi format.
 Both apps typecheck. Behaviour is unchanged throughout, with one intended improvement: a
 number of components previously rendered once with empty or default content and were
 corrected by an effect immediately afterwards. Those now render correctly the first time.
+
+---
+
+## Addendum 2 — what building the replacement backend uncovered
+
+Reproducing the admin dashboard meant reading how it currently gets its numbers. Three
+defects, all in `apps/admin/src/features/reports/services/reports.service.ts`.
+
+**Four of the eight dashboard figures were never computed.** Beside four measured values
+sit four literals:
+
+```ts
+return {
+  totalProfits,
+  totalProfitsChange: 30,        // placeholder
+  newUsersCount: totalUsers,
+  newUsersChange: -15,           // placeholder
+  activeSubscribersCount: activeSubscribers,
+  subscribersChange: 20,         // placeholder
+  publishedFilesCount,
+  filesChange: 10,               // placeholder
+};
+```
+
+They render as trend badges, styled identically to the real figures beside them. Staff
+reading the dashboard had no way to tell which four of the eight numbers were measurements
+and which were invented. This is the most consequential finding in the audit: the others
+are defects, this one is a dashboard that misreports the business.
+
+**The revenue chart merged years.** `getProfitChartData()` bucketed by `date.getMonth()`,
+which returns 0–11 with no year attached:
+
+```ts
+const monthIndex = date.getMonth();
+monthlyData[months[monthIndex]] += sub.finalAmount || 0;
+```
+
+Every January of every year summed into one bar. The chart was correct in the product's
+first twelve months and got quietly wronger every month after.
+
+**The dashboard downloaded the subscriptions table to add up one column.** `getDashboardStats()`
+made four HTTP round-trips, one of them `GET /Subscriptions` — every row, unpaginated — so
+the browser could run `reduce((sum, sub) => sum + sub.finalAmount, 0)`. `getLatestSubscriptions()`
+added an N+1 on top: ten subscriptions, then one `GET /Users/{id}` per distinct subscriber
+to resolve names and avatars, for eleven requests to render a sidebar list.
+
+All three are answered by `supabase/migrations/0004_statistics.sql`: one `GROUP BY` per
+question, computed where the data is. Trends are real percentages, buckets carry their
+year, and `percent_change` returns null rather than inventing a figure when there is no
+base to compare against — the dashboard renders that as a dash.
+
+### Phase 2 verification
+
+| What | How | Result |
+|---|---|---|
+| Security boundary | 30 pgTAP assertions, every role, PostgREST's own session mechanism | pass |
+| Contract fidelity | 27 checks against the captured OpenAPI | pass |
+| Harness can fail | enum deliberately mis-mapped; verification reported FAIL | confirmed |
+| `@supabase/ssr` pairing | type probe on `rpc()` argument inference | caught a real mismatch |
+
+The last one is worth keeping: `@supabase/ssr@0.5.2` against `@supabase/supabase-js@2.112.4`
+silently dropped the `Database` generic, typing every `rpc()` argument as `undefined`. No
+error, no warning — the only symptom is that argument checking quietly stops. Upgrading to
+0.12.5 fixed it, and `packages/db/src/supabase-version-guard.ts` now fails the typecheck if
+the pair drifts apart again.
