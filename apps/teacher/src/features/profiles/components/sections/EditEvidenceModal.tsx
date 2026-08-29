@@ -26,30 +26,16 @@ export const EditEvidenceModal: React.FC<EditEvidenceModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [imageTitle, setImageTitle] = useState("");
+  // The parent mounts this modal only while it is open, so the form is seeded from the
+  // image being edited at mount and discarded on close. Previously two effects did this
+  // work — one to fill the form on open, one to blank it on close — and each cost an extra
+  // render, with a frame in between where the modal showed the *previous* image's title.
+  const [imageTitle, setImageTitle] = useState(() => image?.description ?? "");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    () => image?.publicUrl ?? null
+  );
   const [errors, setErrors] = useState<{ title?: string; image?: string }>({});
-
-  // Initialize form with existing image data when modal opens
-  useEffect(() => {
-    if (isOpen && image) {
-      setImageTitle(image.description || "");
-      setImagePreview(image.publicUrl ?? null);
-      setSelectedImage(null);
-      setErrors({});
-    }
-  }, [isOpen, image]);
-
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setImageTitle("");
-      setSelectedImage(null);
-      setImagePreview(null);
-      setErrors({});
-    }
-  }, [isOpen]);
 
   // Handle escape key
   useEffect(() => {

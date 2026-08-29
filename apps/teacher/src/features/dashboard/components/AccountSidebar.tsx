@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { dashboardContent } from "@/content";
 import { ROUTES } from "@/config";
+import { useExpandedMenus } from "../hooks/useExpandedMenus";
 
 interface SubNavItem {
   label: string;
@@ -23,19 +24,7 @@ interface AccountNavItem {
 export const AccountSidebar: React.FC = () => {
   const pathname = usePathname();
   const { accountSidebar } = dashboardContent;
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
-
-  // Auto-expand menus if on their pages
-  useEffect(() => {
-    const menusToExpand: string[] = [];
-    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION)) {
-      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION);
-    }
-    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA)) {
-      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA);
-    }
-    setExpandedMenus(menusToExpand);
-  }, [pathname]);
+  const { isExpanded, toggle } = useExpandedMenus(pathname);
 
   const navItems: AccountNavItem[] = [
     {
@@ -162,17 +151,8 @@ export const AccountSidebar: React.FC = () => {
     return pathname === href;
   };
 
-  const isMenuExpanded = (href: string) => {
-    return expandedMenus.includes(href);
-  };
-
-  const toggleMenu = (href: string) => {
-    if (isMenuExpanded(href)) {
-      setExpandedMenus(expandedMenus.filter((m) => m !== href));
-    } else {
-      setExpandedMenus([...expandedMenus, href]);
-    }
-  };
+  const isMenuExpanded = isExpanded;
+  const toggleMenu = toggle;
 
   return (
     <aside className="w-full lg:w-64 lg:h-[60vh] lg:overflow-y-auto bg-white rounded-xl lg:rounded-2xl p-4">

@@ -8,6 +8,7 @@ import { ROUTES } from "@/config";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/features/auth";
+import { useExpandedMenus } from "../hooks/useExpandedMenus";
 
 interface DashboardSidebarProps {
   isOpen?: boolean;
@@ -44,7 +45,8 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { logout, isLoading: isLoggingOut } = useLogout();
   const { sidebar, accountSidebar } = dashboardContent;
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
-  const [expandedNestedMenus, setExpandedNestedMenus] = useState<string[]>([]);
+  const { isExpanded: isNestedMenuExpanded, toggle: toggleNestedMenu } =
+    useExpandedMenus(pathname);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
@@ -52,24 +54,6 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   });
   const dropdownRef = useRef<HTMLLIElement>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Auto-expand nested menus based on current path (mobile)
-  useEffect(() => {
-    const menusToExpand: string[] = [];
-    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION)) {
-      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_SUBSCRIPTION);
-    }
-    if (pathname.startsWith(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA)) {
-      menusToExpand.push(ROUTES.DASHBOARD_ACCOUNT_PROFILE_DATA);
-    }
-    setExpandedNestedMenus(menusToExpand);
-  }, [pathname]);
-
-  const toggleNestedMenu = (href: string) => {
-    setExpandedNestedMenus((prev) =>
-      prev.includes(href) ? prev.filter((m) => m !== href) : [...prev, href]
-    );
-  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -521,7 +505,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                           const subActive = isAccountLinkActive(subitem);
                           const hasNestedSubmenu =
                             subitem.submenu && subitem.submenu.length > 0;
-                          const isNestedExpanded = expandedNestedMenus.includes(
+                          const isNestedExpanded = isNestedMenuExpanded(
                             subitem.href
                           );
 

@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { serverApi } from "@/shared/lib/api";
 import { getAccessToken } from "@/shared/lib/cookies";
+import { backendMessage, backendStatus } from "@/shared/lib/api-error";
 
 export async function GET() {
   try {
@@ -32,12 +33,14 @@ export async function GET() {
       { status: "Failure", message: data?.message || "فشل في جلب الشروط والأحكام", data: null },
       { status: 400 },
     );
-  } catch (error: any) {
-    const status = error?.response?.status || 500;
-    const message = error?.response?.data?.message || "حدث خطأ غير متوقع";
+  } catch (error: unknown) {
     return NextResponse.json(
-      { status: "Failure", message, data: null },
-      { status },
+      {
+        status: "Failure",
+        message: backendMessage(error, "حدث خطأ غير متوقع"),
+        data: null,
+      },
+      { status: backendStatus(error) },
     );
   }
 }

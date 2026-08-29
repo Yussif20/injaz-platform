@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -46,43 +46,47 @@ function CreateFileContent() {
   const { updateAcademicYearAsync } = useUpdateProfileAcademicYear();
   const { updateProfileTypeAsync } = useUpdateProfileType();
 
-  // Form state
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedProfileType, setSelectedProfileType] = useState<number | null>(null);
+  // Form state.
+  // In edit mode the current values arrive on the query string, so each field is the user's
+  // explicit choice if they have made one and the prefilled value otherwise. Deriving it
+  // this way removes the effect that used to copy the prefill into state after the
+  // reference data loaded — which briefly showed an empty dropdown on every edit.
+  const [yearChoice, setYearChoice] = useState<number | null>(null);
+  const [profileTypeChoice, setProfileTypeChoice] = useState<number | null>(null);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const [profileTypeDropdownOpen, setProfileTypeDropdownOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Image state
+  // Image state.
+  // In edit mode the existing image comes in on the query string, so it is known on the
+  // very first render and is used as the initial value. It used to be written by the effect
+  // below, which meant edit mode always painted an empty image slot before filling it in.
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(() => {
+    const imageUrlParam = isEditMode ? searchParams.get("imageUrl") : null;
+    return imageUrlParam ? normalizeImageUrl(imageUrlParam) : null;
+  });
 
   const isLoading = yearsLoading || profileTypesLoading;
 
-  // Pre-fill fields in edit mode
-  useEffect(() => {
-    if (!isEditMode) return;
-
-    // Show existing image immediately (doesn't depend on API data)
-    const imageUrlParam = searchParams.get("imageUrl");
-    if (imageUrlParam) {
-      setImagePreview(normalizeImageUrl(imageUrlParam));
-    }
-
-    if (isLoading) return;
-
+  // The year arrives on the query string as a *name*, so it can only be resolved to an id
+  // once the reference data has loaded. Until then this is null and the placeholder shows.
+  const prefilledYear = useMemo(() => {
+    if (!isEditMode) return null;
     const yearParam = searchParams.get("year");
-    if (yearParam && academicYears.length > 0) {
-      const match = academicYears.find((y) => y.yearName === yearParam);
-      if (match) setSelectedYear(match.id);
-    }
+    if (!yearParam) return null;
+    return academicYears.find((y) => y.yearName === yearParam)?.id ?? null;
+  }, [isEditMode, searchParams, academicYears]);
 
+  const prefilledProfileType = useMemo(() => {
+    if (!isEditMode) return null;
     const profileTypeIdParam = searchParams.get("profileTypeId");
-    if (profileTypeIdParam) {
-      setSelectedProfileType(Number(profileTypeIdParam));
-    }
-  }, [isEditMode, isLoading, searchParams, academicYears]);
+    return profileTypeIdParam ? Number(profileTypeIdParam) : null;
+  }, [isEditMode, searchParams]);
+
+  const selectedYear = yearChoice ?? prefilledYear;
+  const selectedProfileType = profileTypeChoice ?? prefilledProfileType;
 
   const hasProfileTypes = profileTypes.length > 0;
   const isFormValid = selectedYear !== null && selectedProfileType !== null && hasProfileTypes;
@@ -363,7 +367,7 @@ function CreateFileContent() {
                           key={year.id}
                           type="button"
                           onClick={() => {
-                            setSelectedYear(year.id);
+                            setYearChoice(year.id);
                             setYearDropdownOpen(false);
                           }}
                           className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${selectedYear === year.id ? "bg-grey-50" : ""}`}
@@ -425,7 +429,7 @@ function CreateFileContent() {
                           key={pt.id}
                           type="button"
                           onClick={() => {
-                            setSelectedProfileType(pt.id);
+                            setProfileTypeChoice(pt.id);
                             setProfileTypeDropdownOpen(false);
                           }}
                           className={`w-full px-4 py-3 text-right hover:bg-grey-50 transition-colors flex items-center justify-between ${selectedProfileType === pt.id ? "bg-grey-50" : ""}`}

@@ -19,9 +19,15 @@ export function TermsModal({ isOpen, onClose, onAccept }: TermsModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  // Fetch terms content when modal opens
+  // Fetch the terms the first time the modal is opened, then keep them for the session.
+  //
+  // `html` has to stay in the dependency list because the effect reads it, so setting it
+  // re-runs this effect. Bailing out at the top makes that re-run a no-op. It previously
+  // fell through to `else setLoading(false)`, a synchronous setState on every re-run that
+  // React flagged as a cascading render — and one that could never do anything, since the
+  // `finally` below has already cleared the flag.
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || html) return;
     let cancelled = false;
 
     async function fetchTerms() {
@@ -42,8 +48,7 @@ export function TermsModal({ isOpen, onClose, onAccept }: TermsModalProps) {
       }
     }
 
-    if (!html) fetchTerms();
-    else setLoading(false);
+    fetchTerms();
 
     return () => { cancelled = true; };
   }, [isOpen, html]);

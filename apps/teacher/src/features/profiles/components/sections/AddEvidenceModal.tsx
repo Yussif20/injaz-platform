@@ -28,15 +28,8 @@ export const AddEvidenceModal: React.FC<AddEvidenceModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ title?: string; image?: string }>({});
 
-  // Reset form when modal opens/closes
-  useEffect(() => {
-    if (!isOpen) {
-      setImageTitle("");
-      setSelectedImage(null);
-      setImagePreview(null);
-      setErrors({});
-    }
-  }, [isOpen]);
+  // No reset effect. The parent mounts this modal only while it is open, so the state
+  // above is created fresh on open and discarded on close.
 
   // Handle escape key
   useEffect(() => {

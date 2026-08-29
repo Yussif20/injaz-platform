@@ -90,17 +90,20 @@ export default function ProfilePreviewPage() {
   const { profiles } = useMyProfiles();
   const profileFromList = profiles.find((p) => String(p.id) === profileId);
 
-  // Selected template state - initialized from profile data
+  // The chosen template is the saved one until the user picks another, so it is state that
+  // the server value seeds. Adopting a newly-arrived server value during render — rather
+  // than from an effect — means the preview never paints the default template for a frame
+  // before correcting itself to the one actually saved.
+  const savedTemplateId = profileDetails?.templateId as TemplateId | undefined;
   const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId>(
     TemplateId.Default,
   );
+  const [lastSavedTemplateId, setLastSavedTemplateId] = useState(savedTemplateId);
 
-  // Update selectedTemplateId when profileDetails loads
-  useEffect(() => {
-    if (profileDetails?.templateId) {
-      setSelectedTemplateId(profileDetails.templateId as TemplateId);
-    }
-  }, [profileDetails?.templateId]);
+  if (savedTemplateId !== undefined && savedTemplateId !== lastSavedTemplateId) {
+    setLastSavedTemplateId(savedTemplateId);
+    setSelectedTemplateId(savedTemplateId);
+  }
 
   // Persist template selection to backend
   const handleTemplateChange = useCallback(async (templateId: TemplateId) => {

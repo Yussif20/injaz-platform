@@ -1,6 +1,13 @@
 "use client";
 
-import React, { Suspense, useState, useEffect, useRef } from "react";
+import React, {
+  Suspense,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -109,84 +116,60 @@ function ManageSubscriptionContent() {
   } = useMySubscription();
   const { subscribe, isLoading: subscribing } = useSubscribe();
 
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  // The countdown is a pure function of the end date and the current time, so it is derived
+  // rather than stored. The interval below only marks time passing; it does not keep a copy
+  // of the answer. The effect previously wrote the whole countdown into state, including a
+  // synchronous write on mount whenever the backend supplied no end date.
+  const [nowTick, setNowTick] = useState(() => Date.now());
 
-  // Compute countdown values (days / hours / minutes / seconds)
   useEffect(() => {
-    if (!info) return;
-
-    // If backend only gives days, show them and keep smaller units at zero
-    if (!info.endDate) {
-      setTimeLeft({
-        days: info.daysRemaining ?? 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      });
-      return;
-    }
-
-    const targetTime = new Date(info.endDate).getTime();
-
-    const update = () => {
-      const now = Date.now();
-      let diff = targetTime - now;
-
-      if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const totalSeconds = Math.floor(diff / 1000);
-      const days = Math.floor(totalSeconds / (24 * 60 * 60));
-      const hours = Math.floor(
-        (totalSeconds % (24 * 60 * 60)) / (60 * 60),
-      );
-      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-      const seconds = totalSeconds % 60;
-
-      setTimeLeft({ days, hours, minutes, seconds });
-    };
-
-    update();
-    const timer = setInterval(update, 1000);
+    if (!info?.endDate) return;
+    const timer = setInterval(() => setNowTick(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [info]);
+  }, [info?.endDate]);
 
-  // UI state: sync payment form visibility with ?step=confirm for breadcrumb
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const timeLeft = useMemo(() => {
+    const zero = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    if (!info) return zero;
 
-  useEffect(() => {
-    if (searchParams.get("step") === "confirm") {
-      setShowPaymentForm(true);
-    }
-  }, [searchParams]);
+    // When the backend gives only a day count, show it and leave the smaller units at zero.
+    if (!info.endDate) return { ...zero, days: info.daysRemaining ?? 0 };
+
+    const diff = new Date(info.endDate).getTime() - nowTick;
+    if (diff <= 0) return zero;
+
+    const totalSeconds = Math.floor(diff / 1000);
+    return {
+      days: Math.floor(totalSeconds / (24 * 60 * 60)),
+      hours: Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60)),
+      minutes: Math.floor((totalSeconds % (60 * 60)) / 60),
+      seconds: totalSeconds % 60,
+    };
+  }, [info, nowTick]);
+
+  // The URL is the source of truth for whether the payment step is showing — that is what
+  // makes the breadcrumb and the browser back button work. Reading it directly removes the
+  // duplicate copy in state, and with it the effect that pushed one into the other.
+  const showPaymentForm = searchParams.get("step") === "confirm";
 
   const setShowPaymentFormWithUrl = (show: boolean) => {
-    setShowPaymentForm(show);
     const path = "/dashboard/account/subscription/manage";
-    if (show) {
-      router.replace(`${path}?step=confirm`, { scroll: false });
-    } else {
-      router.replace(path, { scroll: false });
-    }
+    router.replace(show ? `${path}?step=confirm` : path, { scroll: false });
   };
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>("visa");
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [applePayAvailable, setApplePayAvailable] = useState(false);
 
-  useEffect(() => {
-    setApplePayAvailable(
-      "ApplePaySession" in window && ApplePaySession.canMakePayments(),
-    );
-  }, []);
+  // Apple Pay support is a fact about the browser, not application state. `window` cannot
+  // be touched while rendering on the server, which is why this was an effect; reading it
+  // through useSyncExternalStore gets the same client-only answer without the extra render,
+  // and gives the server an explicit `false` to render instead of a value it must correct.
+  const applePayAvailable = useSyncExternalStore(
+    () => () => {},
+    () => "ApplePaySession" in window && ApplePaySession.canMakePayments(),
+    () => false,
+  );
 
   // Card form state
   const [cardName, setCardName] = useState("");

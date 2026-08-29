@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useRef, useState, useEffect, type KeyboardEvent, type ClipboardEvent } from "react";
+import { useRef, useMemo, type KeyboardEvent, type ClipboardEvent } from "react";
 
 interface OtpInputProps {
   length?: number;
@@ -21,18 +21,16 @@ export function OtpInput({
   error,
   disabled = false,
 }: OtpInputProps) {
-  const [otp, setOtp] = useState<string[]>(Array(length).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Sync external value with internal state
-  useEffect(() => {
-    if (value) {
-      const valueArray = value.split("").slice(0, length);
-      const padded = [...valueArray, ...Array(length - valueArray.length).fill("")];
-      setOtp(padded);
-    } else {
-      setOtp(Array(length).fill(""));
-    }
+  // The component is fully controlled: `value` is the single source of truth and every
+  // edit is reported through `onChange`. Deriving the per-box digits during render keeps
+  // it that way. Mirroring `value` into state and re-syncing it from an effect would
+  // render twice for every keystroke, and leaves a window where the boxes disagree with
+  // the value the parent holds.
+  const otp = useMemo<string[]>(() => {
+    const digits = value.split("").slice(0, length);
+    return Array.from({ length }, (_, i) => digits[i] ?? "");
   }, [value, length]);
 
   const focusInput = (index: number) => {
@@ -49,7 +47,6 @@ export function OtpInput({
 
     const newOtp = [...otp];
     newOtp[index] = digit;
-    setOtp(newOtp);
     onChange(newOtp.join(""));
 
     // Move to next input if digit entered
@@ -78,7 +75,6 @@ export function OtpInput({
     if (pastedData) {
       const newOtp = pastedData.split("");
       const padded = [...newOtp, ...Array(length - newOtp.length).fill("")];
-      setOtp(padded);
       onChange(padded.join(""));
 
       // Focus last filled input or last input

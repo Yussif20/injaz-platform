@@ -292,24 +292,31 @@ export default function ProfileSectionsPage() {
         ))}
       </div>
 
-      {/* Add Evidence Modal */}
-      <AddEvidenceModal
-        isOpen={isAddModalOpen}
-        onClose={handleAddModalClose}
-        onSubmit={handleSubmitEvidence}
-        isLoading={isAddingImage}
-        apiError={addEvidenceError}
-      />
+      {/* Add Evidence Modal.
+          Mounted only while open, so its form state is built fresh on open and discarded
+          on close. These modals used to stay mounted and clear themselves from an effect,
+          which cost a second render every time one closed. */}
+      {isAddModalOpen && (
+        <AddEvidenceModal
+          isOpen
+          onClose={handleAddModalClose}
+          onSubmit={handleSubmitEvidence}
+          isLoading={isAddingImage}
+          apiError={addEvidenceError}
+        />
+      )}
 
       {/* Edit Evidence Modal */}
-      <EditEvidenceModal
-        isOpen={isEditModalOpen}
-        onClose={handleEditModalClose}
-        onSubmit={handleSubmitEditEvidence}
-        isLoading={isUpdatingImage}
-        image={imageToEdit}
-        apiError={editEvidenceError}
-      />
+      {isEditModalOpen && (
+        <EditEvidenceModal
+          isOpen
+          onClose={handleEditModalClose}
+          onSubmit={handleSubmitEditEvidence}
+          isLoading={isUpdatingImage}
+          image={imageToEdit}
+          apiError={editEvidenceError}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal

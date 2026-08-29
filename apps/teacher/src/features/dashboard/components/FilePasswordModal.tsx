@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { dashboardContent } from "@/content";
 import { Button } from "@/shared/components/ui";
 
@@ -15,8 +15,19 @@ interface FilePasswordModalProps {
   error?: string | null;
 }
 
-export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
-  isOpen,
+/**
+ * Gate the modal body on `isOpen` so the typed password lives exactly as long as the modal
+ * is on screen. It previously stayed mounted and blanked itself from an effect, which both
+ * cost a render on every close and left the password in React state until that effect ran.
+ *
+ * The split is here rather than at the call sites because two pages render this modal.
+ */
+export const FilePasswordModal: React.FC<FilePasswordModalProps> = (props) => {
+  if (!props.isOpen) return null;
+  return <FilePasswordModalBody {...props} />;
+};
+
+const FilePasswordModalBody: React.FC<FilePasswordModalProps> = ({
   onClose,
   mode,
   onActivate,
@@ -30,14 +41,6 @@ export const FilePasswordModal: React.FC<FilePasswordModalProps> = ({
   const { filePasswordModal } = dashboardContent;
 
   const isPasswordValid = password.length >= 1;
-
-  useEffect(() => {
-    if (!isOpen) {
-      setPassword("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

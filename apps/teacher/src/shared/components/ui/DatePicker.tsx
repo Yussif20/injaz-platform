@@ -93,13 +93,6 @@ function getHijriMonthDays(hijriYear: number, hijriMonth: number): number {
 function hijriStringToGregorianDate(hijriYMD: string): Date {
   const [y, m, d] = hijriYMD.split("-").map((x) => parseInt(x, 10));
   const day1 = findGregorianForHijriDay1(y, m);
-/** Format Hijri YYYY-MM-DD for display (e.g. "15 جمادي الآخرة 1445 هـ"). */
-function formatHijriDisplay(hijriYMD: string): string {
-  const [y, m, d] = hijriYMD.split("-").map((x) => parseInt(x, 10));
-  const monthName = HIJRI_MONTHS[m - 1] ?? hijriYMD;
-  return `${d} ${monthName} ${y} هـ`;
-}
-
   return new Date(day1.getTime() + (d - 1) * 86400000);
 }
 
@@ -166,6 +159,69 @@ interface DatePickerProps {
   placeholder?: string;
 }
 
+/**
+ * Render a stored value in whichever calendar it was stored in.
+ *
+ * This was a `useMemo` over three string operations. The React Compiler could not preserve
+ * that memoization and so skipped optimizing this entire component — a poor trade for
+ * caching work this cheap. As a plain function it is out of the compiler's way, and the
+ * compiler now memoizes the component's real cost (the calendar grids) on its own.
+ */
+function formatDisplayValue(value: string | undefined): string {
+  if (!value) return "";
+  if (value.startsWith("H")) {
+    return formatHijriDisplay(value.slice(1));
+  }
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "";
+  return `${d.getDate()} ${GREGORIAN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/**
+ * The calendar position implied by a stored value, expressed in both calendars at once.
+ *
+ * Returns null when the value is absent or unparseable, meaning "leave the calendar where
+ * it is". `mode` is only present for a Hijri value: a Hijri date forces Hijri mode, while a
+ * Gregorian one leaves whichever mode the user is currently in alone.
+ */
+function calendarPositionFor(value: string | undefined): {
+  selectedDate: Date;
+  viewYear: number;
+  viewMonth: number;
+  hijriViewYear: number;
+  hijriViewMonth: number;
+  mode?: CalendarMode;
+} | null {
+  if (!value) return null;
+
+  if (value.startsWith("H")) {
+    const hijriYMD = value.slice(1);
+    const d = hijriStringToGregorianDate(hijriYMD);
+    if (isNaN(d.getTime())) return null;
+    const [y, m] = hijriYMD.split("-").map((x) => parseInt(x, 10));
+    const fallback = gregorianToHijri(d);
+    return {
+      selectedDate: d,
+      viewYear: d.getFullYear(),
+      viewMonth: d.getMonth(),
+      hijriViewYear: y ?? fallback.year,
+      hijriViewMonth: m ?? fallback.month,
+      mode: "hijri",
+    };
+  }
+
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return null;
+  const h = gregorianToHijri(d);
+  return {
+    selectedDate: d,
+    viewYear: d.getFullYear(),
+    viewMonth: d.getMonth(),
+    hijriViewYear: h.year,
+    hijriViewMonth: h.month,
+  };
+}
+
 export const DatePicker: React.FC<DatePickerProps> = ({
   label,
   value,
@@ -173,54 +229,51 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   error,
   placeholder = "اختر التاريخ",
 }) => {
+  // The calendar opens on the stored date when there is one, and on today otherwise. Both
+  // are known at first render, so they are the initial state rather than something an
+  // effect corrects afterwards — which used to open every populated picker on the current
+  // month for one frame before jumping to the saved date.
+  const initial = calendarPositionFor(value);
+  const today = new Date();
+  const todayHijri = gregorianToHijri(today);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [mode, setMode] = useState<CalendarMode>("gregorian");
+  const [mode, setMode] = useState<CalendarMode>(initial?.mode ?? "gregorian");
   const [selectedDate, setSelectedDate] = useState<Date | null>(
-    value ? new Date(value) : null,
+    initial?.selectedDate ?? null,
   );
   const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(null);
 
   // Gregorian navigation state
-  const [viewYear, setViewYear] = useState(new Date().getFullYear());
-  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+  const [viewYear, setViewYear] = useState(initial?.viewYear ?? today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initial?.viewMonth ?? today.getMonth());
 
   // Hijri navigation state
-  const [hijriViewYear, setHijriViewYear] = useState(() => {
-    return gregorianToHijri(new Date()).year;
-  });
-  const [hijriViewMonth, setHijriViewMonth] = useState(() => {
-    return gregorianToHijri(new Date()).month;
-  });
+  const [hijriViewYear, setHijriViewYear] = useState(
+    initial?.hijriViewYear ?? todayHijri.year,
+  );
+  const [hijriViewMonth, setHijriViewMonth] = useState(
+    initial?.hijriViewMonth ?? todayHijri.month,
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize from value (Gregorian "YYYY-MM-DD" or Hijri "HYYYY-MM-DD")
-  useEffect(() => {
-    if (!value) return;
-    if (value.startsWith("H")) {
-      const hijriYMD = value.slice(1);
-      const d = hijriStringToGregorianDate(hijriYMD);
-      if (!isNaN(d.getTime())) {
-        setSelectedDate(d);
-        setMode("hijri");
-        const [y, m] = hijriYMD.split("-").map((x) => parseInt(x, 10));
-        setHijriViewYear(y);
-        setHijriViewMonth(m);
-        setViewYear(d.getFullYear());
-        setViewMonth(d.getMonth());
-      }
-    } else {
-      const d = new Date(value);
-      if (!isNaN(d.getTime())) {
-        setSelectedDate(d);
-        setViewYear(d.getFullYear());
-        setViewMonth(d.getMonth());
-        const h = gregorianToHijri(d);
-        setHijriViewYear(h.year);
-        setHijriViewMonth(h.month);
-      }
+  // Re-derive the position when the value changes underneath us (a form reset, or a parent
+  // loading its data late). Done during render rather than in an effect so the calendar is
+  // never briefly showing the previous date.
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    const next = calendarPositionFor(value);
+    if (next) {
+      setSelectedDate(next.selectedDate);
+      setViewYear(next.viewYear);
+      setViewMonth(next.viewMonth);
+      setHijriViewYear(next.hijriViewYear);
+      setHijriViewMonth(next.hijriViewMonth);
+      if (next.mode) setMode(next.mode);
     }
-  }, [value]);
+  }
 
   // Close on outside click
   useEffect(() => {
@@ -294,15 +347,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   // Format display value: show in the same calendar as stored (Hijri or Gregorian)
-  const displayValue = useMemo(() => {
-    if (!value) return "";
-    if (value.startsWith("H")) {
-      return formatHijriDisplay(value.slice(1));
-    }
-    const d = new Date(value);
-    if (isNaN(d.getTime())) return "";
-    return `${d.getDate()} ${GREGORIAN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-  }, [value]);
+  const displayValue = formatDisplayValue(value);
 
   // ─── Gregorian Calendar Grid ──────────────────────────────────────────────
 

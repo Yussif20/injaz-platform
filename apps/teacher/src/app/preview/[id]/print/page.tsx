@@ -69,15 +69,15 @@ export default function PrintPreviewPage() {
 
   const [profileDetails, setProfileDetails] = useState<ProfileDetails | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // A request is only ever in flight when there is a token to send, so both of these start
+  // in the state a missing token implies rather than being corrected by the effect below.
+  const [isLoading, setIsLoading] = useState(() => Boolean(token));
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const error = token ? fetchError : "Missing token";
 
   useEffect(() => {
-    if (!token) {
-      setError("Missing token");
-      setIsLoading(false);
-      return;
-    }
+    if (!token) return;
 
     // Fetch profile details using the export token
     // The token is verified server-side in the /api/export/profile route
@@ -85,7 +85,7 @@ export default function PrintPreviewPage() {
       try {
         const res = await fetch(`/api/export/profile?token=${encodeURIComponent(token!)}`);
         if (!res.ok) {
-          setError(`Failed to fetch profile: ${res.status}`);
+          setFetchError(`Failed to fetch profile: ${res.status}`);
           setIsLoading(false);
           return;
         }
@@ -94,10 +94,10 @@ export default function PrintPreviewPage() {
           setProfileDetails(json.data.details);
           setImageUrl(json.data.imageUrl || null);
         } else {
-          setError(json.message || "Failed to fetch profile");
+          setFetchError(json.message || "Failed to fetch profile");
         }
       } catch (e) {
-        setError((e as Error).message);
+        setFetchError((e as Error).message);
       } finally {
         setIsLoading(false);
       }
