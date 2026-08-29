@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Nested lockfiles.
+# A git-subtree import brings each app's own package-lock.json, still describing it as a
+# standalone project. With a Vercel Root Directory of apps/<name> that lockfile wins over
+# the workspace root, and the app is installed against a dependency tree that predates the
+# monorepo. The build succeeds and the runtime cannot resolve a module.
+# Ignored so an npm install in the wrong directory cannot reintroduce them.
+apps/*/package-lock.json
+packages/*/package-lock.json
+
+# Build output
+.next/
+out/
+build/
+dist/
+.turbo/
+*.tsbuildinfo
+
+# Environment. Env files live per app (apps/x/.env.local), matching Vercel where each
+# project has its own variables. The root one is for scripts only.
+.env
+.env*.local
+
+# Editor / OS
+.DS_Store
+*.pem
+.vercel
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local agent settings
+.claude/settings.local.json

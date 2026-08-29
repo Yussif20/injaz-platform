@@ -1,0 +1,3 @@
+# Both legacy repositories were authored by one person under two git author names with the
+# same address. Without this, the merged history splits the contribution graph in two.
+Yousef Ayman <yousefayman2000500@gmail.com> yussif20 <yousefayman2000500@gmail.com>
